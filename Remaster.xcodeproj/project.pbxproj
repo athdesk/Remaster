@@ -7,13 +7,62 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DE9C87942A38A753002770AD /* RemasterHelperHIDApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9C87932A38A753002770AD /* RemasterHelperHIDApp.swift */; };
+		DE9C87982A38A755002770AD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DE9C87972A38A755002770AD /* Assets.xcassets */; };
+		DE9C87A52A38A8AB002770AD /* HIDBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = DE9C87A42A38A8AB002770AD /* HIDBridge.mm */; };
+		DE9C87A62A38A8BE002770AD /* BridgeMonitor.mm in Sources */ = {isa = PBXBuildFile; fileRef = DE9C876F2A3899FE002770AD /* BridgeMonitor.mm */; };
+		DE9C87A72A38A918002770AD /* libhidpp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DE1D62112A388A09009DAA65 /* libhidpp.a */; };
+		DE9C87A92A38BD53002770AD /* MainLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9C87A82A38BD53002770AD /* MainLogic.swift */; };
+		DE9C87AF2A38C26F002770AD /* MxHIDDevice.mm in Sources */ = {isa = PBXBuildFile; fileRef = DE9C87AE2A38C26F002770AD /* MxHIDDevice.mm */; };
+		DE9C87B22A38D0B2002770AD /* SwiftMX.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9C87B12A38D0B2002770AD /* SwiftMX.swift */; };
+		DE9C87B42A39113E002770AD /* MenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9C87B32A39113E002770AD /* MenuView.swift */; };
+		DE9C87B62A391F2D002770AD /* Convenience.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9C87B52A391F2D002770AD /* Convenience.swift */; };
 		DEBC42092A386DDA0054F984 /* RemasterApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEBC42082A386DDA0054F984 /* RemasterApp.swift */; };
 		DEBC420B2A386DDA0054F984 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEBC420A2A386DDA0054F984 /* ContentView.swift */; };
 		DEBC420D2A386DDE0054F984 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DEBC420C2A386DDE0054F984 /* Assets.xcassets */; };
 		DEBC42102A386DDE0054F984 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DEBC420F2A386DDE0054F984 /* Preview Assets.xcassets */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		DE1D62102A388A09009DAA65 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DE1D620C2A388A09009DAA65 /* hidpp.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = DE1D62052A388A09009DAA65;
+			remoteInfo = hidpp;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		DEBC422B2A38704A0054F984 /* Embed XPC Services */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/XPCServices";
+			dstSubfolderSpec = 16;
+			files = (
+			);
+			name = "Embed XPC Services";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		DE1D620C2A388A09009DAA65 /* hidpp.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = hidpp.xcodeproj; path = ../hidpp/hidpp.xcodeproj; sourceTree = "<group>"; };
+		DE9C876F2A3899FE002770AD /* BridgeMonitor.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = BridgeMonitor.mm; sourceTree = "<group>"; };
+		DE9C87712A389A0D002770AD /* BridgeMonitor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BridgeMonitor.h; sourceTree = "<group>"; };
+		DE9C87912A38A753002770AD /* RemasterHelperHID.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RemasterHelperHID.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DE9C87932A38A753002770AD /* RemasterHelperHIDApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemasterHelperHIDApp.swift; sourceTree = "<group>"; };
+		DE9C87972A38A755002770AD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		DE9C879C2A38A755002770AD /* RemasterHelperHID.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = RemasterHelperHID.entitlements; sourceTree = "<group>"; };
+		DE9C87A22A38A8AA002770AD /* RemasterHelperHID-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RemasterHelperHID-Bridging-Header.h"; sourceTree = "<group>"; };
+		DE9C87A32A38A8AB002770AD /* HIDBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HIDBridge.h; sourceTree = "<group>"; };
+		DE9C87A42A38A8AB002770AD /* HIDBridge.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = HIDBridge.mm; sourceTree = "<group>"; };
+		DE9C87A82A38BD53002770AD /* MainLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainLogic.swift; sourceTree = "<group>"; };
+		DE9C87AD2A38C26F002770AD /* MxHIDDevice.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MxHIDDevice.h; sourceTree = "<group>"; };
+		DE9C87AE2A38C26F002770AD /* MxHIDDevice.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MxHIDDevice.mm; sourceTree = "<group>"; };
+		DE9C87B12A38D0B2002770AD /* SwiftMX.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftMX.swift; sourceTree = "<group>"; };
+		DE9C87B32A39113E002770AD /* MenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuView.swift; sourceTree = "<group>"; };
+		DE9C87B52A391F2D002770AD /* Convenience.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Convenience.swift; sourceTree = "<group>"; };
 		DEBC42052A386DDA0054F984 /* Remaster.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Remaster.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DEBC42082A386DDA0054F984 /* RemasterApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemasterApp.swift; sourceTree = "<group>"; };
 		DEBC420A2A386DDA0054F984 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -23,6 +72,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		DE9C878E2A38A753002770AD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DE9C87A72A38A918002770AD /* libhidpp.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		DEBC42022A386DDA0054F984 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -33,11 +90,59 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		DE1D620D2A388A09009DAA65 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				DE1D62112A388A09009DAA65 /* libhidpp.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		DE9C87922A38A753002770AD /* RemasterHelperHID */ = {
+			isa = PBXGroup;
+			children = (
+				DE9C87B02A38D09F002770AD /* SwiftMX */,
+				DE9C87A02A38A860002770AD /* HIDBridge */,
+				DE9C87932A38A753002770AD /* RemasterHelperHIDApp.swift */,
+				DE9C87972A38A755002770AD /* Assets.xcassets */,
+				DE9C879C2A38A755002770AD /* RemasterHelperHID.entitlements */,
+				DE9C87A82A38BD53002770AD /* MainLogic.swift */,
+				DE9C87B32A39113E002770AD /* MenuView.swift */,
+			);
+			path = RemasterHelperHID;
+			sourceTree = "<group>";
+		};
+		DE9C87A02A38A860002770AD /* HIDBridge */ = {
+			isa = PBXGroup;
+			children = (
+				DE9C87A22A38A8AA002770AD /* RemasterHelperHID-Bridging-Header.h */,
+				DE9C87A32A38A8AB002770AD /* HIDBridge.h */,
+				DE9C87A42A38A8AB002770AD /* HIDBridge.mm */,
+				DE9C87712A389A0D002770AD /* BridgeMonitor.h */,
+				DE9C876F2A3899FE002770AD /* BridgeMonitor.mm */,
+				DE9C87AD2A38C26F002770AD /* MxHIDDevice.h */,
+				DE9C87AE2A38C26F002770AD /* MxHIDDevice.mm */,
+			);
+			path = HIDBridge;
+			sourceTree = "<group>";
+		};
+		DE9C87B02A38D09F002770AD /* SwiftMX */ = {
+			isa = PBXGroup;
+			children = (
+				DE9C87B12A38D0B2002770AD /* SwiftMX.swift */,
+				DE9C87B52A391F2D002770AD /* Convenience.swift */,
+			);
+			path = SwiftMX;
+			sourceTree = "<group>";
+		};
 		DEBC41FC2A386DDA0054F984 = {
 			isa = PBXGroup;
 			children = (
+				DE1D620C2A388A09009DAA65 /* hidpp.xcodeproj */,
 				DEBC42072A386DDA0054F984 /* Remaster */,
+				DE9C87922A38A753002770AD /* RemasterHelperHID */,
 				DEBC42062A386DDA0054F984 /* Products */,
+				DEBC42522A38760F0054F984 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -45,6 +150,7 @@
 			isa = PBXGroup;
 			children = (
 				DEBC42052A386DDA0054F984 /* Remaster.app */,
+				DE9C87912A38A753002770AD /* RemasterHelperHID.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -69,9 +175,33 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
+		DEBC42522A38760F0054F984 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		DE9C87902A38A753002770AD /* RemasterHelperHID */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DE9C879D2A38A755002770AD /* Build configuration list for PBXNativeTarget "RemasterHelperHID" */;
+			buildPhases = (
+				DE9C878D2A38A753002770AD /* Sources */,
+				DE9C878E2A38A753002770AD /* Frameworks */,
+				DE9C878F2A38A753002770AD /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = RemasterHelperHID;
+			productName = RemasterHelperHID;
+			productReference = DE9C87912A38A753002770AD /* RemasterHelperHID.app */;
+			productType = "com.apple.product-type.application";
+		};
 		DEBC42042A386DDA0054F984 /* Remaster */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = DEBC42142A386DDE0054F984 /* Build configuration list for PBXNativeTarget "Remaster" */;
@@ -79,6 +209,7 @@
 				DEBC42012A386DDA0054F984 /* Sources */,
 				DEBC42022A386DDA0054F984 /* Frameworks */,
 				DEBC42032A386DDA0054F984 /* Resources */,
+				DEBC422B2A38704A0054F984 /* Embed XPC Services */,
 			);
 			buildRules = (
 			);
@@ -99,6 +230,10 @@
 				LastSwiftUpdateCheck = 1430;
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
+					DE9C87902A38A753002770AD = {
+						CreatedOnToolsVersion = 14.3;
+						LastSwiftMigration = 1430;
+					};
 					DEBC42042A386DDA0054F984 = {
 						CreatedOnToolsVersion = 14.3;
 					};
@@ -115,14 +250,39 @@
 			mainGroup = DEBC41FC2A386DDA0054F984;
 			productRefGroup = DEBC42062A386DDA0054F984 /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = DE1D620D2A388A09009DAA65 /* Products */;
+					ProjectRef = DE1D620C2A388A09009DAA65 /* hidpp.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				DEBC42042A386DDA0054F984 /* Remaster */,
+				DE9C87902A38A753002770AD /* RemasterHelperHID */,
 			);
 		};
 /* End PBXProject section */
 
+/* Begin PBXReferenceProxy section */
+		DE1D62112A388A09009DAA65 /* libhidpp.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libhidpp.a;
+			remoteRef = DE1D62102A388A09009DAA65 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
+
 /* Begin PBXResourcesBuildPhase section */
+		DE9C878F2A38A753002770AD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DE9C87982A38A755002770AD /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		DEBC42032A386DDA0054F984 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -135,6 +295,21 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		DE9C878D2A38A753002770AD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DE9C87B42A39113E002770AD /* MenuView.swift in Sources */,
+				DE9C87B62A391F2D002770AD /* Convenience.swift in Sources */,
+				DE9C87A52A38A8AB002770AD /* HIDBridge.mm in Sources */,
+				DE9C87A92A38BD53002770AD /* MainLogic.swift in Sources */,
+				DE9C87942A38A753002770AD /* RemasterHelperHIDApp.swift in Sources */,
+				DE9C87AF2A38C26F002770AD /* MxHIDDevice.mm in Sources */,
+				DE9C87B22A38D0B2002770AD /* SwiftMX.swift in Sources */,
+				DE9C87A62A38A8BE002770AD /* BridgeMonitor.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		DEBC42012A386DDA0054F984 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -147,6 +322,67 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		DE9C879E2A38A755002770AD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = RemasterHelperHID/RemasterHelperHID.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9KLSAWARBP;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../hidpp/\"";
+				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = me.athdesk.RemasterHelperHID;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "RemasterHelperHID/HIDBridge/RemasterHelperHID-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		DE9C879F2A38A755002770AD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = RemasterHelperHID/RemasterHelperHID.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9KLSAWARBP;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../hidpp/\"";
+				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = me.athdesk.RemasterHelperHID;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "RemasterHelperHID/HIDBridge/RemasterHelperHID-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 		DEBC42122A386DDE0054F984 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -317,6 +553,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		DE9C879D2A38A755002770AD /* Build configuration list for PBXNativeTarget "RemasterHelperHID" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DE9C879E2A38A755002770AD /* Debug */,
+				DE9C879F2A38A755002770AD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		DEBC42002A386DDA0054F984 /* Build configuration list for PBXProject "Remaster" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
