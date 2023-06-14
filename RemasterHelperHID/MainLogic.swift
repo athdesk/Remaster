@@ -57,8 +57,11 @@ func start() {
     ]
     let x = HIDDeviceMonitor(SupportedDevices, reportSize: 10)
     
+    var y: HIDDevice?
+    
     NotificationCenter.default.addObserver(forName: .HIDDeviceConnected, object: nil, queue: nil) { n in
-        var device = n.object as! HIDDevice
+        let device = n.object as! HIDDevice
+        y = device
         print("Device Connected (Swift) \(device)")
     }
     
@@ -67,11 +70,29 @@ func start() {
         print("Device Disconnected (Swift) \(device)")
     }
     
-    NotificationCenter.default.addObserver(forName: .HIDDeviceDataReceived, object: nil, queue: nil) { n in
+    NotificationCenter.default.addObserver(forName: .HIDDeviceExtraDataReceived(), object: nil, queue: nil) { n in
         let device = n.object as! HIDDevice.Report
         print(device.reportData.base64EncodedString())
     }
     
-    x.start()
+    DispatchQueue.global(qos: .utility).async {
+        x.start()
+    }
     
+    
+    sleep(3)
+    print("eee")
+
+    
+    if y != nil {
+        var hppdev = HIDPPDevice(dev: y!, devIndex: 0)
+        print(hppdev.protocolVersion)
+    }
+    
+}
+
+extension Data {
+    var hexDescription: String {
+        return reduce("") {$0 + String(format: "%02x", $1)}
+    }
 }

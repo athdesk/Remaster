@@ -54,7 +54,7 @@ class HIDDeviceMonitor {
       
     func rawDeviceAdded(_ inResult: IOReturn, inSender: UnsafeMutableRawPointer, inIOHIDDeviceRef: IOHIDDevice!) {
         let device = HIDDevice(device:inIOHIDDeviceRef)
-        device.registerInputReportCallback()
+        device.enableNotifications()
         NotificationCenter.default.post(name: .HIDDeviceConnected, object: device)
     }
     
@@ -66,66 +66,18 @@ class HIDDeviceMonitor {
 }
 
 extension HIDDevice {
-//    public class ReportFilter {
-//        static public let defaultFilter = ReportFilter()
-//        public typealias ReportFilterClosure = (_ reportId: UInt32, _ report: Data) -> Bool
-//        public let closure: ReportFilterClosure
-//
-//        fileprivate var extraData: Any? // Since we have a whole class just to pass through a closure, we might as well store some context
-//
-//        init() {
-//            print("using blank closure")
-//            self.closure = {_,_ in return true}
-//        }
-//
-//        init(closure: @escaping ReportFilterClosure) {
-//            print("using custom closure")
-//            self.closure = closure
-//        }
-//    }
-//
-    private struct ReportStorage {
-        static var input = [HIDDevice:UnsafeMutablePointer<UInt8>]()
-//        static var filter = [HIDDevice:ReportFilter]()
-    }
-    
-    struct Report {
-        let reportData: Data
-        let sourceDevice: HIDDevice
-    }
-    
-    internal var inputReport: UnsafeMutablePointer<UInt8> {
-        if ReportStorage.input[self] == nil {
-            ReportStorage.input[self] = UnsafeMutablePointer<UInt8>.allocate(capacity: self.reportSizeIn)
-        }
-        return ReportStorage.input[self]!
-    }
-//
-//    public var reportFilter: ReportFilter.ReportFilterClosure {
-//        get {
-//            return ReportStorage.filter[self]?.closure ?? {_,_ in return true}
-//        }
-//        set {
-//            return ReportStorage.filter[self] = ReportFilter(closure: newValue)
-//        }
-//    }
-    
-    static func filter(_ reportId: UInt32, _ report: Data) -> Bool {
-        return reportId == 17
-    }
-    
-    func registerInputReportCallback() {
+    // It's better for this to be only called once so it's in an extension
+    fileprivate func enableNotifications() {
         let inputCallback: IOHIDReportCallback = { context, _, _, _, reportId, report, reportLength in
-//            let filter = unsafeBitCast(selfPtr, to: ReportFilterClosure.self)
             let device = Unmanaged<IOHIDDevice>.fromOpaque(context!).takeUnretainedValue()
             let data = Data(bytes: UnsafePointer<UInt8>(report), count: reportLength)
             if HIDDevice.filter(reportId, data) {
-                NotificationCenter.default.post(name: .HIDDeviceDataReceived, object: Report(reportData: data, sourceDevice: HIDDevice(device: device)))
+                NotificationCenter.default.post(name: .HIDDeviceExtraDataReceived(device), object: Report(reportData: data, sourceDevice: HIDDevice(device: device)))
+            } else {
+                NotificationCenter.default.post(name: .HIDDeviceDataReceived(device), object: Report(reportData: data, sourceDevice: HIDDevice(device: device)))
             }
         }
-        let filterPtr = Unmanaged.passUnretained(self.device).toOpaque() // i'm sorry
+        let filterPtr = Unmanaged.passUnretained(self.device).toOpaque()
         IOHIDDeviceRegisterInputReportCallback(device, inputReport, self.reportSizeIn, inputCallback, filterPtr)
     }
-    
-    
 }

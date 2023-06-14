@@ -11,7 +11,13 @@ import Foundation
 import IOKit.hid
 
 public extension Notification.Name {
-    static let HIDDeviceDataReceived = Notification.Name("HIDDeviceDataReceived")
+    static func HIDDeviceDataReceived(_ id: IOHIDDevice? = nil) -> Notification.Name {
+        Notification.Name("HIDDeviceDataReceived@\(String(id.hashValue ?? 0))")
+    }
+    static func HIDDeviceExtraDataReceived(_ id: IOHIDDevice? = nil) -> Notification.Name {
+        Notification.Name("HIDDeviceExtraDataReceived@\(String(id.hashValue ?? 0))")
+    }
+
     static let HIDDeviceConnected = Notification.Name("HIDDeviceConnected")
     static let HIDDeviceDisconnected = Notification.Name("HIDDeviceDisconnected")
 }
@@ -46,6 +52,13 @@ private func GenericDeviceGetIntProperty(device: IOHIDDevice, key: String) -> In
 }
 
 public struct HIDDevice : Hashable {
+    static func filter(_ reportId: UInt32, _ report: Data) -> Bool { // doing custom filters is a pain
+        return reportId == 17
+    }
+    struct Report {
+        let reportData: Data
+        let sourceDevice: HIDDevice
+    }
     public let id: Int
     public let vendorId: Int
     public let productId: Int
@@ -53,23 +66,52 @@ public struct HIDDevice : Hashable {
     public let reportSizeOut: Int
     public let device: IOHIDDevice
     public let name: String
+    public let notificationName: Notification.Name
+    public let notificationNameExtra: Notification.Name
     
     private static var knownDevices = [IOHIDDevice:Self]()
 
+    
+    // TODO: make this not static, it's not needed anymore
+    private struct ReportStorage {
+        static var input = [HIDDevice:UnsafeMutablePointer<UInt8>]()
+        static var output = [HIDDevice:UnsafeMutablePointer<UInt8>]()
+    }
+    
+    internal var inputReport: UnsafeMutablePointer<UInt8> {
+        if ReportStorage.input[self] == nil {
+            ReportStorage.input[self] = UnsafeMutablePointer<UInt8>.allocate(capacity: self.reportSizeIn)
+        }
+        return ReportStorage.input[self]!
+    }
+    
+    internal var outputReport: UnsafeMutablePointer<UInt8> {
+        if ReportStorage.output[self] == nil {
+            ReportStorage.output[self] = UnsafeMutablePointer<UInt8>.allocate(capacity: self.reportSizeOut)
+        }
+        return ReportStorage.output[self]!
+    }
+    
     public func forget() { // better for this to be manual
         HIDDevice.knownDevices.removeValue(forKey: self.device)
     }
+    
+    public func writeReport(withData d: Data) -> Bool {
+        if d.count > reportSizeOut {
+            print("Report size has to be at most \(reportSizeOut) bytes")
+            return false
+        }
+        
+        d.copyBytes(to: outputReport, count: reportSizeOut)
+        
+        let res = IOHIDDeviceSetReport(device,
+                             kIOHIDReportTypeOutput,
+                             CFIndex(d[0]),
+                             outputReport,
+                             d.count);
+        return res == kIOReturnSuccess
+    }
 
-    public func getStringProperty(key: String) -> String {
-        let value = IOHIDDeviceGetProperty(self.device, key as CFString)
-        return value as? String ?? ""
-    }
-    
-    public func getIntProperty(key: String) -> Int {
-        let value = IOHIDDeviceGetProperty(self.device, key as CFString)
-        return value as? Int ?? 0
-    }
-    
     static public func ==(lhs: HIDDevice, rhs: HIDDevice) -> Bool {
         return lhs.id == rhs.id
     }
@@ -90,6 +132,8 @@ public struct HIDDevice : Hashable {
         self.productId = GenericDeviceGetIntProperty(device: self.device, key: kIOHIDProductIDKey)
         self.reportSizeIn = GenericDeviceGetIntProperty(device: self.device, key: kIOHIDMaxInputReportSizeKey)
         self.reportSizeOut = GenericDeviceGetIntProperty(device: self.device, key: kIOHIDMaxOutputReportSizeKey)
+        self.notificationName =  Notification.Name.HIDDeviceDataReceived(device)
+        self.notificationNameExtra = Notification.Name.HIDDeviceExtraDataReceived(device)
         HIDDevice.knownDevices[device] = self
     }
 }

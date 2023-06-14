@@ -20,6 +20,8 @@
 		DE9C87B82A39BA4D002770AD /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9C87B72A39BA4D002770AD /* Preferences.swift */; };
 		DE9C87BB2A39EAC1002770AD /* DeviceMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9C87BA2A39EAC1002770AD /* DeviceMonitor.swift */; };
 		DE9C87BD2A39EAEC002770AD /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9C87BC2A39EAEC002770AD /* Device.swift */; };
+		DE9C87BF2A3A34AA002770AD /* HID++.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9C87BE2A3A34AA002770AD /* HID++.swift */; };
+		DE9C87C12A3A66B4002770AD /* HID++10.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9C87C02A3A66B4002770AD /* HID++10.swift */; };
 		DEBC42092A386DDA0054F984 /* RemasterApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEBC42082A386DDA0054F984 /* RemasterApp.swift */; };
 		DEBC420B2A386DDA0054F984 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEBC420A2A386DDA0054F984 /* ContentView.swift */; };
 		DEBC420D2A386DDE0054F984 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DEBC420C2A386DDE0054F984 /* Assets.xcassets */; };
@@ -69,6 +71,8 @@
 		DE9C87B72A39BA4D002770AD /* Preferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
 		DE9C87BA2A39EAC1002770AD /* DeviceMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceMonitor.swift; sourceTree = "<group>"; };
 		DE9C87BC2A39EAEC002770AD /* Device.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Device.swift; sourceTree = "<group>"; };
+		DE9C87BE2A3A34AA002770AD /* HID++.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HID++.swift"; sourceTree = "<group>"; };
+		DE9C87C02A3A66B4002770AD /* HID++10.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HID++10.swift"; sourceTree = "<group>"; };
 		DEBC42052A386DDA0054F984 /* Remaster.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Remaster.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DEBC42082A386DDA0054F984 /* RemasterApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemasterApp.swift; sourceTree = "<group>"; };
 		DEBC420A2A386DDA0054F984 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -148,6 +152,8 @@
 			children = (
 				DE9C87BA2A39EAC1002770AD /* DeviceMonitor.swift */,
 				DE9C87BC2A39EAEC002770AD /* Device.swift */,
+				DE9C87BE2A3A34AA002770AD /* HID++.swift */,
+				DE9C87C02A3A66B4002770AD /* HID++10.swift */,
 			);
 			path = SwiftHID;
 			sourceTree = "<group>";
@@ -320,11 +326,13 @@
 				DE9C87BB2A39EAC1002770AD /* DeviceMonitor.swift in Sources */,
 				DE9C87B42A39113E002770AD /* MenuView.swift in Sources */,
 				DE9C87B62A391F2D002770AD /* Convenience.swift in Sources */,
+				DE9C87C12A3A66B4002770AD /* HID++10.swift in Sources */,
 				DE9C87A52A38A8AB002770AD /* HIDBridge.mm in Sources */,
 				DE9C87A92A38BD53002770AD /* MainLogic.swift in Sources */,
 				DE9C87942A38A753002770AD /* RemasterHelperHIDApp.swift in Sources */,
 				DE9C87AF2A38C26F002770AD /* MxHIDDevice.mm in Sources */,
 				DE9C87B22A38D0B2002770AD /* SwiftMX.swift in Sources */,
+				DE9C87BF2A3A34AA002770AD /* HID++.swift in Sources */,
 				DE9C87A62A38A8BE002770AD /* BridgeMonitor.mm in Sources */,
 				DE9C87B82A39BA4D002770AD /* Preferences.swift in Sources */,
 			);
