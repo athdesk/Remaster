@@ -17,7 +17,7 @@ struct RemasterHelperHIDApp: App {
     }
   
     init() {
-        DispatchQueue.global(qos: .userInitiated).async { // using this qos to get scheduled well
+        DispatchQueue.global(qos: .utility).async { // using this qos to get scheduled well
             print("Backgroud thread started")
             start()
         }

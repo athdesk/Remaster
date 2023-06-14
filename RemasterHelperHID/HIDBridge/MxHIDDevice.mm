@@ -16,6 +16,7 @@
 
 static HIDPP20::Device* internalDevice;
 
+// TODO: group dispatchers by path, if this program ever has to support > 1 device at once. We must not have 2 dispatchers for one device.
 - (BOOL)initializeWithDevpath:(NSString*)devpath index:(int)index {
     
     auto pathCStr = [devpath UTF8String];

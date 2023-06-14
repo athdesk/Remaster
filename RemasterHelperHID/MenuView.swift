@@ -28,25 +28,24 @@ class ViewData : ObservableObject {
 }
 
 struct MenuView: View {
-    @State var dpiSlider: Float = 1200.0
+    @State var dpiSlider: Float = Float(DefaultMousePreferences.dpi)
     @ObservedObject var data: ViewData = ViewData.sharedInstance
-    @State var DeviceConnected: Bool = false
+    @ObservedObject var watcher: ConnectionWatcher = ConnectionWatcher.sharedInstance
     
     var body: some View {
         VStack {
             Text("Current DPI: \(data.dpiReport)")
-            Slider(value: $dpiSlider, in: ClosedRange(uncheckedBounds: (100, 8000)), step: 200.0, onEditingChanged: { x in
-                if (!x) {
-                    if (CurrentMXDevice != nil) {
-                        CurrentMXDevice!.setMouseDPI(val: UInt32(dpiSlider))
-                    }
-                }
-            })
-            .disabled(DeviceConnected)
+            Slider(value: $dpiSlider, in: ClosedRange(uncheckedBounds: (200, 8000)), step: 200.0)
+            .disabled(!watcher.status)
             
         }
         .padding(16)
         .frame(maxWidth: 240)
         .onAppear()
+        .onChange(of: dpiSlider, perform: { x in
+            if (CurrentMXDevice != nil) {
+                CurrentMXDevice!.setMouseDPI(val: UInt32(x))
+            }
+        })
     }
 }
