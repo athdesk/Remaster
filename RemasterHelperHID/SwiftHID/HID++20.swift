@@ -7,22 +7,44 @@
 
 import Foundation
 
-//protocol Feature : Equatable {
-//    var ID: Int16 { get }
-//    associatedtype Func: RawRepresentable where Func.RawValue == UInt8
-//}
+typealias FeatureID = UInt16
+
+protocol IFeature : RawRepresentable where RawValue == FunctionID {
+    static var ID: FeatureID { get }
+    static var index: FeatureIndex { get }
+}
+
+extension IFeature {
+    func Call(parameters: [UInt8] = [], timeout: TimeInterval = 1) -> HIDPP.CustomReport {
+        let t = HIDPP.CustomReport.type(fromLen: parameters.count + 4)
+        var call = HIDPP.CustomReport(t, Self.index, self.rawValue)
+        call.parameters = parameters
+        return call
+    }
+}
 
 extension HIDPP {
+
     struct v20 {
-//        struct DPI: Feature {
-//            let ID: Int16 = 0x2201
-//            enum Func: UInt8 {
+        enum IRoot : FunctionID, IFeature {
+            static let ID: FeatureID = 0x0000
+            static let index: FeatureIndex = 0x00
+
+            case GetFeature = 0
+            case Ping = 1
+        }
+        
+//        struct DPI : IFeature {
+//            static let ID: FeatureID = 0x2201
+//            static let index: FeatureIndex = 0
+//            enum Function: FunctionID {
 //                case GetSensorCount = 0
 //                case GetSensorDPIList = 1
 //                case GetSensorDPI = 2
 //                case SetSensorDPI = 3
 //            }
 //        }
+//
         enum SubID: UInt8 {
             case ErrorMessage = 0xFF
 
@@ -49,19 +71,40 @@ extension HIDPP {
 }
 
 extension HIDPP.CustomReport {
+    init<T : RawRepresentable>(_ t: RType,
+                               _ feat: FeatureIndex,
+                               _ fun: T,
+                               _ swId: UInt8? = nil,
+                               _ dev: UInt8? = nil) where T.RawValue == FunctionID {
+        self.init(t, feat, fun.rawValue, swId, dev)
+    }
+    
     func CheckError20() -> HIDPP.v20.ErrorCode {
         guard self.subID == HIDPP.v20.SubID.ErrorMessage else { return .Success }
         return HIDPP.v20.ErrorCode(rawValue: self.parameters[1]) ?? .Invalid
     }
 }
 
-extension HIDPPDevice {
-    func CallFunction(featureIndex: UInt8, function: UInt8, parameters: [UInt8], timeout: TimeInterval = 1) -> HIDPP.CustomReport? {
-        //TODO: check if device supports receiving parameters (size)
-        let t = HIDPP.CustomReport.type(fromLen: parameters.count + 4)
-        var call = MakeReport(t, featureIndex, function)
-        call.parameters = parameters
-        return SendCommand(call, timeout: timeout)
+extension HIDPP.Device {
+    typealias Proto = HIDPP.v20
+    var protocolVersion: String { GetProtocolVersion() } // should not be expensive enough to warrant doing it lazily
+    
+    private func GetProtocolVersion() -> String {
+        let call = Proto.IRoot.Ping.Call(parameters: .init(repeating: 0, count: 8))
+        let response = SendCommand(call, timeout: 1)
+        if response != nil {
+            let errCode = response!.CheckError10()
+            if errCode == .InvalidSubID { return "1.0" }
+            if errCode == .Success { return "\(response!.parameters[0]).\(response!.parameters[1])" }
+        }
+        return "Invalid"
+    }
+    
+    func GetFeatureIndex(forID f: FeatureID) -> FeatureIndex? {
+        let p = f.bigEndian.bytes
+        let call = Proto.IRoot.GetFeature.Call(parameters: p)
+        let r = SendCommand(call)
+        return r?.unwrap()[0]
     }
 }
 

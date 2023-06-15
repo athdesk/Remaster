@@ -85,7 +85,7 @@ func start() {
 
     
     if y != nil {
-        var hppdev = HIDPPDevice(dev: y!, devIndex: 0)
+        var hppdev = HIDPP.Device(dev: y!, devIndex: 0)
         print(hppdev.protocolVersion)
     }
     

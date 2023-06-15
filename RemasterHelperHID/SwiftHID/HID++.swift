@@ -7,18 +7,21 @@
 
 import Foundation
 
+typealias FeatureIndex = UInt8
+typealias FunctionID = UInt8
+
 struct HIDPP {
-    enum RType: UInt8 {
-        case Short = 0x10
-        case Long = 0x11
-        case Huge = 0x12
-        case Invalid
-    }
-    
     struct CustomReport {
         private var d: Data
         
-        var type: HIDPP.RType {
+        enum RType: UInt8 {
+            case Short = 0x10
+            case Long = 0x11
+            case Huge = 0x12
+            case Invalid
+        }
+        
+        var type: RType {
             get {
                 switch d[0] {
                 case 0x10:
@@ -39,7 +42,7 @@ struct HIDPP {
             set { d[1] = newValue}
         }
         
-        var subID: UInt8 {
+        var subID: FeatureIndex {
             get { d[2] }
             set { d[2] = newValue}
         }
@@ -59,7 +62,7 @@ struct HIDPP {
             }
         }
         
-        var function: UInt8 {
+        var function: FunctionID {
             get { d[3] >> 4 }
             set { d[3] = newValue << 4 | d[3] & 0x0F}
         }
@@ -68,7 +71,7 @@ struct HIDPP {
             get { d[3] & 0x0F }
             set { d[3] = d[3] & 0xF0 | newValue & 0x0F}
         }
-
+        
         public static func type(fromLen l: Int) -> RType {
             if l <= 7 { return .Short }
             if l <= 20 { return .Long }
@@ -88,7 +91,7 @@ struct HIDPP {
                 return 64
             }
         }
-
+        
         public func unwrap() -> Data {
             return d
         }
@@ -101,68 +104,61 @@ struct HIDPP {
             d = Data(count: CustomReport.len(fromType: type))
             self.type = type
         }
-    }
-    
-    static func MakeReport(_ t: RType, _ dev: UInt8, _ feat: UInt8, _ fun: UInt8, _ swId: UInt8) -> CustomReport {
-        var report = CustomReport(withType: t)
-        report.deviceIndex = dev
-        report.subID = feat
-        report.function = fun
-        report.swId = swId
-        return report
-    }
-}
-
-struct HIDPPDevice {
-    private let hid: HIDDevice
-    private let devIndex: UInt8
-    
-    var protocolVersion: String { GetProtocolVersion() } // should not be expensive enough to warrant doing it lazily
-    
-    private func GetProtocolVersion() -> String {
-        let call = MakeReport(.Long, 0, 1, 1) // TODO: use enums
-        let response = SendCommand(call, timeout: 1)
-        if response != nil {
-            let errCode = response!.CheckError10()
-            if errCode == .InvalidSubID { return "1.0" }
-            if errCode == .Success { return "\(response!.parameters[0]).\(response!.parameters[1])" }
+        
+        init(_ t: RType,
+                               _ feat: FeatureIndex,
+                               _ fun: FunctionID,
+                               _ swId: UInt8? = nil,
+                               _ dev: UInt8? = nil) {
+            d = Data(count: CustomReport.len(fromType: t))
+            self.type = t
+            self.deviceIndex = dev ?? 0 // this is to make it possible to manually populate
+            self.subID = feat
+            self.function = fun
+            self.swId = swId ?? 1 // seems to always be 1
         }
-        return "Invalid"
-    }
-    
-    // swId defaults to 1 because apparently that's how it's done
-    func MakeReport(_ t: HIDPP.RType, _ feat: UInt8, _ fun: UInt8, _ swId: UInt8 = 1) -> HIDPP.CustomReport {
-        HIDPP.MakeReport(t, devIndex, feat, fun, swId)
+        
     }
 
-    func SendCommand(_ report: HIDPP.CustomReport, timeout: TimeInterval = .infinity) -> HIDPP.CustomReport? {
-        let s = hid.writeReport(withData: report.unwrap())
-        guard s == true else { return nil }
-        let receiveLock = NSLock()
-        receiveLock.lock()
+    struct Device {
+        private let hid: HIDDevice
+        private let devIndex: UInt8
+               
+        // swId defaults to 1 because apparently that's how it's done
+        func MakeReport(_ t: HIDPP.CustomReport.RType, _ feat: FeatureIndex, _ fun: FunctionID, _ swId: UInt8 = 1) -> HIDPP.CustomReport {
+            HIDPP.CustomReport(t, feat, fun, swId, devIndex)
+        }
         
-        var result: HIDPP.CustomReport? = nil
-        
-        let obs = NotificationCenter.default.addObserver(forName: hid.notificationNameExtra, object: nil, queue: nil) { n in
-            let recv = n.object as! HIDDevice.Report
-            let ppReport = HIDPP.CustomReport(withData: recv.reportData)
-
-            guard ppReport.deviceIndex == devIndex else { return }
-            guard ppReport.subID == report.subID else { return }
-            guard ppReport.address == report.address else { return }
-            result = ppReport
+        func SendCommand(_ report: HIDPP.CustomReport, timeout: TimeInterval = .infinity) -> HIDPP.CustomReport? {
+            let s = hid.writeReport(withData: report.unwrap())
+            guard s == true else { return nil }
+            let receiveLock = NSLock()
+            receiveLock.lock()
+            
+            var result: HIDPP.CustomReport? = nil
+            
+            let obs = NotificationCenter.default.addObserver(forName: hid.notificationNameExtra, object: nil, queue: nil) { n in
+                let recv = n.object as! HIDDevice.Report
+                let ppReport = HIDPP.CustomReport(withData: recv.reportData)
+                
+                guard ppReport.deviceIndex == devIndex else { return }
+                guard ppReport.subID == report.subID else { return }
+                guard ppReport.address == report.address else { return }
+                result = ppReport
+                receiveLock.unlock()
+            }
+            
+            defer { NotificationCenter.default.removeObserver(obs) }
+            
+            guard receiveLock.lock(before: .init(timeIntervalSinceNow: timeout)) else { return nil }
             receiveLock.unlock()
+            return result
         }
         
-        defer { NotificationCenter.default.removeObserver(obs) }
-        
-        guard receiveLock.lock(before: .init(timeIntervalSinceNow: timeout)) else { return nil }
-        receiveLock.unlock()
-        return result
+        init(dev: HIDDevice, devIndex: UInt8) {
+            self.hid = dev
+            self.devIndex = devIndex
+        }
     }
-
-    init(dev: HIDDevice, devIndex: UInt8) {
-        self.hid = dev
-        self.devIndex = devIndex
-    }
+    
 }

@@ -23,6 +23,7 @@
 		DE9C87BF2A3A34AA002770AD /* HID++.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9C87BE2A3A34AA002770AD /* HID++.swift */; };
 		DE9C87C12A3A66B4002770AD /* HID++10.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9C87C02A3A66B4002770AD /* HID++10.swift */; };
 		DE9C87C32A3A9009002770AD /* HID++20.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9C87C22A3A9009002770AD /* HID++20.swift */; };
+		DE9C87C52A3AA5C7002770AD /* Bits.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9C87C42A3AA5C7002770AD /* Bits.swift */; };
 		DEBC42092A386DDA0054F984 /* RemasterApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEBC42082A386DDA0054F984 /* RemasterApp.swift */; };
 		DEBC420B2A386DDA0054F984 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEBC420A2A386DDA0054F984 /* ContentView.swift */; };
 		DEBC420D2A386DDE0054F984 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DEBC420C2A386DDE0054F984 /* Assets.xcassets */; };
@@ -75,6 +76,7 @@
 		DE9C87BE2A3A34AA002770AD /* HID++.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HID++.swift"; sourceTree = "<group>"; };
 		DE9C87C02A3A66B4002770AD /* HID++10.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HID++10.swift"; sourceTree = "<group>"; };
 		DE9C87C22A3A9009002770AD /* HID++20.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HID++20.swift"; sourceTree = "<group>"; };
+		DE9C87C42A3AA5C7002770AD /* Bits.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bits.swift; sourceTree = "<group>"; };
 		DEBC42052A386DDA0054F984 /* Remaster.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Remaster.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DEBC42082A386DDA0054F984 /* RemasterApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemasterApp.swift; sourceTree = "<group>"; };
 		DEBC420A2A386DDA0054F984 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -157,6 +159,7 @@
 				DE9C87BE2A3A34AA002770AD /* HID++.swift */,
 				DE9C87C02A3A66B4002770AD /* HID++10.swift */,
 				DE9C87C22A3A9009002770AD /* HID++20.swift */,
+				DE9C87C42A3AA5C7002770AD /* Bits.swift */,
 			);
 			path = SwiftHID;
 			sourceTree = "<group>";
@@ -326,6 +329,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DE9C87BD2A39EAEC002770AD /* Device.swift in Sources */,
+				DE9C87C52A3AA5C7002770AD /* Bits.swift in Sources */,
 				DE9C87BB2A39EAC1002770AD /* DeviceMonitor.swift in Sources */,
 				DE9C87B42A39113E002770AD /* MenuView.swift in Sources */,
 				DE9C87B62A391F2D002770AD /* Convenience.swift in Sources */,

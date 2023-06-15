@@ -102,7 +102,7 @@ public struct HIDDevice : Hashable {
             return false
         }
         
-        d.copyBytes(to: outputReport, count: reportSizeOut)
+        d.copyBytes(to: outputReport, count: min(reportSizeOut, d.count))
         
         let res = IOHIDDeviceSetReport(device,
                              kIOHIDReportTypeOutput,
