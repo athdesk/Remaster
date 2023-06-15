@@ -59,8 +59,24 @@ struct HIDPP {
             }
         }
         
+        var function: UInt8 {
+            get { d[3] >> 4 }
+            set { d[3] = newValue << 4 | d[3] & 0x0F}
+        }
         
-        private static func len(fromType t: RType) -> Int {
+        var swId: UInt8 {
+            get { d[3] & 0x0F }
+            set { d[3] = d[3] & 0xF0 | newValue & 0x0F}
+        }
+
+        public static func type(fromLen l: Int) -> RType {
+            if l <= 7 { return .Short }
+            if l <= 20 { return .Long }
+            if l <= 64 { return .Huge }
+            return .Invalid
+        }
+        
+        public static func len(fromType t: RType) -> Int {
             switch t {
             case .Short:
                 return 7
@@ -91,7 +107,8 @@ struct HIDPP {
         var report = CustomReport(withType: t)
         report.deviceIndex = dev
         report.subID = feat
-        report.address = fun << 4 | swId & 0x0f
+        report.function = fun
+        report.swId = swId
         return report
     }
 }
@@ -113,7 +130,8 @@ struct HIDPPDevice {
         return "Invalid"
     }
     
-    func MakeReport(_ t: HIDPP.RType, _ feat: UInt8, _ fun: UInt8, _ swId: UInt8) -> HIDPP.CustomReport {
+    // swId defaults to 1 because apparently that's how it's done
+    func MakeReport(_ t: HIDPP.RType, _ feat: UInt8, _ fun: UInt8, _ swId: UInt8 = 1) -> HIDPP.CustomReport {
         HIDPP.MakeReport(t, devIndex, feat, fun, swId)
     }
 
