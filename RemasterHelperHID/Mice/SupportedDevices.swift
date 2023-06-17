@@ -8,13 +8,31 @@
 import Foundation
 
 enum RemasterDevice : CaseIterable {
+    // Receivers
+    case Unifying
+    case Bolt
+    
+    case MxMaster2S
     case MxMaster3S
     case G502HSE
     
-    func getDriver() -> Mouse.Type {
+    func isReceiver() -> Bool {
         switch self {
+        case .Unifying: fallthrough
+        case .Bolt:
+            return true
+        default:
+            return false
+        }
+    }
+    
+    func getDriver() -> Mouse.Type? {
+        if isReceiver() { return nil }
+        switch self {
+        case .MxMaster2S:
+            return MxMaster2SDevice.self
         case .MxMaster3S:
-            return GenericV20Device.self
+            return MxMaster3SDevice.self
         default:
             return GenericV20Device.self
         }
@@ -22,6 +40,12 @@ enum RemasterDevice : CaseIterable {
 
     func getMonitorData() -> HIDMonitorData {
         switch self {
+        case .Unifying:
+            return HIDMonitorData(vendorId: 0x046d, productId: 0xc52b, usagePage: 1, usage: 6)
+        case .Bolt:
+            return HIDMonitorData(vendorId: 0x046d, productId: 0xc548, usagePage: 1, usage: 6)
+        case .MxMaster2S:
+            return HIDMonitorData(vendorId: 0x046d, productId: 0xb019)
         case .MxMaster3S:
             return HIDMonitorData(vendorId: 0x046d, productId: 0xb034)
         case .G502HSE:

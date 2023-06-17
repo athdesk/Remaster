@@ -8,8 +8,11 @@
 import Foundation
 
 class MxMaster3SDevice : GenericV20Device {
-//    required init(withHIDDevice d: HIDDevice, index i: UInt8) {
-//        super.init(withHIDDevice: d, index: i)
-//        backingDevice?.funcReportType = .Long
-//    }
+    override func setDPI(to n: UInt) {
+        var p: [UInt8] = [0] // 0 is sensorId
+        let n16 = UInt16(n)
+        p.append(contentsOf: n16.bigEndian.bytes)
+        _ = Proto.AdjustableDPI.SetSensorDPI.Call(onDevice: backingDevice, parameters: p)
+        _ = getDPI()
+    }
 }

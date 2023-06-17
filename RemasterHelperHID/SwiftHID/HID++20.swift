@@ -47,12 +47,12 @@ extension IFeature {
         do {
             var call = try HIDPP.CustomReport(t, Self.getIndex(dev), self.rawValue, nil, dev.devIndex)
             call.parameters = parameters
-            print("making call @\(self): \(call.unwrap().hexDescription)")
+            DebugPrint("making call \(self)(\(try! Self.getIndex(dev)))@\(dev.hid.name): \(call.unwrap().hexDescription)")
             let r = dev.SendCommand(call, timeout: timeout)
-            print("response @\(self): \(r?.unwrap().hexDescription ?? "bad")")
+            DebugPrint("response \(self)@\(dev.hid.name): \(r?.unwrap().hexDescription ?? "bad")")
             return r
         } catch {
-            print("Error getting FeatureIndex")
+            print("Feature \(self) not supported by \(dev.hid.name)")
             return nil
         }
     }
@@ -64,26 +64,34 @@ extension HIDPP {
             static internal let ID: FeatureID = 0x0000
             static internal var _index: FeatureIndex? = 0
 
-            case GetFeature = 0
-            case Ping = 1
+            case GetFeature = 0x0
+            case Ping = 0x1
+        }
+        
+        enum HiResWheel: FunctionID, IFeature {
+            static let ID: FeatureID = 0x2130
+            
+            case GetCapability = 0x00
+            case GetMode = 0x10
+            case GetRatchet = 0x30
+        }
+        
+        enum BatteryStatus : FunctionID, IFeature {
+            static let ID: FeatureID = 0x1000
+
+            case GetBatteryLevelStatus = 0x00
+            case GetBatteryCapability = 0x01
         }
         
         enum AdjustableDPI : FunctionID, IFeature {
             static let ID: FeatureID = 0x2201
 
-            case GetSensorCount = 0
-            case GetSensorDPIList = 1
-            case GetSensorDPI = 2
-            case SetSensorDPI = 3
+            case GetSensorCount = 0x00
+            case GetSensorDPIList = 0x01
+            case GetSensorDPI = 0x02
+            case SetSensorDPI = 0x03
         }
-        enum SubID: UInt8 {
-            case ErrorMessage = 0xFF
-
-            static public func ==(lhs: UInt8, rhs: SubID) -> Bool {
-                return lhs == rhs.rawValue
-            }
-        }
-        
+               
         enum ErrorCode : UInt8 {
             case Success = 0x00
             case Unknown = 0x01
@@ -115,14 +123,21 @@ extension HIDPP.CustomReport {
     }
     
     func CheckError20() -> HIDPP.v20.ErrorCode {
-        guard self.subID == HIDPP.v20.SubID.ErrorMessage else { return .Success }
+        guard self.subID == 0xFF else { return .Success }
         return HIDPP.v20.ErrorCode(fromRawValue: self.parameters[1])
     }
 }
 
 extension HIDPP.Device {
     typealias Proto = HIDPP.v20
+    
+    struct HIDAddress {
+        var device: IOHIDDevice
+        var index: UInt8
+    }
+    
     var protocolVersion: String { GetProtocolVersion() } // should not be expensive enough to warrant doing it lazily
+    var identifier: HIDAddress { HIDAddress(device: hid.device, index: devIndex) }
     
     private func GetProtocolVersion() -> String {
         let response = Proto.IRoot.Ping.Call(onDevice: self)
@@ -134,42 +149,11 @@ extension HIDPP.Device {
         return "Invalid"
     }
     
-    // Min, Step, Max on my devices, idk it may be different so better to return Data()
-    func GetSupportedDPI(sensorId: UInt8 = 0) -> [UInt8]? {
-        var p: [UInt8] = [sensorId]
-        let report = Proto.AdjustableDPI.GetSensorDPIList.Call(onDevice: self, parameters: p)
-        if report?.CheckError20() == .Success {
-            return report?.parameters
-        } else {
-            print("Error reading DPI")
-            return nil
-        }
-    }
-    
-    func GetSensorDPI(sensorId: UInt8 = 0) -> UInt16 {
-        let p: [UInt8] = [sensorId]
-        let report = Proto.AdjustableDPI.GetSensorDPI.Call(onDevice: self, parameters: p)
-        if report?.CheckError20() == .Success {
-            let data = report?.parameters
-            let dpiBuf = [UInt8](data?[1..<3] ?? .init())
-            return UInt16(dpiBuf)?.bigEndian ?? 0
-        } else {
-            print("Error reading DPI")
-            return 0
-        }
-    }
-    
-    func SetSensorDPI(to n: UInt16, sensorId: UInt8 = 0) {
-        var p: [UInt8] = [sensorId]
-        p.append(contentsOf: n.bigEndian.bytes)
-        _ = Proto.AdjustableDPI.SetSensorDPI.Call(onDevice: self, parameters: p)
-    }
-    
     func GetFeatureIndex(forID f: FeatureID) -> FeatureIndex? {
         let p = f.bigEndian.bytes
-        let r = Proto.IRoot.GetFeature.Call(onDevice: self, parameters: p)
-//        print(r?.parameters[0])
-        return r?.parameters[0]
+        let report = Proto.IRoot.GetFeature.Call(onDevice: self, parameters: p)
+        if report?.parameters[0] == 0 { return nil }
+        return report?.parameters[0]
     }
 }
 

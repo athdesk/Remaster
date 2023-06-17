@@ -17,9 +17,9 @@ struct MousePreferences {
     private var id: String
     private var backingDict: Dictionary<Key, Int64> // This is going to be ugly if we ever need non-numeric preferences
     
-    var dpi: UInt32 {
+    var dpi: UInt {
         get {
-            UInt32(getVal(key: .DPI))
+            UInt(getVal(key: .DPI))
         }
         set {
             setVal(key: .DPI, val: Int64(newValue))

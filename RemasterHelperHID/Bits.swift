@@ -32,3 +32,17 @@ extension UnsignedInteger {
         }
     }
 }
+
+func DebugPrint(_ x: Any...) {
+    #if DEBUG
+    for i in x {
+        print(i)
+    }
+    #endif
+}
+
+func DebugPrint(_ x: Any) {
+    #if DEBUG
+    print(x)
+    #endif
+}

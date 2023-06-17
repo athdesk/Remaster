@@ -18,23 +18,62 @@ import Foundation
 //      clever in the way we reapply settings etc.
 
 
+// just to only have explicit identifiers
+protocol MouseIdentifier : Hashable { }
+
+// no chance this breaks everything, right?
+struct MouseIdent: Hashable, Equatable {
+    fileprivate let srcHash: Int
+    
+    init<T: Hashable>(_ ident: T) {
+        srcHash = ident.hashValue
+    }
+}
+
+extension Dictionary where Key == MouseIdent {
+    mutating func removeValue(forKey key: any MouseIdentifier) -> Value? {
+        return self.removeValue(forKey: Key(key))
+    }
+    
+    subscript(key: any MouseIdentifier) -> Value? {
+        get {
+            return self.first { x in
+                x.key == Key(key)
+            }?.value
+        }
+        set {
+            if newValue == nil {
+                self.removeValue(forKey: Key(key))
+            } else {
+                self.updateValue(newValue!, forKey: Key(key))
+            }
+        }
+    }
+}
 
 protocol Mouse : AnyObject {
-    func getSupportedDPI() -> (UInt, UInt, UInt)
+    var identifier: any MouseIdentifier { get }
+    var name: String { get }
+    
+    func getBattery() -> UInt
+    func getSupportedDPI() -> (UInt, UInt, UInt)?
     func getDPI() -> UInt
     func setDPI(to: UInt)
     func refreshData(delayed: Bool)
+    
     init?(withHIDDevice d: HIDDevice, index i: UInt8)
 }
 
 extension Mouse {
     // TODO: callbacks have to be disabled/changed for non-main devices
+    internal var CallbackBattery: UIntCallback { DefaultCallbackBat }
     internal var CallbackDPI: UIntCallback { DefaultCallbackDPI }
     internal var CallbackDPISupport: UIntTripletCallback { DefaultCallbackDPISupport }
     
     func refreshData(delayed: Bool = false) {
         DispatchQueue.global().async {
             if delayed { sleep(2) } // otherwise this won't work when first connecting
+            _ = self.getBattery()
             _ = self.getDPI()
             _ = self.getSupportedDPI()
         }
@@ -42,9 +81,6 @@ extension Mouse {
     
     init?(withHIDDevice d: HIDDevice, index i: UInt8) { print("Device \(d) does not have a driver yet :("); return nil }
 }
-
-// just to only have explicit identifiers
-protocol MouseIdentifier : Hashable { }
 
 // much swiftui
 class ConnectionWatcher : ObservableObject {
@@ -59,48 +95,54 @@ class ConnectionWatcher : ObservableObject {
 }
 
 class MouseFactory {
-    enum Identifiers : MouseIdentifier, CaseIterable {
+    static private let MainChangedCallback = DefaultStatusCallback
+    
+    enum Identifiers : MouseIdentifier, CaseIterable, Hashable {
         // Special identifiers that alias to some specific instances
         case Main
     }
-    static let isReal: ((key: AnyHashable, value: any Mouse)) -> (Bool) = {val in
+    static let isReal: ((key: MouseIdent, value: any Mouse)) -> (Bool) = {val in
         for i in Identifiers.allCases {
-            if val.key.hashValue == i.hashValue { return false }
+            if val.key.srcHash == i.hashValue { return false }
         }
         return true
     }
     
-    static private var mice: Dictionary<AnyHashable, any Mouse> = .init()
-    static var defaultInstance: (any Mouse)? { mice[Identifiers.Main] }
-    static var miceCount: Int { mice.filter(isReal).count }
+    static private var _mice: Dictionary<MouseIdent, any Mouse> = .init()
+    static public var mice: Dictionary<MouseIdent, any Mouse> { _mice.filter(isReal) }
+    
+    static var defaultInstance: (any Mouse)? { _mice[Identifiers.Main] }
+    static var miceCount: Int { _mice.filter(isReal).count }
     
     // TODO: for now just pick the first one, when we have favorites we'll change this
     static private func chooseMainInstance() {
-        guard let newMain = mice.first(where: isReal)?.value else { return }
-        if newMain === mice[Identifiers.Main] { return }
-        print("There's a new sheriff in town! \(newMain)")
-        mice[Identifiers.Main] = newMain
+        guard let newMain = _mice.first(where: isReal)?.value else { return }
+        if newMain === _mice[Identifiers.Main] { return }
+        print("There's a new sheriff in town! \(newMain.name)")
+        MainChangedCallback(newMain.name)
+        _mice[Identifiers.Main] = newMain
         newMain.refreshData()
         ConnectionWatcher.sharedInstance.updateStatus()
     }
     
     // This should be set as a callback for the HID Monitor
-    static func addMouse(withIdentifier i: some MouseIdentifier, device: some Mouse) {
-        mice[i] = device
+    static func addMouse(_ device: some Mouse) {
+        _mice.updateValue(device, forKey: MouseIdent(device.identifier))
         chooseMainInstance()
-        print("New mouse in da house! \(i)")
+        print("New mouse in da house! \(device.name)")
         print("\(miceCount) known mice currently here")
     }
     
     static func removeMouse(withIdentifier i: some MouseIdentifier) {
-        mice.removeValue(forKey: i)
+        let m = _mice.removeValue(forKey: i)
+        if m == nil { return }
         chooseMainInstance()
-        print("Mouse \(i) left :(")
+        print("Mouse \(m?.name ?? "Unknown") left :(")
         print("\(miceCount) known mice currently here")
     }
     
     static func getMouse(withIdentifier i: some MouseIdentifier) -> (any Mouse)? {
-        return mice[i]
+        return _mice[i]
     }
     
 }

@@ -26,7 +26,7 @@ import IOKit.hid
 //    })
 //}
 
-extension IOHIDDevice : MouseIdentifier { }
+//extension IOHIDDevice : MouseIdentifier { }
 
 func start() {
     let hidMonitor = HIDDeviceMonitor(SupportedDevices, reportSize: 64)
@@ -35,13 +35,16 @@ func start() {
         let device = n.object as! HIDDevice
         print(device.device)
         guard let driver = RemasterDevice(fromMonitorData: device.idPair)?.getDriver() else { return }
+        // TODO: find out which device indices are populated and add each single device
         guard let m = driver.init(withHIDDevice: device, index: 0xff) else { return } // TODO: index hardcoded for now
-        MouseFactory.addMouse(withIdentifier: device.device, device: m)
+        MouseFactory.addMouse(m)
     }
     
     NotificationCenter.default.addObserver(forName: .HIDDeviceDisconnected, object: nil, queue: nil) { n in
         let device = n.object as! HIDDevice
-        MouseFactory.removeMouse(withIdentifier: device.device)
+        for i in [UInt8]([0, 1, 2, 3, 4, 5, 6, 255]) {
+            MouseFactory.removeMouse(withIdentifier: HIDPP.Device.HIDAddress(device: device.device, index: i))
+        }
     }
       
     DispatchQueue.global(qos: .utility).async {

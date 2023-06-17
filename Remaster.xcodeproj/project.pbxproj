@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DE4A9B4B2A3E056A007B5F7A /* MxMaster2S.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4A9B4A2A3E056A007B5F7A /* MxMaster2S.swift */; };
 		DE9C87942A38A753002770AD /* RemasterHelperHIDApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9C87932A38A753002770AD /* RemasterHelperHIDApp.swift */; };
 		DE9C87982A38A755002770AD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DE9C87972A38A755002770AD /* Assets.xcassets */; };
 		DE9C87A72A38A918002770AD /* libhidpp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DE1D62112A388A09009DAA65 /* libhidpp.a */; };
@@ -22,9 +23,6 @@
 		DE9C87C72A3B6EED002770AD /* MouseInterface.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9C87C62A3B6EED002770AD /* MouseInterface.swift */; };
 		DE9C87CA2A3B808F002770AD /* GenericV20.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9C87C92A3B808F002770AD /* GenericV20.swift */; };
 		DE9C87CC2A3B8423002770AD /* SupportedDevices.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9C87CB2A3B8423002770AD /* SupportedDevices.swift */; };
-		DE9C87D02A3C742F002770AD /* ReportDescriptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9C87CF2A3C742F002770AD /* ReportDescriptor.swift */; };
-		DE9C87D32A3CFDB8002770AD /* TINUIORegistry in Frameworks */ = {isa = PBXBuildFile; productRef = DE9C87D22A3CFDB8002770AD /* TINUIORegistry */; };
-		DE9C87D52A3CFDDD002770AD /* IORegInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9C87D42A3CFDDD002770AD /* IORegInfo.swift */; };
 		DE9C87D72A3D261E002770AD /* MxMaster3S.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9C87D62A3D261E002770AD /* MxMaster3S.swift */; };
 		DEBC42092A386DDA0054F984 /* RemasterApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEBC42082A386DDA0054F984 /* RemasterApp.swift */; };
 		DEBC420B2A386DDA0054F984 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEBC420A2A386DDA0054F984 /* ContentView.swift */; };
@@ -57,6 +55,7 @@
 
 /* Begin PBXFileReference section */
 		DE1D620C2A388A09009DAA65 /* hidpp.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = hidpp.xcodeproj; path = ../hidpp/hidpp.xcodeproj; sourceTree = "<group>"; };
+		DE4A9B4A2A3E056A007B5F7A /* MxMaster2S.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MxMaster2S.swift; sourceTree = "<group>"; };
 		DE9C87912A38A753002770AD /* RemasterHelperHID.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RemasterHelperHID.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DE9C87932A38A753002770AD /* RemasterHelperHIDApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemasterHelperHIDApp.swift; sourceTree = "<group>"; };
 		DE9C87972A38A755002770AD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -73,8 +72,6 @@
 		DE9C87C62A3B6EED002770AD /* MouseInterface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MouseInterface.swift; sourceTree = "<group>"; };
 		DE9C87C92A3B808F002770AD /* GenericV20.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericV20.swift; sourceTree = "<group>"; };
 		DE9C87CB2A3B8423002770AD /* SupportedDevices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportedDevices.swift; sourceTree = "<group>"; };
-		DE9C87CF2A3C742F002770AD /* ReportDescriptor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportDescriptor.swift; sourceTree = "<group>"; };
-		DE9C87D42A3CFDDD002770AD /* IORegInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IORegInfo.swift; sourceTree = "<group>"; };
 		DE9C87D62A3D261E002770AD /* MxMaster3S.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MxMaster3S.swift; sourceTree = "<group>"; };
 		DEBC42052A386DDA0054F984 /* Remaster.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Remaster.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DEBC42082A386DDA0054F984 /* RemasterApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemasterApp.swift; sourceTree = "<group>"; };
@@ -97,7 +94,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DE9C87D32A3CFDB8002770AD /* TINUIORegistry in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -133,11 +129,9 @@
 			children = (
 				DE9C87BA2A39EAC1002770AD /* DeviceMonitor.swift */,
 				DE9C87BC2A39EAEC002770AD /* Device.swift */,
-				DE9C87CF2A3C742F002770AD /* ReportDescriptor.swift */,
 				DE9C87BE2A3A34AA002770AD /* HID++.swift */,
 				DE9C87C02A3A66B4002770AD /* HID++10.swift */,
 				DE9C87C22A3A9009002770AD /* HID++20.swift */,
-				DE9C87D42A3CFDDD002770AD /* IORegInfo.swift */,
 			);
 			path = SwiftHID;
 			sourceTree = "<group>";
@@ -149,6 +143,7 @@
 				DE9C87C92A3B808F002770AD /* GenericV20.swift */,
 				DE9C87CB2A3B8423002770AD /* SupportedDevices.swift */,
 				DE9C87D62A3D261E002770AD /* MxMaster3S.swift */,
+				DE4A9B4A2A3E056A007B5F7A /* MxMaster2S.swift */,
 			);
 			path = Mice;
 			sourceTree = "<group>";
@@ -235,7 +230,6 @@
 			);
 			name = Remaster;
 			packageProductDependencies = (
-				DE9C87D22A3CFDB8002770AD /* TINUIORegistry */,
 			);
 			productName = Remaster;
 			productReference = DEBC42052A386DDA0054F984 /* Remaster.app */;
@@ -270,7 +264,6 @@
 			);
 			mainGroup = DEBC41FC2A386DDA0054F984;
 			packageReferences = (
-				DE9C87D12A3CFDB7002770AD /* XCRemoteSwiftPackageReference "TINUIORegistry" */,
 			);
 			productRefGroup = DEBC42062A386DDA0054F984 /* Products */;
 			projectDirPath = "";
@@ -329,12 +322,11 @@
 				DE9C87B42A39113E002770AD /* MenuView.swift in Sources */,
 				DE9C87C12A3A66B4002770AD /* HID++10.swift in Sources */,
 				DE9C87D72A3D261E002770AD /* MxMaster3S.swift in Sources */,
-				DE9C87D02A3C742F002770AD /* ReportDescriptor.swift in Sources */,
+				DE4A9B4B2A3E056A007B5F7A /* MxMaster2S.swift in Sources */,
 				DE9C87CA2A3B808F002770AD /* GenericV20.swift in Sources */,
 				DE9C87A92A38BD53002770AD /* MainLogic.swift in Sources */,
 				DE9C87C32A3A9009002770AD /* HID++20.swift in Sources */,
 				DE9C87C72A3B6EED002770AD /* MouseInterface.swift in Sources */,
-				DE9C87D52A3CFDDD002770AD /* IORegInfo.swift in Sources */,
 				DE9C87942A38A753002770AD /* RemasterHelperHIDApp.swift in Sources */,
 				DE9C87BF2A3A34AA002770AD /* HID++.swift in Sources */,
 				DE9C87CC2A3B8423002770AD /* SupportedDevices.swift in Sources */,
@@ -613,25 +605,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCRemoteSwiftPackageReference section */
-		DE9C87D12A3CFDB7002770AD /* XCRemoteSwiftPackageReference "TINUIORegistry" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/ITzTravelInTime/TINUIORegistry";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.1.3;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		DE9C87D22A3CFDB8002770AD /* TINUIORegistry */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = DE9C87D12A3CFDB7002770AD /* XCRemoteSwiftPackageReference "TINUIORegistry" */;
-			productName = TINUIORegistry;
-		};
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = DEBC41FD2A386DDA0054F984 /* Project object */;
 }
