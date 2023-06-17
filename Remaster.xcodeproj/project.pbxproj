@@ -9,14 +9,9 @@
 /* Begin PBXBuildFile section */
 		DE9C87942A38A753002770AD /* RemasterHelperHIDApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9C87932A38A753002770AD /* RemasterHelperHIDApp.swift */; };
 		DE9C87982A38A755002770AD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DE9C87972A38A755002770AD /* Assets.xcassets */; };
-		DE9C87A52A38A8AB002770AD /* HIDBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = DE9C87A42A38A8AB002770AD /* HIDBridge.mm */; };
-		DE9C87A62A38A8BE002770AD /* BridgeMonitor.mm in Sources */ = {isa = PBXBuildFile; fileRef = DE9C876F2A3899FE002770AD /* BridgeMonitor.mm */; };
 		DE9C87A72A38A918002770AD /* libhidpp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DE1D62112A388A09009DAA65 /* libhidpp.a */; };
 		DE9C87A92A38BD53002770AD /* MainLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9C87A82A38BD53002770AD /* MainLogic.swift */; };
-		DE9C87AF2A38C26F002770AD /* MxHIDDevice.mm in Sources */ = {isa = PBXBuildFile; fileRef = DE9C87AE2A38C26F002770AD /* MxHIDDevice.mm */; };
-		DE9C87B22A38D0B2002770AD /* SwiftMX.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9C87B12A38D0B2002770AD /* SwiftMX.swift */; };
 		DE9C87B42A39113E002770AD /* MenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9C87B32A39113E002770AD /* MenuView.swift */; };
-		DE9C87B62A391F2D002770AD /* Convenience.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9C87B52A391F2D002770AD /* Convenience.swift */; };
 		DE9C87B82A39BA4D002770AD /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9C87B72A39BA4D002770AD /* Preferences.swift */; };
 		DE9C87BB2A39EAC1002770AD /* DeviceMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9C87BA2A39EAC1002770AD /* DeviceMonitor.swift */; };
 		DE9C87BD2A39EAEC002770AD /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9C87BC2A39EAEC002770AD /* Device.swift */; };
@@ -62,21 +57,12 @@
 
 /* Begin PBXFileReference section */
 		DE1D620C2A388A09009DAA65 /* hidpp.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = hidpp.xcodeproj; path = ../hidpp/hidpp.xcodeproj; sourceTree = "<group>"; };
-		DE9C876F2A3899FE002770AD /* BridgeMonitor.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = BridgeMonitor.mm; sourceTree = "<group>"; };
-		DE9C87712A389A0D002770AD /* BridgeMonitor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BridgeMonitor.h; sourceTree = "<group>"; };
 		DE9C87912A38A753002770AD /* RemasterHelperHID.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RemasterHelperHID.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DE9C87932A38A753002770AD /* RemasterHelperHIDApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemasterHelperHIDApp.swift; sourceTree = "<group>"; };
 		DE9C87972A38A755002770AD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		DE9C879C2A38A755002770AD /* RemasterHelperHID.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = RemasterHelperHID.entitlements; sourceTree = "<group>"; };
-		DE9C87A22A38A8AA002770AD /* RemasterHelperHID-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RemasterHelperHID-Bridging-Header.h"; sourceTree = "<group>"; };
-		DE9C87A32A38A8AB002770AD /* HIDBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HIDBridge.h; sourceTree = "<group>"; };
-		DE9C87A42A38A8AB002770AD /* HIDBridge.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = HIDBridge.mm; sourceTree = "<group>"; };
 		DE9C87A82A38BD53002770AD /* MainLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainLogic.swift; sourceTree = "<group>"; };
-		DE9C87AD2A38C26F002770AD /* MxHIDDevice.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MxHIDDevice.h; sourceTree = "<group>"; };
-		DE9C87AE2A38C26F002770AD /* MxHIDDevice.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MxHIDDevice.mm; sourceTree = "<group>"; };
-		DE9C87B12A38D0B2002770AD /* SwiftMX.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftMX.swift; sourceTree = "<group>"; };
 		DE9C87B32A39113E002770AD /* MenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuView.swift; sourceTree = "<group>"; };
-		DE9C87B52A391F2D002770AD /* Convenience.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Convenience.swift; sourceTree = "<group>"; };
 		DE9C87B72A39BA4D002770AD /* Preferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
 		DE9C87BA2A39EAC1002770AD /* DeviceMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceMonitor.swift; sourceTree = "<group>"; };
 		DE9C87BC2A39EAEC002770AD /* Device.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Device.swift; sourceTree = "<group>"; };
@@ -131,9 +117,7 @@
 			children = (
 				DE9C87C82A3B807F002770AD /* Mice */,
 				DE9C87B92A39EA91002770AD /* SwiftHID */,
-				DE9C87B02A38D09F002770AD /* SwiftMX */,
 				DE9C87C42A3AA5C7002770AD /* Bits.swift */,
-				DE9C87A02A38A860002770AD /* HIDBridge */,
 				DE9C87932A38A753002770AD /* RemasterHelperHIDApp.swift */,
 				DE9C87B32A39113E002770AD /* MenuView.swift */,
 				DE9C87A82A38BD53002770AD /* MainLogic.swift */,
@@ -142,29 +126,6 @@
 				DE9C879C2A38A755002770AD /* RemasterHelperHID.entitlements */,
 			);
 			path = RemasterHelperHID;
-			sourceTree = "<group>";
-		};
-		DE9C87A02A38A860002770AD /* HIDBridge */ = {
-			isa = PBXGroup;
-			children = (
-				DE9C87A32A38A8AB002770AD /* HIDBridge.h */,
-				DE9C87A42A38A8AB002770AD /* HIDBridge.mm */,
-				DE9C87712A389A0D002770AD /* BridgeMonitor.h */,
-				DE9C876F2A3899FE002770AD /* BridgeMonitor.mm */,
-				DE9C87AD2A38C26F002770AD /* MxHIDDevice.h */,
-				DE9C87AE2A38C26F002770AD /* MxHIDDevice.mm */,
-				DE9C87A22A38A8AA002770AD /* RemasterHelperHID-Bridging-Header.h */,
-			);
-			path = HIDBridge;
-			sourceTree = "<group>";
-		};
-		DE9C87B02A38D09F002770AD /* SwiftMX */ = {
-			isa = PBXGroup;
-			children = (
-				DE9C87B12A38D0B2002770AD /* SwiftMX.swift */,
-				DE9C87B52A391F2D002770AD /* Convenience.swift */,
-			);
-			path = SwiftMX;
 			sourceTree = "<group>";
 		};
 		DE9C87B92A39EA91002770AD /* SwiftHID */ = {
@@ -366,21 +327,16 @@
 				DE9C87C52A3AA5C7002770AD /* Bits.swift in Sources */,
 				DE9C87BB2A39EAC1002770AD /* DeviceMonitor.swift in Sources */,
 				DE9C87B42A39113E002770AD /* MenuView.swift in Sources */,
-				DE9C87B62A391F2D002770AD /* Convenience.swift in Sources */,
 				DE9C87C12A3A66B4002770AD /* HID++10.swift in Sources */,
 				DE9C87D72A3D261E002770AD /* MxMaster3S.swift in Sources */,
 				DE9C87D02A3C742F002770AD /* ReportDescriptor.swift in Sources */,
 				DE9C87CA2A3B808F002770AD /* GenericV20.swift in Sources */,
-				DE9C87A52A38A8AB002770AD /* HIDBridge.mm in Sources */,
 				DE9C87A92A38BD53002770AD /* MainLogic.swift in Sources */,
 				DE9C87C32A3A9009002770AD /* HID++20.swift in Sources */,
 				DE9C87C72A3B6EED002770AD /* MouseInterface.swift in Sources */,
 				DE9C87D52A3CFDDD002770AD /* IORegInfo.swift in Sources */,
 				DE9C87942A38A753002770AD /* RemasterHelperHIDApp.swift in Sources */,
-				DE9C87AF2A38C26F002770AD /* MxHIDDevice.mm in Sources */,
-				DE9C87B22A38D0B2002770AD /* SwiftMX.swift in Sources */,
 				DE9C87BF2A3A34AA002770AD /* HID++.swift in Sources */,
-				DE9C87A62A38A8BE002770AD /* BridgeMonitor.mm in Sources */,
 				DE9C87CC2A3B8423002770AD /* SupportedDevices.swift in Sources */,
 				DE9C87B82A39BA4D002770AD /* Preferences.swift in Sources */,
 			);
@@ -423,7 +379,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = me.athdesk.RemasterHelperHID;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "RemasterHelperHID/HIDBridge/RemasterHelperHID-Bridging-Header.h";
+				SWIFT_INSTALL_OBJC_HEADER = NO;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 			};
@@ -454,7 +410,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = me.athdesk.RemasterHelperHID;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "RemasterHelperHID/HIDBridge/RemasterHelperHID-Bridging-Header.h";
+				SWIFT_INSTALL_OBJC_HEADER = NO;
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
