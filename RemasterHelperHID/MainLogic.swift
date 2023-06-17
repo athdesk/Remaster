@@ -8,91 +8,81 @@
 import Foundation
 import IOKit.hid
 
-var bridge = HIDBridge()
-var CurrentMXDevice: SwiftMxDevice? = nil
+//var bridge = HIDBridge()
+//var CurrentMXDevice: SwiftMxDevice? = nil
+//
+//func OnDeviceConnected(dev: SwiftMxDevice) {
+//    dev.restoreDesiredDPI()
+//}
+//
+//func ConnectDevice(devPath: String, devIndex: Int32) {
+//    CurrentMXDevice = nil // this is needed due to a bug, maybe I should fix the memory corruption lol
+//                          // if we create a new instance of SwiftMxDevice, the old one doesn't get
+//                          // destroyed before the new one is initialized, so we end up with two Dispatchers
+//
+//    CurrentMXDevice = try? SwiftMxDevice(devPath: devPath, devIndex: devIndex, callback: { dev in
+//        OnDeviceConnected(dev: dev)
+//        print("Found a new device to handle")
+//    })
+//}
 
-func OnDeviceConnected(dev: SwiftMxDevice) {
-    dev.restoreDesiredDPI()
-}
-
-func ConnectDevice(devPath: String, devIndex: Int32) {
-    CurrentMXDevice = nil // this is needed due to a bug, maybe I should fix the memory corruption lol
-                          // if we create a new instance of SwiftMxDevice, the old one doesn't get
-                          // destroyed before the new one is initialized, so we end up with two Dispatchers
-    
-    CurrentMXDevice = try? SwiftMxDevice(devPath: devPath, devIndex: devIndex, callback: { dev in
-        OnDeviceConnected(dev: dev)
-        print("Found a new device to handle")
-    })
-}
+extension IOHIDDevice : MouseIdentifier { }
 
 func start() {
-    bridge.setDeviceAddedHandler({path, index in
-        let stPath = String(cString: path)
-        print("Device connected: \(stPath)@\(index)")
-        if (index == 255) { return }
-        if (stPath == CurrentMXDevice?.devPath) { return } // this will happen at startup
-        ConnectDevice(devPath: stPath, devIndex: index)
-    })
-    
-    bridge.setDeviceRemovedHandler { path, index in
-        let stPath = String(cString: path)
-        print("Device disconnected: \(stPath), ours is \(CurrentMXDevice?.devPath ?? "nil")")
-        if CurrentMXDevice?.devPath == stPath {
-            print("Active device has disconnected :(")
-            CurrentMXDevice = nil
-        }
-    }
+    let hidMonitor = HIDDeviceMonitor(SupportedDevices, reportSize: 64)
 
-    DispatchQueue.global(qos: .background).async {
-        bridge.bringup() // This blocks
-    }
-
-    sleep(1)
-    
-    print("---------------------- playground")
-    
-    let SupportedDevices: [HIDMonitorData] = [
-        HIDMonitorData(vendorId: 0x046d, productId: 0xb034)
-    ]
-    let x = HIDDeviceMonitor(SupportedDevices, reportSize: 10)
-    
-    var y: HIDDevice?
-    
     NotificationCenter.default.addObserver(forName: .HIDDeviceConnected, object: nil, queue: nil) { n in
         let device = n.object as! HIDDevice
-        y = device
-        print("Device Connected (Swift) \(device)")
+        print(device.device)
+        guard let driver = RemasterDevice(fromMonitorData: device.idPair)?.getDriver() else { return }
+        guard let m = driver.init(withHIDDevice: device, index: 0xff) else { return } // TODO: index hardcoded for now
+        MouseFactory.addMouse(withIdentifier: device.device, device: m)
     }
     
     NotificationCenter.default.addObserver(forName: .HIDDeviceDisconnected, object: nil, queue: nil) { n in
         let device = n.object as! HIDDevice
-        print("Device Disconnected (Swift) \(device)")
+        MouseFactory.removeMouse(withIdentifier: device.device)
     }
-    
-    NotificationCenter.default.addObserver(forName: .HIDDeviceExtraDataReceived(), object: nil, queue: nil) { n in
-        let device = n.object as! HIDDevice.Report
-        print(device.reportData.base64EncodedString())
-    }
-    
+      
     DispatchQueue.global(qos: .utility).async {
-        x.start()
+        hidMonitor.start()
     }
-    
-    
-    sleep(3)
-    print("eee")
+ 
+    sleep(500)
+//    let x = MouseFactory.defaultInstance as! DriverMxMaster3
+//    let iodev = x.backingDevice!.hid.device
+//
+//    let cfElements = IOHIDDeviceCopyMatchingElements(iodev, nil, IOOptionBits(kIOHIDOptionsTypeNone))!
+//    
+//    let supports0: Bool = false
+//    let supports1: Bool = false
+//    let supports2: Bool = false
+//    
+//    func hasReport(r: Int) {
+//        
+//    }
+//    
+//    for el in cfElements as! Array<IOHIDElement> {
+//        let u = IOHIDElementGetUsagePage(el)
+//        if u == 0xff00 || u == 0xff43  {
+//            let marker = UInt8(IOHIDElementGetUsage(el) & 0xff)
+//        
+////            switch marker {
+////            case 0:
+////
+////            case 1: break
+////            case 2: break
+////            default: break
+////            }
+//            print()
+//        }
+//    }
 
-    
-    if y != nil {
-        var hppdev = HIDPP.Device(dev: y!, devIndex: 0)
-        print(hppdev.protocolVersion)
-    }
     
 }
 
 extension Data {
     var hexDescription: String {
-        return reduce("") {$0 + String(format: "%02x", $1)}
+        return reduce("") {$0 + String(format: "%02x ", $1)}
     }
 }

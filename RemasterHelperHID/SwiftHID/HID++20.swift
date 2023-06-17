@@ -9,42 +9,73 @@ import Foundation
 
 typealias FeatureID = UInt16
 
-protocol IFeature : RawRepresentable where RawValue == FunctionID {
-    static var ID: FeatureID { get }
-    static var index: FeatureIndex { get }
+enum Err : Error {
+    case FeatureIndexError
 }
 
+protocol IFeature : RawRepresentable where RawValue == FunctionID {
+    static var ID: FeatureID { get }
+    static var _index: FeatureIndex? { get }
+}
+
+// Ugly hack time ^ _ ^
+// I regret not having done a real Device class
+
+fileprivate var StoredFeatureIndexes: Dictionary<HIDPP.Device, Dictionary<FeatureID, FeatureIndex>> = .init()
+
 extension IFeature {
-    func Call(parameters: [UInt8] = [], timeout: TimeInterval = 1) -> HIDPP.CustomReport {
-        let t = HIDPP.CustomReport.type(fromLen: parameters.count + 4)
-        var call = HIDPP.CustomReport(t, Self.index, self.rawValue)
-        call.parameters = parameters
-        return call
+    static internal var _index: FeatureIndex? { nil }
+    static internal func getIndex(_ dev: HIDPP.Device) throws -> FeatureIndex {
+        if self._index != nil { return self._index! }
+        var dict = StoredFeatureIndexes[dev] ?? .init()
+        let f = dict[self.ID] ?? {
+            let e = dev.GetFeatureIndex(forID: self.ID)
+            if e != nil {
+                dict[self.ID] = e!
+                StoredFeatureIndexes[dev] = dict
+            }
+            return e
+        }()
+        
+        guard f != nil else { throw Err.FeatureIndexError }
+        return f!
+    }
+    
+    func Call(onDevice dev: HIDPP.Device, parameters: [UInt8] = [], timeout: TimeInterval = 1) -> HIDPP.CustomReport? {
+        // TODO: make an exception to the default for longer reports
+        let t = dev.funcReportType ?? HIDPP.CustomReport.RType.Long
+        do {
+            var call = try HIDPP.CustomReport(t, Self.getIndex(dev), self.rawValue, nil, dev.devIndex)
+            call.parameters = parameters
+            print("making call @\(self): \(call.unwrap().hexDescription)")
+            let r = dev.SendCommand(call, timeout: timeout)
+            print("response @\(self): \(r?.unwrap().hexDescription ?? "bad")")
+            return r
+        } catch {
+            print("Error getting FeatureIndex")
+            return nil
+        }
     }
 }
 
 extension HIDPP {
-
     struct v20 {
         enum IRoot : FunctionID, IFeature {
-            static let ID: FeatureID = 0x0000
-            static let index: FeatureIndex = 0x00
+            static internal let ID: FeatureID = 0x0000
+            static internal var _index: FeatureIndex? = 0
 
             case GetFeature = 0
             case Ping = 1
         }
         
-//        struct DPI : IFeature {
-//            static let ID: FeatureID = 0x2201
-//            static let index: FeatureIndex = 0
-//            enum Function: FunctionID {
-//                case GetSensorCount = 0
-//                case GetSensorDPIList = 1
-//                case GetSensorDPI = 2
-//                case SetSensorDPI = 3
-//            }
-//        }
-//
+        enum AdjustableDPI : FunctionID, IFeature {
+            static let ID: FeatureID = 0x2201
+
+            case GetSensorCount = 0
+            case GetSensorDPIList = 1
+            case GetSensorDPI = 2
+            case SetSensorDPI = 3
+        }
         enum SubID: UInt8 {
             case ErrorMessage = 0xFF
 
@@ -66,6 +97,10 @@ extension HIDPP {
             case Unsupported = 0x09
             case UnknownDevice = 0x0A
             case Invalid
+            
+            init(fromRawValue v: UInt8) {
+                self = ErrorCode(rawValue: v) ?? ErrorCode.Invalid
+            }
         }
     }
 }
@@ -81,7 +116,7 @@ extension HIDPP.CustomReport {
     
     func CheckError20() -> HIDPP.v20.ErrorCode {
         guard self.subID == HIDPP.v20.SubID.ErrorMessage else { return .Success }
-        return HIDPP.v20.ErrorCode(rawValue: self.parameters[1]) ?? .Invalid
+        return HIDPP.v20.ErrorCode(fromRawValue: self.parameters[1])
     }
 }
 
@@ -90,8 +125,7 @@ extension HIDPP.Device {
     var protocolVersion: String { GetProtocolVersion() } // should not be expensive enough to warrant doing it lazily
     
     private func GetProtocolVersion() -> String {
-        let call = Proto.IRoot.Ping.Call(parameters: .init(repeating: 0, count: 8))
-        let response = SendCommand(call, timeout: 1)
+        let response = Proto.IRoot.Ping.Call(onDevice: self)
         if response != nil {
             let errCode = response!.CheckError10()
             if errCode == .InvalidSubID { return "1.0" }
@@ -100,11 +134,42 @@ extension HIDPP.Device {
         return "Invalid"
     }
     
+    // Min, Step, Max on my devices, idk it may be different so better to return Data()
+    func GetSupportedDPI(sensorId: UInt8 = 0) -> [UInt8]? {
+        var p: [UInt8] = [sensorId]
+        let report = Proto.AdjustableDPI.GetSensorDPIList.Call(onDevice: self, parameters: p)
+        if report?.CheckError20() == .Success {
+            return report?.parameters
+        } else {
+            print("Error reading DPI")
+            return nil
+        }
+    }
+    
+    func GetSensorDPI(sensorId: UInt8 = 0) -> UInt16 {
+        let p: [UInt8] = [sensorId]
+        let report = Proto.AdjustableDPI.GetSensorDPI.Call(onDevice: self, parameters: p)
+        if report?.CheckError20() == .Success {
+            let data = report?.parameters
+            let dpiBuf = [UInt8](data?[1..<3] ?? .init())
+            return UInt16(dpiBuf)?.bigEndian ?? 0
+        } else {
+            print("Error reading DPI")
+            return 0
+        }
+    }
+    
+    func SetSensorDPI(to n: UInt16, sensorId: UInt8 = 0) {
+        var p: [UInt8] = [sensorId]
+        p.append(contentsOf: n.bigEndian.bytes)
+        _ = Proto.AdjustableDPI.SetSensorDPI.Call(onDevice: self, parameters: p)
+    }
+    
     func GetFeatureIndex(forID f: FeatureID) -> FeatureIndex? {
         let p = f.bigEndian.bytes
-        let call = Proto.IRoot.GetFeature.Call(parameters: p)
-        let r = SendCommand(call)
-        return r?.unwrap()[0]
+        let r = Proto.IRoot.GetFeature.Call(onDevice: self, parameters: p)
+//        print(r?.parameters[0])
+        return r?.parameters[0]
     }
 }
 

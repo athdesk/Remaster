@@ -12,17 +12,17 @@ import IOKit.hid
 
 public extension Notification.Name {
     static func HIDDeviceDataReceived(_ id: IOHIDDevice? = nil) -> Notification.Name {
-        Notification.Name("HIDDeviceDataReceived@\(String(id.hashValue ?? 0))")
+        Notification.Name("HIDDeviceDataReceived@\(String(id.hashValue))")
     }
     static func HIDDeviceExtraDataReceived(_ id: IOHIDDevice? = nil) -> Notification.Name {
-        Notification.Name("HIDDeviceExtraDataReceived@\(String(id.hashValue ?? 0))")
+        Notification.Name("HIDDeviceExtraDataReceived@\(String(id.hashValue))")
     }
 
     static let HIDDeviceConnected = Notification.Name("HIDDeviceConnected")
     static let HIDDeviceDisconnected = Notification.Name("HIDDeviceDisconnected")
 }
 
-public struct HIDMonitorData {
+public struct HIDMonitorData : Equatable {
     public let vendorId: Int
     public let productId: Int
     public var usagePage: Int?
@@ -39,6 +39,11 @@ public struct HIDMonitorData {
         self.usagePage = usagePage
         self.usage = usage
     }
+}
+
+private func GenericDeviceGetDataProperty(device: IOHIDDevice, key: String) -> Data {
+    let value = IOHIDDeviceGetProperty(device, key as CFString)
+    return value as? Data ?? .init()
 }
 
 private func GenericDeviceGetStringProperty(device: IOHIDDevice, key: String) -> String {
@@ -64,10 +69,14 @@ public struct HIDDevice : Hashable {
     public let productId: Int
     public let reportSizeIn: Int
     public let reportSizeOut: Int
+    // TODO: should probably implement a report descriptor parser. But that's a lot of work :c
+    public let reportDescriptor: Data
     public let device: IOHIDDevice
     public let name: String
     public let notificationName: Notification.Name
     public let notificationNameExtra: Notification.Name
+    
+    var idPair: HIDMonitorData { HIDMonitorData(vendorId: self.vendorId, productId: self.productId) }
     
     private static var knownDevices = [IOHIDDevice:Self]()
 
@@ -132,6 +141,7 @@ public struct HIDDevice : Hashable {
         self.productId = GenericDeviceGetIntProperty(device: self.device, key: kIOHIDProductIDKey)
         self.reportSizeIn = GenericDeviceGetIntProperty(device: self.device, key: kIOHIDMaxInputReportSizeKey)
         self.reportSizeOut = GenericDeviceGetIntProperty(device: self.device, key: kIOHIDMaxOutputReportSizeKey)
+        self.reportDescriptor = GenericDeviceGetDataProperty(device: self.device, key: kIOHIDReportDescriptorKey)
         self.notificationName =  Notification.Name.HIDDeviceDataReceived(device)
         self.notificationNameExtra = Notification.Name.HIDDeviceExtraDataReceived(device)
         HIDDevice.knownDevices[device] = self

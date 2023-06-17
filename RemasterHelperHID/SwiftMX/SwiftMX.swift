@@ -9,18 +9,6 @@ import Foundation
 
 extension String : Error {} // Just makes throwing errors not a pain
 
-class ConnectionWatcher : ObservableObject {
-    static let sharedInstance = ConnectionWatcher()
-    @Published var status: Bool = false
-    
-    func updateStatus() {
-        DispatchQueue.main.async { [self] in
-            status = SwiftMxDevice.activeInstances > 0
-            print("Connection status UI elements now are: \(status)")
-        }
-    }
-}
-
 class SwiftMxDevice {
     var devPath: String
     var devIndex: Int32

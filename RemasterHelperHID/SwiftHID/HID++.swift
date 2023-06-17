@@ -120,39 +120,51 @@ struct HIDPP {
         
     }
 
-    struct Device {
-        private let hid: HIDDevice
-        private let devIndex: UInt8
-               
+    struct Device : Hashable {
+        public let hid: HIDDevice
+        internal let devIndex: UInt8
+        var funcReportType: HIDPP.CustomReport.RType? = nil       // this is done manually, i can't seem to figure it out from the reportdescriptor
+        
         // swId defaults to 1 because apparently that's how it's done
         func MakeReport(_ t: HIDPP.CustomReport.RType, _ feat: FeatureIndex, _ fun: FunctionID, _ swId: UInt8 = 1) -> HIDPP.CustomReport {
             HIDPP.CustomReport(t, feat, fun, swId, devIndex)
         }
         
         func SendCommand(_ report: HIDPP.CustomReport, timeout: TimeInterval = .infinity) -> HIDPP.CustomReport? {
-            let s = hid.writeReport(withData: report.unwrap())
-            guard s == true else { return nil }
-            let receiveLock = NSLock()
-            receiveLock.lock()
-            
             var result: HIDPP.CustomReport? = nil
-            
+            let receiveLock = NSLock()
             let obs = NotificationCenter.default.addObserver(forName: hid.notificationNameExtra, object: nil, queue: nil) { n in
                 let recv = n.object as! HIDDevice.Report
                 let ppReport = HIDPP.CustomReport(withData: recv.reportData)
                 
                 guard ppReport.deviceIndex == devIndex else { return }
-                guard ppReport.subID == report.subID else { return }
-                guard ppReport.address == report.address else { return }
+                
+                let e = ppReport.CheckError20()
+                if e != .Success {
+                    // Make sure this is for us
+//                    guard ppReport.swId == report.swId else { return }
+//                    guard ppReport.function == report.function else { return }
+                    // Nevermind it doesn't really work
+                    print("Got error from HID device :( \(e)")
+                } else {
+                    guard ppReport.subID == report.subID else { return }
+                    guard ppReport.address == report.address else { return }
+                }
+
                 result = ppReport
                 receiveLock.unlock()
             }
-            
             defer { NotificationCenter.default.removeObserver(obs) }
-            
+            receiveLock.lock()
+            _ = hid.writeReport(withData: report.unwrap())
             guard receiveLock.lock(before: .init(timeIntervalSinceNow: timeout)) else { return nil }
             receiveLock.unlock()
             return result
+        }
+        
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(hid)
+            hasher.combine(devIndex)
         }
         
         init(dev: HIDDevice, devIndex: UInt8) {
