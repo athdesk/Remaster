@@ -19,7 +19,7 @@ class HIDDeviceMonitor {
         self.reportSize = reportSize
     }
     
-    @objc func start() {
+    func start() {
         let managerRef = IOHIDManagerCreate(kCFAllocatorDefault, IOOptionBits(kIOHIDOptionsTypeNone))
         var deviceMatches:[[String:Any]] = []
         for vp in self.vp {
@@ -45,6 +45,7 @@ class HIDDeviceMonitor {
             let this:HIDDeviceMonitor = unsafeBitCast(inContext, to: HIDDeviceMonitor.self)
             this.rawDeviceRemoved(inResult, inSender: inSender!, inIOHIDDeviceRef: inIOHIDDeviceRef)
         }
+        
         IOHIDManagerRegisterDeviceMatchingCallback(managerRef, matchingCallback, unsafeBitCast(self, to: UnsafeMutableRawPointer.self))
         IOHIDManagerRegisterDeviceRemovalCallback(managerRef, removalCallback, unsafeBitCast(self, to: UnsafeMutableRawPointer.self))
         
@@ -55,13 +56,13 @@ class HIDDeviceMonitor {
     func rawDeviceAdded(_ inResult: IOReturn, inSender: UnsafeMutableRawPointer, inIOHIDDeviceRef: IOHIDDevice!) {
         let device = HIDDevice(device:inIOHIDDeviceRef)
         device.enableNotifications()
-        NotificationCenter.default.post(name: .HIDDeviceConnected, object: device)
+        DispatchQueue.main.async { NotificationCenter.default.post(name: .HIDDeviceConnected, object: device) }
     }
     
     func rawDeviceRemoved(_ inResult: IOReturn, inSender: UnsafeMutableRawPointer, inIOHIDDeviceRef: IOHIDDevice!) {
         let device = HIDDevice(device:inIOHIDDeviceRef) // this should live enough to avoid remaking the whole struct (impossible)
-        device.forget()
-        NotificationCenter.default.post(name: .HIDDeviceDisconnected, object: device)
+//        device.forget()
+        DispatchQueue.main.async { NotificationCenter.default.post(name: .HIDDeviceDisconnected, object: device) }
     }
 }
 

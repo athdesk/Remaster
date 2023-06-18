@@ -23,8 +23,9 @@ class GenericV20Device : Mouse {
     //TODO: private this after debugging
     public var backingDevice: HIDPP.Device
     public var identifier: any MouseIdentifier { backingDevice.identifier }
-    public var name: String { backingDevice.hid.name }
+    public var name: String { backingDevice.name }
     
+
     func getBattery() -> UInt {
         let report = Proto.BatteryStatus.GetBatteryLevelStatus.Call(onDevice: backingDevice)
         if report?.CheckError20() == .Success {
@@ -85,7 +86,14 @@ class GenericV20Device : Mouse {
         }
     }
     
-    required init(withHIDDevice d: HIDDevice, index i: UInt8) {
-        backingDevice = HIDPP.Device(dev: d, devIndex: i)
+    required init?(withHIDDevice d: HIDDevice, index i: UInt8) {
+        guard let dev = HIDPP.Device(dev: d, devIndex: i) else { return nil }
+        let v = dev.protocolVersion
+        if (v ?? "1.0" == "1.0") {
+            print(" -- protocol version of device \(i) is \(v ?? "Unknown"), skipping")
+            return nil
+
+        }
+        backingDevice = dev
     }
 }

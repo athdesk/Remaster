@@ -69,11 +69,12 @@ extension HIDPP {
         }
         
         enum HiResWheel: FunctionID, IFeature {
-            static let ID: FeatureID = 0x2130
+            static let ID: FeatureID = 0x2121
             
             case GetCapability = 0x00
-            case GetMode = 0x10
-            case GetRatchet = 0x30
+            case GetMode = 0x1
+            case SetMode = 0x2
+            case GetRatchet = 0x03
         }
         
         enum BatteryStatus : FunctionID, IFeature {
@@ -136,17 +137,18 @@ extension HIDPP.Device {
         var index: UInt8
     }
     
-    var protocolVersion: String { GetProtocolVersion() } // should not be expensive enough to warrant doing it lazily
     var identifier: HIDAddress { HIDAddress(device: hid.device, index: devIndex) }
+
+    var protocolVersion: String? { GetProtocolVersion() }
     
-    private func GetProtocolVersion() -> String {
+    private func GetProtocolVersion() -> String? {
         let response = Proto.IRoot.Ping.Call(onDevice: self)
         if response != nil {
             let errCode = response!.CheckError10()
             if errCode == .InvalidSubID { return "1.0" }
             if errCode == .Success { return "\(response!.parameters[0]).\(response!.parameters[1])" }
         }
-        return "Invalid"
+        return nil
     }
     
     func GetFeatureIndex(forID f: FeatureID) -> FeatureIndex? {

@@ -43,7 +43,7 @@ enum RemasterDevice : CaseIterable {
         case .Unifying:
             return HIDMonitorData(vendorId: 0x046d, productId: 0xc52b, usagePage: 1, usage: 6)
         case .Bolt:
-            return HIDMonitorData(vendorId: 0x046d, productId: 0xc548, usagePage: 1, usage: 6)
+            return HIDMonitorData(vendorId: 0x046d, productId: 0xc548, usagePage: 0xff00, usage: 1)
         case .MxMaster2S:
             return HIDMonitorData(vendorId: 0x046d, productId: 0xb019)
         case .MxMaster3S:

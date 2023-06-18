@@ -122,7 +122,11 @@ struct HIDPP {
 
     struct Device : Hashable {
         public let hid: HIDDevice
-        internal let devIndex: UInt8
+        public let devIndex: UInt8
+        public var name: String { hid.name }
+        
+        internal var opQueue: OperationQueue
+        
         var funcReportType: HIDPP.CustomReport.RType? = nil       // this is done manually, i can't seem to figure it out from the reportdescriptor
         
         // swId defaults to 1 because apparently that's how it's done
@@ -133,26 +137,31 @@ struct HIDPP {
         func SendCommand(_ report: HIDPP.CustomReport, timeout: TimeInterval = .infinity) -> HIDPP.CustomReport? {
             var result: HIDPP.CustomReport? = nil
             let receiveLock = NSLock()
-            let obs = NotificationCenter.default.addObserver(forName: hid.notificationNameExtra, object: nil, queue: nil) { n in
-                let recv = n.object as! HIDDevice.Report
-                let ppReport = HIDPP.CustomReport(withData: recv.reportData)
-                
-                guard ppReport.deviceIndex == devIndex else { return }
-                
-                let e = ppReport.CheckError20()
-                if e != .Success {
-                    // Make sure this is for us
-//                    guard ppReport.swId == report.swId else { return }
-//                    guard ppReport.function == report.function else { return }
-                    // Nevermind it doesn't really work
-                    print("Got error from HID device :( \(e)")
-                } else {
-                    guard ppReport.subID == report.subID else { return }
-                    guard ppReport.address == report.address else { return }
+            let obs = NotificationCenter.default.addObserver(forName: hid.notificationNameExtra, object: nil, queue: opQueue) { n in
+                DispatchQueue.global().async {
+                    let recv = n.object as! HIDDevice.Report
+                    //                print("()<--------", recv.reportData.hexDescription)
+                    let ppReport = HIDPP.CustomReport(withData: recv.reportData)
+                    
+                    guard ppReport.deviceIndex == devIndex else { return }
+                    
+                    let e = ppReport.CheckError20()
+                    if e != .Success {
+                        // Make sure this is for us
+                        //                    guard ppReport.swId == report.swId else { return }
+                        //                    guard ppReport.function == report.function else { return }
+                        // Nevermind it doesn't really work
+                        print(" -- Got 2.0 error from HID device")
+                    } else if ppReport.CheckError10() != .Success {
+                        print(" -- Got 1.0 error from HID device")
+                    } else {
+                        guard ppReport.subID == report.subID else { return }
+                        guard ppReport.address == report.address else { return }
+                    }
+                    
+                    result = ppReport
+                    receiveLock.unlock()
                 }
-
-                result = ppReport
-                receiveLock.unlock()
             }
             defer { NotificationCenter.default.removeObserver(obs) }
             receiveLock.lock()
@@ -167,9 +176,16 @@ struct HIDPP {
             hasher.combine(devIndex)
         }
         
-        init(dev: HIDDevice, devIndex: UInt8) {
+        init?(dev: HIDDevice, devIndex: UInt8) {
             self.hid = dev
             self.devIndex = devIndex
+            opQueue = OperationQueue()
+            opQueue.name = hid.notificationName.rawValue
+            opQueue.maxConcurrentOperationCount = 4
+            opQueue.underlyingQueue = DispatchQueue.global(qos: .utility)
+            if protocolVersion == nil {
+                return nil
+            }
         }
     }
     

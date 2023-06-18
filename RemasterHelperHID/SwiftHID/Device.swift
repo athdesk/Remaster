@@ -58,7 +58,7 @@ private func GenericDeviceGetIntProperty(device: IOHIDDevice, key: String) -> In
 
 public struct HIDDevice : Hashable {
     static func filter(_ reportId: UInt32, _ report: Data) -> Bool { // doing custom filters is a pain
-        return reportId == 17
+        return reportId != 2
     }
     struct Report {
         let reportData: Data
@@ -69,7 +69,6 @@ public struct HIDDevice : Hashable {
     public let productId: Int
     public let reportSizeIn: Int
     public let reportSizeOut: Int
-    // TODO: should probably implement a report descriptor parser. But that's a lot of work :c
     public let reportDescriptor: Data
     public let device: IOHIDDevice
     public let name: String
@@ -101,10 +100,6 @@ public struct HIDDevice : Hashable {
         return ReportStorage.output[self]!
     }
     
-    public func forget() { // better for this to be manual
-        HIDDevice.knownDevices.removeValue(forKey: self.device)
-    }
-    
     public func writeReport(withData d: Data) -> Bool {
         if d.count > reportSizeOut {
             print("Report size has to be at most \(reportSizeOut) bytes")
@@ -130,10 +125,10 @@ public struct HIDDevice : Hashable {
     }
     
     public init(device: IOHIDDevice) {
-        if let instance = HIDDevice.knownDevices[device] {
-            self = instance
-            return
-        }
+//        if let instance = HIDDevice.knownDevices[device] {
+//            self = instance
+//            return
+//        }
         self.device = device
         self.id = GenericDeviceGetIntProperty(device: self.device, key: kIOHIDLocationIDKey)
         self.name = GenericDeviceGetStringProperty(device: self.device, key: kIOHIDProductKey)
@@ -144,6 +139,6 @@ public struct HIDDevice : Hashable {
         self.reportDescriptor = GenericDeviceGetDataProperty(device: self.device, key: kIOHIDReportDescriptorKey)
         self.notificationName =  Notification.Name.HIDDeviceDataReceived(device)
         self.notificationNameExtra = Notification.Name.HIDDeviceExtraDataReceived(device)
-        HIDDevice.knownDevices[device] = self
+//        HIDDevice.knownDevices[device] = self
     }
 }

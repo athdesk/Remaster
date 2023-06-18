@@ -30,17 +30,32 @@ import IOKit.hid
 
 func start() {
     let hidMonitor = HIDDeviceMonitor(SupportedDevices, reportSize: 64)
-
-    NotificationCenter.default.addObserver(forName: .HIDDeviceConnected, object: nil, queue: nil) { n in
+    
+    let opQueue = OperationQueue()
+    opQueue.name = "Main Monitor Queue"
+    opQueue.maxConcurrentOperationCount = 4
+    opQueue.underlyingQueue = DispatchQueue.global(qos: .userInitiated)
+    
+    NotificationCenter.default.addObserver(forName: .HIDDeviceConnected, object: nil, queue: opQueue) { n in
         let device = n.object as! HIDDevice
         print(device.device)
-        guard let driver = RemasterDevice(fromMonitorData: device.idPair)?.getDriver() else { return }
-        // TODO: find out which device indices are populated and add each single device
-        guard let m = driver.init(withHIDDevice: device, index: 0xff) else { return } // TODO: index hardcoded for now
-        MouseFactory.addMouse(m)
+        guard let rawDevice = RemasterDevice(fromMonitorData: device.idPair) else { return }
+        if rawDevice.isReceiver() {
+            for i in 0...6 {
+                print("receiver, trying index \(i)")
+                guard let m = MxMaster3SDevice(withHIDDevice: device, index: UInt8(i)) else { continue }
+                MouseFactory.addMouse(m)
+            }
+        } else {
+            guard let driver = rawDevice.getDriver() else { return }
+            print("porcodio")
+            // TODO: find out which device indices are populated and add each single device
+            guard let m = driver.init(withHIDDevice: device, index: 0xff) else { return } // TODO: index hardcoded for now
+            MouseFactory.addMouse(m)
+        }
     }
     
-    NotificationCenter.default.addObserver(forName: .HIDDeviceDisconnected, object: nil, queue: nil) { n in
+    NotificationCenter.default.addObserver(forName: .HIDDeviceDisconnected, object: nil, queue: opQueue) { n in
         let device = n.object as! HIDDevice
         for i in [UInt8]([0, 1, 2, 3, 4, 5, 6, 255]) {
             MouseFactory.removeMouse(withIdentifier: HIDPP.Device.HIDAddress(device: device.device, index: i))

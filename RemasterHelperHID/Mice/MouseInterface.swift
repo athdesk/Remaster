@@ -79,7 +79,7 @@ extension Mouse {
         }
     }
     
-    init?(withHIDDevice d: HIDDevice, index i: UInt8) { print("Device \(d) does not have a driver yet :("); return nil }
+//    init?(withHIDDevice d: HIDDevice, index i: UInt8) { print("Device \(d) does not have a driver yet :("); return nil }
 }
 
 // much swiftui
