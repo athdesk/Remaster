@@ -20,15 +20,14 @@ extension HIDPP.Device.HIDAddress : MouseIdentifier {
 
 class GenericV20Device : Mouse {
     typealias Proto = HIDPP.v20
-    //TODO: private this after debugging
-    public var backingDevice: HIDPP.Device
+    private var backingDevice: HIDPP.Device
     public var identifier: any MouseIdentifier { backingDevice.identifier }
     public var name: String { backingDevice.name }
     
 
     func getBattery() -> UInt {
         let report = Proto.BatteryStatus.GetBatteryLevelStatus.Call(onDevice: backingDevice)
-        if report?.CheckError20() == .Success {
+        if report?.isError == false {
             let b = UInt(report!.parameters[0])
             CallbackBattery(b)
             return b
@@ -40,7 +39,7 @@ class GenericV20Device : Mouse {
     func getSupportedDPI() -> (UInt, UInt, UInt)? {
         let p: [UInt8] = [0]
         let report = Proto.AdjustableDPI.GetSensorDPIList.Call(onDevice: backingDevice, parameters: p)
-        if report?.CheckError20() == .Success {
+        if report?.isError == false {
             let d = report!.parameters
             let min = UInt(UInt16([UInt8](d[1..<3]))?.bigEndian ?? 0)
             var step = UInt(UInt16([UInt8](d[3..<5]))?.bigEndian ?? 0)
@@ -62,7 +61,7 @@ class GenericV20Device : Mouse {
     func getDPI() -> UInt {
         let p: [UInt8] = [0] // 0 is sensorId
         let report = Proto.AdjustableDPI.GetSensorDPI.Call(onDevice: backingDevice, parameters: p)
-        if report?.CheckError20() == .Success {
+        if report?.isError == false {
             let data = report!.parameters
             let dpiBuf = [UInt8](data[1..<3])
             let r = UInt(UInt16(dpiBuf)?.bigEndian ?? 0)

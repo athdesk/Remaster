@@ -13,6 +13,7 @@ typealias FunctionID = UInt8
 struct HIDPP {
     struct CustomReport {
         private var d: Data
+        var isError: Bool { !(CheckError10() == .Success && CheckError20() == .Success) }
         
         enum RType: UInt8 {
             case Short = 0x10
@@ -123,7 +124,11 @@ struct HIDPP {
     struct Device : Hashable {
         public let hid: HIDDevice
         public let devIndex: UInt8
-        public var name: String { hid.name }
+        public var isStandalone: Bool { devIndex == 0 || devIndex == 255 }
+        public var name: String {
+            if isStandalone { return hid.name }
+            return GetName() ?? "1.0 Device"
+        }
         
         internal var opQueue: OperationQueue
         
@@ -151,9 +156,9 @@ struct HIDPP {
                         //                    guard ppReport.swId == report.swId else { return }
                         //                    guard ppReport.function == report.function else { return }
                         // Nevermind it doesn't really work
-                        print(" -- Got 2.0 error from HID device")
+//                        print(" -- Got 2.0 error from HID device")
                     } else if ppReport.CheckError10() != .Success {
-                        print(" -- Got 1.0 error from HID device")
+//                        print(" -- Got 1.0 error from HID device")
                     } else {
                         guard ppReport.subID == report.subID else { return }
                         guard ppReport.address == report.address else { return }

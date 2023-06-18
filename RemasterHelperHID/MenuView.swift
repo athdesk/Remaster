@@ -27,7 +27,14 @@ let DefaultCallbackBat: UIntCallback = { x in
     ViewData.sharedInstance.setBatReport(v: x)
 }
 
-class ViewData : ObservableObject {
+class ViewData : ObservableObject, Equatable {
+    static func == (lhs: ViewData, rhs: ViewData) -> Bool {
+        lhs.statusString == rhs.statusString &&
+        lhs.dpiReport == rhs.dpiReport &&
+        lhs.batReport == rhs.batReport &&
+        lhs.dpiSupport == rhs.dpiSupport
+    }
+    
     
     static let sharedInstance = ViewData()
     
@@ -46,7 +53,7 @@ class ViewData : ObservableObject {
     @Published var _dpiSupport: (UInt?, UInt?, UInt?) = (0, 0, 0) // Min, Max, Step
     
     
-    struct DPISupport {
+    struct DPISupport : Equatable {
         var min: Float
         var max: Float
         var step: Float
@@ -88,6 +95,7 @@ class ViewData : ObservableObject {
 }
 
 struct StatusView: View {
+
     @EnvironmentObject var data: ViewData
     var body: some View {
         HStack {
@@ -103,14 +111,14 @@ struct DPIView: View {
     @EnvironmentObject var data: ViewData
     @State var dpiSlider: Float = Float(DefaultMousePreferences.dpi)
     var body: some View {
-        Text("Current DPI: \(data._dpiReport)")
-        Slider(value: $dpiSlider,
-               in: ClosedRange(uncheckedBounds: (data.dpiSupport.min, data.dpiSupport.max)),
-        onEditingChanged: { x in
-            if !x {
-                data.dpiReport = dpiSlider
-            }
-        })
+        VStack {
+            Text("Current DPI: \(data._dpiReport)")
+            Slider(value: $dpiSlider,
+                   in: ClosedRange(uncheckedBounds: (data.dpiSupport.min, data.dpiSupport.max)),
+                   onEditingChanged: { x in if !x { data.dpiReport = dpiSlider} })
+            .onChange(of: data.dpiReport) { newValue in dpiSlider = newValue }
+        }
+        .animation(.default, value: data)
     }
 }
 

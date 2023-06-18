@@ -68,6 +68,13 @@ extension HIDPP {
             case Ping = 0x1
         }
         
+        enum FriendlyName: FunctionID, IFeature {
+            static let ID: FeatureID = 0x0007
+            
+            case GetNameLength = 0x00
+            case GetName = 0x01
+        }
+        
         enum HiResWheel: FunctionID, IFeature {
             static let ID: FeatureID = 0x2121
             
@@ -149,6 +156,28 @@ extension HIDPP.Device {
             if errCode == .Success { return "\(response!.parameters[0]).\(response!.parameters[1])" }
         }
         return nil
+    }
+    
+    func GetName() -> String? {
+        if protocolVersion == nil || protocolVersion == "1.0" { return nil }
+        let r = Proto.FriendlyName.GetNameLength.Call(onDevice: self)
+        guard let length = r?.parameters[0] else { return nil }
+        if r?.isError == true { return nil }
+        
+        var nameArray: [UInt8] = []
+        while nameArray.count < length {
+            let p = [UInt8(nameArray.count)]
+            let r = Proto.FriendlyName.GetName.Call(onDevice: self, parameters: p)
+            if r?.isError == true { return nil }
+            guard let nameBuf = r?.parameters else { return nil }
+            if nameBuf[0] == 0x00 {
+                nameArray.append(contentsOf: nameBuf[1...])
+            } else {
+                nameArray.append(contentsOf: nameBuf)
+            }
+        }
+        nameArray.append(0x00)
+        return String(cString: nameArray)
     }
     
     func GetFeatureIndex(forID f: FeatureID) -> FeatureIndex? {

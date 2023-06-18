@@ -95,7 +95,10 @@ class ConnectionWatcher : ObservableObject {
 }
 
 class MouseFactory {
-    static private let MainChangedCallback = DefaultStatusCallback
+    static private let MainChangedCallback = { s in
+        ConnectionWatcher.sharedInstance.updateStatus()
+        DefaultStatusCallback(s)
+    }
     
     enum Identifiers : MouseIdentifier, CaseIterable, Hashable {
         // Special identifiers that alias to some specific instances
@@ -116,7 +119,11 @@ class MouseFactory {
     
     // TODO: for now just pick the first one, when we have favorites we'll change this
     static private func chooseMainInstance() {
-        guard let newMain = _mice.first(where: isReal)?.value else { return }
+        guard let newMain = _mice.first(where: isReal)?.value else {
+            _mice[Identifiers.Main] = nil
+            MainChangedCallback("No Mouse Connected")
+            return
+        }
         if newMain === _mice[Identifiers.Main] { return }
         print("There's a new sheriff in town! \(newMain.name)")
         MainChangedCallback(newMain.name)
