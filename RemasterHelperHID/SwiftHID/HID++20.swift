@@ -8,6 +8,24 @@
 import Foundation
 
 typealias FeatureID = UInt16
+typealias FunctionID = UInt8
+
+struct FeatureIndex : RawRepresentable {
+    typealias RawValue = UInt8
+    var rawValue: UInt8
+    
+    static func ==(lhs: FeatureIndex, rhs: UInt8) -> Bool {
+        lhs.rawValue == rhs
+    }
+    
+    init(rawValue: UInt8) {
+        self.rawValue = rawValue
+    }
+    
+    init(_ value: UInt8) {
+        self.rawValue = value
+    }
+}
 
 enum Err : Error {
     case FeatureIndexError
@@ -25,7 +43,8 @@ fileprivate var StoredFeatureIndexes: Dictionary<HIDPP.Device, Dictionary<Featur
 
 extension IFeature {
     static internal var _index: FeatureIndex? { nil }
-    static internal func getIndex(_ dev: HIDPP.Device) throws -> FeatureIndex {
+    
+    static func getIndex(_ dev: HIDPP.Device) throws -> FeatureIndex {
         if self._index != nil { return self._index! }
         var dict = StoredFeatureIndexes[dev] ?? .init()
         let f = dict[self.ID] ?? {
@@ -62,7 +81,7 @@ extension HIDPP {
     struct v20 {
         enum IRoot : FunctionID, IFeature {
             static internal let ID: FeatureID = 0x0000
-            static internal var _index: FeatureIndex? = 0
+            static internal var _index: FeatureIndex? = FeatureIndex(0)
 
             case GetFeature = 0x0
             case Ping = 0x1
@@ -118,6 +137,14 @@ extension HIDPP {
                 self = ErrorCode(rawValue: v) ?? ErrorCode.Invalid
             }
         }
+        
+        static public let Features: [any IFeature.Type] = [
+            IRoot.self,
+            FriendlyName.self,
+            HiResWheel.self,
+            BatteryStatus.self,
+            AdjustableDPI.self
+        ]
     }
 }
 
@@ -184,7 +211,25 @@ extension HIDPP.Device {
         let p = f.bigEndian.bytes
         let report = Proto.IRoot.GetFeature.Call(onDevice: self, parameters: p)
         if report?.parameters[0] == 0 { return nil }
-        return report?.parameters[0]
+        return FeatureIndex(report!.parameters[0])
+    }
+    
+    func GetFeature(forIndex i: FeatureIndex) -> (any IFeature.Type)? {
+        if let dict = StoredFeatureIndexes[self] {
+            if let res = dict.first(where: { pair in pair.value == i }) {
+                // Already have it. Yay!
+                for t in Proto.Features {
+                    if t.ID == res.key { return t }
+                }
+            }
+        }
+        // Don't have it. Have to enumerate :(
+        for t in Proto.Features {
+            if (try? t.getIndex(self) == i) == true {
+                return t
+            }
+        }
+        return nil
     }
 }
 

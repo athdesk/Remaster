@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DE07A4E82A3F257500E43C5C /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE07A4E72A3F257400E43C5C /* Event.swift */; };
 		DE4A9B4B2A3E056A007B5F7A /* MxMaster2S.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4A9B4A2A3E056A007B5F7A /* MxMaster2S.swift */; };
 		DE9C87942A38A753002770AD /* RemasterHelperHIDApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9C87932A38A753002770AD /* RemasterHelperHIDApp.swift */; };
 		DE9C87982A38A755002770AD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DE9C87972A38A755002770AD /* Assets.xcassets */; };
@@ -54,6 +55,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		DE07A4E72A3F257400E43C5C /* Event.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Event.swift; sourceTree = "<group>"; };
 		DE1D620C2A388A09009DAA65 /* hidpp.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = hidpp.xcodeproj; path = ../hidpp/hidpp.xcodeproj; sourceTree = "<group>"; };
 		DE4A9B4A2A3E056A007B5F7A /* MxMaster2S.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MxMaster2S.swift; sourceTree = "<group>"; };
 		DE9C87912A38A753002770AD /* RemasterHelperHID.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RemasterHelperHID.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -132,6 +134,7 @@
 				DE9C87BE2A3A34AA002770AD /* HID++.swift */,
 				DE9C87C02A3A66B4002770AD /* HID++10.swift */,
 				DE9C87C22A3A9009002770AD /* HID++20.swift */,
+				DE07A4E72A3F257400E43C5C /* Event.swift */,
 			);
 			path = SwiftHID;
 			sourceTree = "<group>";
@@ -324,6 +327,7 @@
 				DE9C87D72A3D261E002770AD /* MxMaster3S.swift in Sources */,
 				DE4A9B4B2A3E056A007B5F7A /* MxMaster2S.swift in Sources */,
 				DE9C87CA2A3B808F002770AD /* GenericV20.swift in Sources */,
+				DE07A4E82A3F257500E43C5C /* Event.swift in Sources */,
 				DE9C87A92A38BD53002770AD /* MainLogic.swift in Sources */,
 				DE9C87C32A3A9009002770AD /* HID++20.swift in Sources */,
 				DE9C87C72A3B6EED002770AD /* MouseInterface.swift in Sources */,

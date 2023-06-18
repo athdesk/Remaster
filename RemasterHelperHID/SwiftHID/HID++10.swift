@@ -75,7 +75,7 @@ extension HIDPP {
 extension HIDPP.CustomReport {
     func CheckError10() -> HIDPP.v10.ErrorCode {
         guard self.type == .Short else { return .Success }
-        guard self.subID == HIDPP.v10.SubID.ErrorMessage else { return .Success }
+        guard self.subID.rawValue == HIDPP.v10.SubID.ErrorMessage else { return .Success }
         
         return HIDPP.v10.ErrorCode(rawValue: self.parameters[1]) ?? .Invalid
     }

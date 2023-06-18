@@ -7,9 +7,6 @@
 
 import Foundation
 
-typealias FeatureIndex = UInt8
-typealias FunctionID = UInt8
-
 struct HIDPP {
     struct CustomReport {
         private var d: Data
@@ -44,8 +41,8 @@ struct HIDPP {
         }
         
         var subID: FeatureIndex {
-            get { d[2] }
-            set { d[2] = newValue}
+            get { FeatureIndex(d[2]) }
+            set { d[2] = newValue.rawValue }
         }
         
         var address: UInt8 {
@@ -131,6 +128,7 @@ struct HIDPP {
         }
         
         internal var opQueue: OperationQueue
+        public let notifier: EventNotifier
         
         var funcReportType: HIDPP.CustomReport.RType? = nil       // this is done manually, i can't seem to figure it out from the reportdescriptor
         
@@ -188,6 +186,7 @@ struct HIDPP {
             opQueue.name = hid.notificationName.rawValue
             opQueue.maxConcurrentOperationCount = 4
             opQueue.underlyingQueue = DispatchQueue.global(qos: .utility)
+            self.notifier = EventNotifier(forHID: dev, forIndex: devIndex)
             if protocolVersion == nil {
                 return nil
             }

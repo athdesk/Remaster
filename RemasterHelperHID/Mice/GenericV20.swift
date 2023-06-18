@@ -20,10 +20,36 @@ extension HIDPP.Device.HIDAddress : MouseIdentifier {
 
 class GenericV20Device : Mouse {
     typealias Proto = HIDPP.v20
-    private var backingDevice: HIDPP.Device
+    internal var backingDevice: HIDPP.Device
     public var identifier: any MouseIdentifier { backingDevice.identifier }
     public var name: String { backingDevice.name }
     
+    internal var EventDPI: EventCallback {{ n in
+        let ppReport = n.object as! HIDPP.CustomReport
+        if ppReport.isError == false {
+            let data = ppReport.parameters
+            switch ppReport.function {
+            case Proto.AdjustableDPI.SetSensorDPI.rawValue: break
+            case Proto.AdjustableDPI.GetSensorDPI.rawValue:
+                    let dpiBuf = [UInt8](data[1..<3])
+                    let r = UInt(UInt16(dpiBuf)?.bigEndian ?? 0)
+                    self.CallbackDPI(r)
+            case Proto.AdjustableDPI.GetSensorDPIList.rawValue:
+                let min = UInt(UInt16([UInt8](data[1..<3]))?.bigEndian ?? 0)
+                var step = UInt(UInt16([UInt8](data[3..<5]))?.bigEndian ?? 0)
+                var max = UInt(UInt16([UInt8](data[5..<7]))?.bigEndian ?? 0)
+                if (step & 0xE000) != 0 {
+                    step -= 0xE000
+                } else { // in this case, there are just min/max and the 3rd param is junk
+                    max = step
+                    step = 0
+                }
+                self.CallbackDPISupport(min, max, step)
+            default:
+                break
+            }
+        }
+    }}
 
     func getBattery() -> UInt {
         let report = Proto.BatteryStatus.GetBatteryLevelStatus.Call(onDevice: backingDevice)
@@ -50,11 +76,8 @@ class GenericV20Device : Mouse {
                 max = step
                 step = 0
             }
-            
-            CallbackDPISupport(min, max, step)
             return (min, max, step)
         }
-        print("Error reading DPI support")
         return nil
     }
     
@@ -65,11 +88,8 @@ class GenericV20Device : Mouse {
             let data = report!.parameters
             let dpiBuf = [UInt8](data[1..<3])
             let r = UInt(UInt16(dpiBuf)?.bigEndian ?? 0)
-            CallbackDPI(r)
             return r
         }
-        print("Error reading DPI")
-        CallbackDPI(0)
         return 0
     }
     
@@ -94,5 +114,10 @@ class GenericV20Device : Mouse {
 
         }
         backingDevice = dev
+        
+        if let i = dev.GetFeatureIndex(forID: Proto.AdjustableDPI.ID) {
+            _ = backingDevice.notifier.newObserver(forIndex: i, using: EventDPI)
+        }
+
     }
 }
