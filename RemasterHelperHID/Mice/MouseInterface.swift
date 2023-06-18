@@ -54,6 +54,7 @@ extension Dictionary where Key == MouseIdent {
 protocol Mouse : AnyObject {
     var identifier: any MouseIdentifier { get }
     var name: String { get }
+    var view: ViewData { get set }
     
     func getBattery() -> UInt
     func getSupportedDPI() -> (UInt, UInt, UInt)?
@@ -65,10 +66,9 @@ protocol Mouse : AnyObject {
 }
 
 extension Mouse {
-    // TODO: callbacks have to be disabled/changed for non-main devices
-    internal var CallbackBattery: UIntCallback { DefaultCallbackBat }
-    internal var CallbackDPI: UIntCallback { DefaultCallbackDPI }
-    internal var CallbackDPISupport: UIntTripletCallback { DefaultCallbackDPISupport }
+    internal var CallbackBattery: UIntCallback { view.DefaultCallbackBat }
+    internal var CallbackDPI: UIntCallback { view.DefaultCallbackDPI }
+    internal var CallbackDPISupport: UIntTripletCallback { view.DefaultCallbackDPISupport }
     
     func refreshData(delayed: Bool = false) {
         DispatchQueue.global().async {
@@ -95,9 +95,11 @@ class ConnectionWatcher : ObservableObject {
 }
 
 class MouseFactory {
-    static private let MainChangedCallback = { s in
+    static private let MainChangedCallback: ((any Mouse)?) -> () = { new in
         ConnectionWatcher.sharedInstance.updateStatus()
-        DefaultStatusCallback(s)
+        new?.view = ViewData.main
+        
+        // TODO: if we ever have on-the-fly changing mains, change ViewData reference in old mouse instances
     }
     
     enum Identifiers : MouseIdentifier, CaseIterable, Hashable {
@@ -121,12 +123,12 @@ class MouseFactory {
     static private func chooseMainInstance() {
         guard let newMain = _mice.first(where: isReal)?.value else {
             _mice[Identifiers.Main] = nil
-            MainChangedCallback("No Mouse Connected")
+            MainChangedCallback(nil)
             return
         }
         if newMain === _mice[Identifiers.Main] { return }
         print("There's a new sheriff in town! \(newMain.name)")
-        MainChangedCallback(newMain.name)
+        MainChangedCallback(newMain)
         _mice[Identifiers.Main] = newMain
         newMain.refreshData()
         ConnectionWatcher.sharedInstance.updateStatus()

@@ -23,6 +23,7 @@ class GenericV20Device : Mouse {
     internal var backingDevice: HIDPP.Device
     public var identifier: any MouseIdentifier { backingDevice.identifier }
     public var name: String { backingDevice.name }
+    public var view: ViewData = ViewData()
     
     internal var EventDPI: EventCallback {{ n in
         let ppReport = n.object as! HIDPP.CustomReport

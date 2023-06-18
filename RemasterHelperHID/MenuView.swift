@@ -11,23 +11,33 @@ typealias UIntCallback = (UInt) -> ()
 typealias UIntTripletCallback = (UInt, UInt, UInt) -> ()
 typealias StringCallback = (String) -> ()
 
-let DefaultStatusCallback: StringCallback = { s in
-    ViewData.sharedInstance.setStatus(s: s)
-}
-
-let DefaultCallbackDPISupport: UIntTripletCallback = { x, y, z in
-    ViewData.sharedInstance.setDPISupport(min: x, max: y, step: z)
-}
-
-let DefaultCallbackDPI: UIntCallback = { x in
-    ViewData.sharedInstance.setDPIReport(v: x)
-}
-
-let DefaultCallbackBat: UIntCallback = { x in
-    ViewData.sharedInstance.setBatReport(v: x)
-}
-
 class ViewData : ObservableObject, Equatable {
+    private func checkUpdateRef() {
+//        if ViewData.mainDeviceRef === self {
+//            ViewData.set(to: self)
+//        }
+    }
+    
+    var DefaultStatusCallback: StringCallback {{ s in
+        self.setStatus(s: s)
+        self.checkUpdateRef()
+    }}
+
+    var DefaultCallbackDPISupport: UIntTripletCallback {{ x, y, z in
+        self.setDPISupport(min: x, max: y, step: z)
+        self.checkUpdateRef()
+    }}
+
+    var DefaultCallbackDPI: UIntCallback {{ x in
+        self.setDPIReport(v: x)
+        self.checkUpdateRef()
+    }}
+
+    var DefaultCallbackBat: UIntCallback {{ x in
+        self.setBatReport(v: x)
+        self.checkUpdateRef()
+    }}
+    
     static func == (lhs: ViewData, rhs: ViewData) -> Bool {
         lhs.statusString == rhs.statusString &&
         lhs.dpiReport == rhs.dpiReport &&
@@ -36,7 +46,19 @@ class ViewData : ObservableObject, Equatable {
     }
     
     
-    static let sharedInstance = ViewData()
+    static var main = ViewData()
+    
+    // here just to keep track of things
+//    static var mainDeviceRef: ViewData?
+    
+    static func set(to v: ViewData) {
+        Self.main.setStatus(s: v.statusString)
+        Self.main.setBatReport(v: v.batReport)
+        Self.main.setDPIReport(v: v._dpiReport)
+        Self.main.setDPISupport(min: v._dpiSupport.0 ?? 0,
+                                max: v._dpiSupport.1 ?? 0,
+                                step: v._dpiSupport.2 ?? 0)
+    }
     
     @Published var statusString: String = "No Mouse Connected"
     
@@ -123,7 +145,7 @@ struct DPIView: View {
 }
 
 struct MenuView: View {
-    @ObservedObject var data: ViewData = ViewData.sharedInstance
+    @ObservedObject var data: ViewData = ViewData.main
     @ObservedObject var watcher: ConnectionWatcher = ConnectionWatcher.sharedInstance
     
     var body: some View {
