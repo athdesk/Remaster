@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Combine
 
 // Class for interfacing with #.*.*.# a mouse #.*.*.# :)
 //
@@ -17,51 +18,30 @@ import Foundation
 //      especially for Bluetooth, so we might need to be a bit
 //      clever in the way we reapply settings etc.
 
-protocol Mouse : AnyObject {
+protocol Mouse : AnyObject, ObservableObject {
     var identifier: any MouseIdentifier { get }
     var name: String { get }
-    var view: ViewData { get set }
+    var transport: TransportType { get }
 
     var EventDPI: EventCallback { get }
     var EventWheel: EventCallback { get }
-   
-    func getSmartShift() -> UInt?
-    func setSmartShift(to: UInt)
-    func getRatchet() -> Bool?
-    func setRatchet(to: Bool)
-    func toggleRatchet()
     
-    func getBattery() -> UInt
+    var Ratchet: Bool? { get set }
+    var SmartShift: UInt? { get set }
     
-    func getSupportedDPI() -> (UInt, UInt, UInt)?
-    func getDPI() -> UInt
-    func setDPI(to: UInt)
+    var Battery: UInt { get }
     
-    func refreshData(delayed: Bool)
+    var DPI: UInt { get set }
+    var SupportedDPI: DPISupport { get }
+    
+    func refreshData()
     
     init?(withHIDDevice d: HIDDevice, index i: UInt8)
 }
 
 extension Mouse {
-    
-    internal var CallbackBattery: UIntCallback { view.DefaultBatteryCallback }
-    internal var CallbackDPI: UIntCallback { view.DefaultDPICallback }
-    internal var CallbackDPISupport: UIntTripletCallback { view.DefaultDPISupportCallback }
-    internal var CallbackRatchet: BoolOptCallback { view.DefaultRatchetCallback }
-    internal var CallbackSmartShift: UIntOptCallback { view.DefaultSmartShiftCallback }
-    
-    func refreshData(delayed: Bool = false) {
-        DispatchQueue.global().async {
-            if delayed { sleep(2) }
-            self.view.DefaultStatusCallback(self.name)
-            _ = self.getBattery()
-            _ = self.getDPI()
-            _ = self.getSupportedDPI()
-            _ = self.getRatchet()
-            _ = self.getSmartShift()
-        }
+    func onUpdate(_ clause: @escaping () -> () ) -> AnyCancellable? {
+        print("onUpdate()")
+        return objectWillChange.sink { _ in clause() }
     }
-
 }
-
-

@@ -8,13 +8,18 @@
 import Foundation
 
 class MxMaster3SDevice : GenericV20Device {
-    var ratchetSaved: Bool? = nil
-    var ssSaved: UInt? = nil
+    @Published private var _Ratchet: Bool? = nil
+    @Published private var _SmartShift: UInt? = nil
+        
+    override var Ratchet: Bool? {
+        get { return _Ratchet }
+        set { setRatchet(to: newValue ?? false)}
+    }
     
-    internal var CallbackRatchet: BoolOptCallback {{ arg in
-        self.ratchetSaved = arg
-        self.view.DefaultRatchetCallback(arg)
-    }}
+    override var SmartShift: UInt? {
+        get { return _SmartShift }
+        set { setSmartShift(to: newValue ?? 0) }
+    }
     
     override internal var EventWheel: EventCallback {{ n in
         let ppReport = n.object as! HIDPP.CustomReport
@@ -24,7 +29,7 @@ class MxMaster3SDevice : GenericV20Device {
             case 0x1:
                 if ppReport.swId == 1 { return } // not an event, may contain false data
                 let ratchetStatus = (data[0] & 0x01) != 0
-                self.CallbackRatchet(ratchetStatus)
+                self._Ratchet = ratchetStatus
             default: break
             }
         }
@@ -57,52 +62,49 @@ class MxMaster3SDevice : GenericV20Device {
                 rat = (flags & 0x01) != 0
             }
         }
-//        print((inv, rat, div, res))
-        self.CallbackRatchet(rat)
+        _Ratchet = rat
         return (inv, rat, div, res)
     }
     
-    override func getSmartShift() -> UInt? {
+    func getSmartShift() -> UInt? {
         let report = Proto.SmartShift.Read.Call(onDevice: backingDevice)
         if report?.isError == false {
             let data = report!.parameters
             let r = UInt(data[1])
-            CallbackSmartShift(r)
             return r
         }
         return nil
     }
     
-    override func setSmartShift(to: UInt) {
-        print("\(#function) \(String(describing: to))")
+    func setSmartShift(to: UInt) {
         var p: [UInt8] = [to > 0 ? 2 : 1]
         p.append(UInt8(to))
+        _SmartShift = to
         _ = Proto.SmartShift.Write.Call(onDevice: backingDevice, parameters: p)
     }
     
-    override func getRatchet() -> Bool? {
-        let s = ratchetSaved ?? getWheelInfo().1
-        self.CallbackRatchet(s)
-        return s
+    private func getRatchet() -> Bool? {
+        return getWheelInfo().1
     }
 
-    override func setRatchet(to: Bool) {
-        setSmartShift(to: to ? 45: 0)
+    private func setRatchet(to: Bool) {
+        // TODO: get a default instead of 45
+        // save this now, it will get clobbered, restore it later
+        let x = _SmartShift ?? getSmartShift()
+        setSmartShift(to: to ? _SmartShift ?? 45: 0)
+        _SmartShift = x
     }
     
-    override func toggleRatchet() {
+    private func toggleRatchet() {
         if let cur = getRatchet() {
             setRatchet(to: !cur)
         }
     }
-    
-    // Does not support granular DPI
-    override func setDPI(to n: UInt) {
-        var p: [UInt8] = [0] // 0 is sensorId
-        let n16 = UInt16(n)
-        p.append(contentsOf: n16.bigEndian.bytes)
-        _ = Proto.AdjustableDPI.SetSensorDPI.Call(onDevice: backingDevice, parameters: p)
-        _ = getDPI()
-    }
 
+    override func refreshData() {
+        super.refreshData()
+        _ = getWheelInfo()
+        _ = getSmartShift()
+    }
+    
 }

@@ -7,6 +7,23 @@
 
 import Foundation
 
+enum ReceiverType : CaseIterable {
+    case Bolt
+    case Unifying
+}
+
+enum TransportType {
+    case Wired
+    case Bluetooth
+    case Receiver(ReceiverType)
+}
+
+struct DPISupport {
+    let min: UInt = 1000
+    let max: UInt = 2000
+    let step: UInt?
+}
+
 // just to only have explicit identifiers
 protocol MouseIdentifier : Hashable { }
 

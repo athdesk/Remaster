@@ -29,7 +29,7 @@ import IOKit.hid
 //extension IOHIDDevice : MouseIdentifier { }
 
 func start() {
-    let hidMonitor = HIDDeviceMonitor(SupportedDevices, reportSize: 64)
+    let hidMonitor = HIDDeviceMonitor(RemasterDevice.SupportedDevices, reportSize: 64)
     
     let opQueue = OperationQueue()
     opQueue.name = "Main Monitor Queue"
@@ -40,17 +40,18 @@ func start() {
         let device = n.object as! HIDDevice
         print(device.device)
         guard let rawDevice = RemasterDevice(fromMonitorData: device.idPair) else { return }
-        if rawDevice.isReceiver() {
+        if case .Receiver = rawDevice {
             for i in 0...6 {
+                // this works surprisingly well
+                // but I should implement receiver communication anyway
+                // to make it possible to pair/unpair devices
                 print("receiver, trying index \(i)")
                 guard let m = MxMaster3SDevice(withHIDDevice: device, index: UInt8(i)) else { continue }
                 MouseFactory.addMouse(m)
             }
         } else {
             guard let driver = rawDevice.getDriver() else { return }
-            print("porcodio")
-            // TODO: find out which device indices are populated and add each single device
-            guard let m = driver.init(withHIDDevice: device, index: 0xff) else { return } // TODO: index hardcoded for now
+            guard let m = driver.init(withHIDDevice: device, index: 0xff) else { return }
             MouseFactory.addMouse(m)
         }
     }
