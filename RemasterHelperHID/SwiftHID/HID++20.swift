@@ -66,7 +66,7 @@ extension IFeature {
         do {
             var call = try HIDPP.CustomReport(t, Self.getIndex(dev), self.rawValue, nil, dev.devIndex)
             call.parameters = parameters
-            DebugPrint("making call \(self)(\(try! Self.getIndex(dev)))@\(dev.hid.name): \(call.unwrap().hexDescription)")
+            DebugPrint("making call \(self)(\(String(describing: try? Self.getIndex(dev))))@\(dev.hid.name): \(call.unwrap().hexDescription)")
             let r = dev.SendCommand(call, timeout: timeout)
             DebugPrint("response \(self)@\(dev.hid.name): \(r?.unwrap().hexDescription ?? "bad")")
             return r
@@ -92,6 +92,13 @@ extension HIDPP {
             
             case GetNameLength = 0x00
             case GetName = 0x01
+        }
+        
+        enum SmartShift: FunctionID, IFeature {
+            static let ID: FeatureID = 0x2110
+            
+            case Read = 0x00
+            case Write = 0x1
         }
         
         enum HiResWheel: FunctionID, IFeature {
@@ -210,6 +217,7 @@ extension HIDPP.Device {
     func GetFeatureIndex(forID f: FeatureID) -> FeatureIndex? {
         let p = f.bigEndian.bytes
         let report = Proto.IRoot.GetFeature.Call(onDevice: self, parameters: p)
+        if report == nil { return nil }
         if report?.parameters[0] == 0 { return nil }
         return FeatureIndex(report!.parameters[0])
     }

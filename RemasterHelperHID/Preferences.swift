@@ -12,24 +12,26 @@ var DefaultMousePreferences = MousePreferences(id: "default")
 struct MousePreferences {
     enum Key : Codable {
         case DPI
+        case SmartShift
     }
     
     private var id: String
     private var backingDict: Dictionary<Key, Int64> // This is going to be ugly if we ever need non-numeric preferences
     
     var dpi: UInt {
-        get {
-            UInt(getVal(key: .DPI))
-        }
-        set {
-            setVal(key: .DPI, val: Int64(newValue))
-        }
+        get { UInt(getVal(key: .DPI))  }
+        set { setVal(key: .DPI, val: Int64(newValue)) }
+    }
+    
+    var smartShift: UInt {
+        get { UInt(getVal(key: .DPI))  }
+        set { setVal(key: .SmartShift, val: Int64(newValue)) }
     }
     
     private func getDefault(key: Key) -> Int64 {
         switch key {
-        case .DPI:
-            return 1200
+        case .DPI: return 1200
+        case .SmartShift: return 40
         }
     }
     

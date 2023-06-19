@@ -52,6 +52,7 @@ extension HIDPP.Device {
 
         func newObserver(forIndex i: FeatureIndex, using block: @escaping EventCallback) -> NSObjectProtocol {
             let t = HIDPP.EType.Device20(i.rawValue)
+            print("Adding observer for index \(i)")
             return newObserver(forType: t, using: block)
         }
         
@@ -78,8 +79,8 @@ extension HIDPP.Device {
                         return
                     }
                     NotificationCenter.default.post(name: EventNotifier.name(forType: type, forBaseName: hid.notificationNameExtra), object: ppReport)
-                    DebugPrint("Notified event \(EventNotifier.name(forType: type, forBaseName: hid.notificationNameExtra))")
-                    DebugPrint(ppReport.unwrap().hexDescription)
+//                    DebugPrint("Notified event \(EventNotifier.name(forType: type, forBaseName: hid.notificationNameExtra))")
+//                    DebugPrint(ppReport.unwrap().hexDescription)
                 }
             }
             

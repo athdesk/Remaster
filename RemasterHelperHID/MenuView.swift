@@ -7,10 +7,6 @@
 
 import SwiftUI
 
-typealias UIntCallback = (UInt) -> ()
-typealias UIntTripletCallback = (UInt, UInt, UInt) -> ()
-typealias StringCallback = (String) -> ()
-
 class ViewData : ObservableObject, Equatable {
     private func checkUpdateRef() {
 //        if ViewData.mainDeviceRef === self {
@@ -18,23 +14,38 @@ class ViewData : ObservableObject, Equatable {
 //        }
     }
     
-    var DefaultStatusCallback: StringCallback {{ s in
-        self.setStatus(s: s)
+    var DefaultSmartShiftCallback: UIntOptCallback {{ v in
+        print("\(#function) \(String(describing: v))")
+        self.setSmartShift(v: v)
+        self.checkUpdateRef()
+    }}
+    
+    var DefaultRatchetCallback: BoolOptCallback {{ v in
+        print("\(#function) \(String(describing: v))")
+        self.setRatchet(b: v)
+        self.checkUpdateRef()
+    }}
+    
+    var DefaultStatusCallback: StringCallback {{ v in
+        print("\(#function) \(String(describing: v))")
+        self.setStatus(s: v)
         self.checkUpdateRef()
     }}
 
-    var DefaultCallbackDPISupport: UIntTripletCallback {{ x, y, z in
+    var DefaultDPISupportCallback: UIntTripletCallback {{ x, y, z in
         self.setDPISupport(min: x, max: y, step: z)
         self.checkUpdateRef()
     }}
 
-    var DefaultCallbackDPI: UIntCallback {{ x in
-        self.setDPIReport(v: x)
+    var DefaultDPICallback: UIntCallback {{ v in
+        print("\(#function) \(String(describing: v))")
+        self.setDPIReport(v: v)
         self.checkUpdateRef()
     }}
 
-    var DefaultCallbackBat: UIntCallback {{ x in
-        self.setBatReport(v: x)
+    var DefaultBatteryCallback: UIntCallback {{ v in
+        print("\(#function) \(String(describing: v))")
+        self.setBatReport(v: v)
         self.checkUpdateRef()
     }}
     
@@ -60,18 +71,19 @@ class ViewData : ObservableObject, Equatable {
                                 step: v._dpiSupport.2 ?? 0)
     }
     
+    let defaultStatus = "No Mouse Connected"
     @Published var statusString: String = "No Mouse Connected"
     
     @Published var batReport: UInt = 0
+    
+    @Published var _smartShift: UInt? = 0
+    var smartShift: Float { Float(_smartShift ?? 0) }
+    
+    @Published var ratchet: Bool?
+    
     @Published var _dpiReport: UInt = DefaultMousePreferences.dpi
-    var dpiReport: Float {
-        get { Float(_dpiReport) }
-        set {
-            DispatchQueue.global(qos: .utility).async {
-                MouseFactory.defaultInstance?.setDPI(to: UInt(newValue))
-            }
-        }
-    }
+    var dpiReport: Float { Float(_dpiReport) }
+    
     @Published var _dpiSupport: (UInt?, UInt?, UInt?) = (0, 0, 0) // Min, Max, Step
     
     
@@ -100,6 +112,14 @@ class ViewData : ObservableObject, Equatable {
         DispatchQueue.main.async { self._dpiReport = v }
     }
     
+    func setRatchet(b: Bool?) {
+        DispatchQueue.main.async { self.ratchet = b }
+    }
+    
+    func setSmartShift(v: UInt?) {
+        DispatchQueue.main.async { self._smartShift = v }
+    }
+    
     func setDPISupport(min: UInt, max: UInt, step: UInt) {
         DispatchQueue.main.async {
             // We wrap into optionals here to keep callbacks and data functions simpler
@@ -117,13 +137,15 @@ class ViewData : ObservableObject, Equatable {
 }
 
 struct StatusView: View {
-
     @EnvironmentObject var data: ViewData
+    @EnvironmentObject var watcher: ConnectionWatcher
     var body: some View {
         HStack {
-            Text(data.statusString)
-            if data.batReport != 0 {
-                Text("\(data.batReport)%")
+            Text(watcher.isMainAvailable ? data.statusString : data.defaultStatus)
+            if watcher.isMainAvailable {
+                if data.batReport != 0 {
+                    Text("\(data.batReport)%")
+                }
             }
         }
     }
@@ -136,13 +158,61 @@ struct DPIView: View {
         VStack {
             Text("Current DPI: \(data._dpiReport)")
             Slider(value: $dpiSlider,
-                   in: ClosedRange(uncheckedBounds: (data.dpiSupport.min, data.dpiSupport.max)),
-                   onEditingChanged: { x in if !x { data.dpiReport = dpiSlider} })
-            .onChange(of: data.dpiReport) { newValue in dpiSlider = newValue }
+                   in: ClosedRange(uncheckedBounds: (data.dpiSupport.min, data.dpiSupport.max)))
+                    { x in if !x { MouseFactory.defaultInstance?.setDPI(to: UInt(dpiSlider)) }}
         }
-        .animation(.default, value: data)
+        .onChange(of: data.dpiReport) { newValue in dpiSlider = newValue }
+        .animation(.easeInOut, value: data)
     }
 }
+
+struct SwitchView: View {
+    @EnvironmentObject var data: ViewData
+    @State var ssSlider: Float = Float(DefaultMousePreferences.smartShift)
+    var body: some View {
+        VStack {
+            HStack {
+                if let r = data.ratchet {
+                    Button {
+                        MouseFactory.defaultInstance?.toggleRatchet()
+                    } label: { Image(systemName: "pin")
+                        .frame(maxWidth: .infinity)
+                        .symbolVariant(.fill)
+                        .symbolVariant(r ? .none : .slash)
+                        .foregroundColor(r ? .accentColor : .primary)
+                    }
+                }
+                Button {
+                    
+                } label: { Image(systemName: "arrow.up.and.down.square.fill").frame(maxWidth: .infinity) }
+                
+                Button {
+                    
+                } label: { Image(systemName: "ellipsis").frame(maxWidth: .infinity) }
+            }
+            .font(.title)
+            .padding(.vertical, 4)
+            .buttonStyle(.plain)
+            .font(.title2)
+            if data.ratchet == true && data.smartShift != 0 {
+                HStack {
+                    Image(systemName: "s.circle.fill")
+                        .font(.title3)
+                    Slider(value: $ssSlider,
+                           in: ClosedRange(uncheckedBounds: (1, 49)))
+                    { x in if !x { MouseFactory.defaultInstance?.setSmartShift(to: UInt(ssSlider)) } }
+                        .animation(.easeInOut(duration: 1), value: data.ratchet)
+                }
+                .padding(.horizontal, 4)
+                .padding(.vertical, 4)
+            }
+        }
+        .symbolRenderingMode(.hierarchical)
+        .onChange(of: data.smartShift) { newValue in ssSlider = newValue }
+        .animation(.easeInOut, value: data)
+    }
+}
+
 
 struct MenuView: View {
     @ObservedObject var data: ViewData = ViewData.main
@@ -152,14 +222,20 @@ struct MenuView: View {
         VStack {
             StatusView()
                 .environmentObject(data)
+                .environmentObject(watcher)
             Divider()
                 .padding(6)
             DPIView()
                 .environmentObject(data)
-                .disabled(!watcher.isMainAvailable)
-            
+            Divider()
+                .padding(6)
+            SwitchView()
+                .environmentObject(data)
+            Divider()
+                .padding(6)
         }
         .padding(16)
         .frame(maxWidth: 240)
+        .disabled(!watcher.isMainAvailable)
     }
 }
