@@ -94,7 +94,7 @@ struct SwitchView: View {
         if let mouse = source.mainMouse {
             Divider()
             VStack {
-                HStack {
+                HStack { // Upper half
                     if let r = mouse.Ratchet {
                         Button { Task.init {
                             mouse.Ratchet?.toggle()
@@ -133,21 +133,21 @@ struct SwitchView: View {
                 .buttonStyle(.plain)
                 .animation(.linear, value: mouse.Ratchet)
                 
-                if mouse.Ratchet == true && mouse.SmartShift != 0 {
-                    HStack {
-                        Image(systemName: "s.circle.fill")
-                            .font(.title3)
-                        Slider(value: $ssSlider,
-                               in: ClosedRange(uncheckedBounds: (1, 49)))
-                        { x in if !x { Task.init { mouse.SmartShift = UInt(ssSlider) }}}
-                            .onAppear() { ssSlider = Float(mouse.SmartShift ?? 40) }
+                HStack { // Lower half (optional controls)
+                    if mouse.Ratchet == true && mouse.SmartShift != 0 {
+                            Image(systemName: "s.circle.fill")
+                                .font(.title3)
+                            Slider(value: $ssSlider,
+                                   in: ClosedRange(uncheckedBounds: (1, 49)))
+                            { x in if !x { Task.init { mouse.SmartShift = UInt(ssSlider) }}}
+                                .onAppear() { ssSlider = Float(mouse.SmartShift ?? 40) }
                     }
-                    .padding(.horizontal, 4)
-                    .padding(.vertical, 4)
-                    .transition(.move(edge: .bottom))
                 }
+                .padding(.horizontal, 4)
+                .padding(.vertical, 4)
+                .transition(.move(edge: .bottom))
             }
-            .frame(height: 56)
+            .frame(height: 64)
         }
     }
 }
