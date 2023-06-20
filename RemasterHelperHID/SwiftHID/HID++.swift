@@ -122,10 +122,19 @@ struct HIDPP {
         public let hid: HIDDevice
         public let devIndex: UInt8
         public var isStandalone: Bool { devIndex == 0 || devIndex == 255 }
-        public var name: String {
+        public lazy var name: String = {
             if isStandalone { return hid.name }
             return GetName() ?? "1.0 Device"
-        }
+        }()
+        public lazy var transport: TransportType = {
+            if devIndex == 0xff {
+                return hid.transport == kIOHIDTransportUSBValue ? .Wired : .Bluetooth
+            }
+            if case .Receiver(let t) = RemasterDevice(fromMonitorData: hid.idPair) {
+                return .Receiver(t)
+            }
+            return .Wired
+        }()
         
         internal var opQueue: OperationQueue
         public let notifier: EventNotifier

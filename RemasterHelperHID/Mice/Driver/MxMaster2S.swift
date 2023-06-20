@@ -8,7 +8,7 @@
 import Foundation
 
 class MxMaster2SDevice : MxMaster3SDevice {
-//    required init(withHIDDevice d: HIDDevice, index i: UInt8) {
+//    required init?(withHIDDevice d: HIDDevice, index i: UInt8) {
 //        super.init(withHIDDevice: d, index: i)
 //        backingDevice.funcReportType = .Short
 //    }

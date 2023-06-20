@@ -11,20 +11,55 @@ import Combine
 struct StatusView: View {
     @ObservedObject var source = DataSource.sharedInstance
     var body: some View {
-        if let mouse = source.mainMouse {
-            HStack {
-                Text(mouse.name)
-                if mouse.Battery != 0 { Text("\(mouse.Battery)%") }
+        HStack(alignment: .center, spacing: 8) {
+            Text(source.mainMouse != nil ? source.mainMouse!.name : "No Mouse")
+                .font(.title2)
+                .minimumScaleFactor(0.1)
+                .lineLimit(1)
+            
+            Spacer()
+                .minimumScaleFactor(0)
+            
+            TransportIndicatorView(transport: source.mainMouse?.transport)
+                .font(.title2)
+                .minimumScaleFactor(0.1)
+                .frame(width: 20, height: 16)
+            
+            if let b = source.mainMouse?.Battery {
+                VStack(spacing: 0) {
+//                    if !b.Charging {
+//                        Text("\(b.Percent)")
+//                            .font(.title3)
+//                            .foregroundColor(.primary)
+//                            .minimumScaleFactor(0.1)
+//                            .frame(height: 16)
+//
+//                    }
+                    ZStack(alignment: .center) {
+                        BatteryIndicatorView(level: Int(b.Percent))
+                            .backgroundStyle(.primary)
+                            .foregroundColor(b.Percent > 15 || b.Charging ? .accentColor : .red)
+                            .frame(width: 28, height: 12)
+                        if b.Charging {
+                            Image(systemName: "bolt.fill")
+                                .foregroundColor(.green)
+                                .minimumScaleFactor(0.1)
+                                .font(.title)
+                                .frame(height: 20)
+                                .transition(.scale)
+                                .animation(.spring(), value: b.Charging)
+                        }
+                    }
+                    .animation(.spring(), value: b.Charging)
+                    .frame(width: 28, height: 16)
+                }
             }
-        } else {
-            Text("No Mouse Connected")
         }
     }
 }
 
 struct DPIView: View {
     @ObservedObject var source = DataSource.sharedInstance
-    
     @State var dpiSlider: Float = 0
     
     var body: some View {
@@ -41,47 +76,62 @@ struct DPIView: View {
                        in: ClosedRange(uncheckedBounds:
                                         (Float(mouse.SupportedDPI.min),
                                          Float(mouse.SupportedDPI.max))))
-                { x in if !x { mouse.DPI = UInt(dpiSlider) }}
+                { x in if !x { Task.init { mouse.DPI = UInt(dpiSlider) }}}
                     .onAppear() { dpiSlider = Float(mouse.DPI) }
                     .onChange(of: source.mainMouseRef) { _ in dpiSlider = Float(source.mainMouse?.DPI ?? 0) }
                     .animation(.linear, value: dpiSlider)
             }
             .transition(.scale)
-            .padding(.horizontal, 10)
+            .padding(.horizontal, 6)
         }
     }
 }
 
 struct SwitchView: View {
     @ObservedObject var source = DataSource.sharedInstance
-    @State var ssSlider: Float = Float(DefaultMousePreferences.smartShift)
+    @State var ssSlider: Float = 0
     var body: some View {
-        Divider()
         if let mouse = source.mainMouse {
+            Divider()
             VStack {
                 HStack {
                     if let r = mouse.Ratchet {
-                        Button {
+                        Button { Task.init {
                             mouse.Ratchet?.toggle()
-                        } label: { Image(systemName: "pin.square")
+                        }} label: { Image(systemName: "pin.square")
                                 .frame(maxWidth: .infinity)
                                 .symbolVariant(r ? .fill : .none)
                                 .foregroundColor(r ? .accentColor : .primary)
                                 .contentTransition(.identity)
                         }
                     }
-                    Button {
-                        
-                    } label: { Image(systemName: "arrow.up.and.down.square.fill").frame(maxWidth: .infinity) }
-                    
-                    Button {
-                        
-                    } label: { Image(systemName: "ellipsis").frame(maxWidth: .infinity) }
+                    if let i = mouse.WheelInvert {
+                        Button { Task.init {
+                            mouse.WheelInvert?.toggle()
+                        }} label: { Image(systemName: "arrow.up.and.down.square")
+                                .frame(maxWidth: .infinity)
+                                .symbolVariant(i ? .fill : .none)
+                                .foregroundColor(i ? .accentColor : .primary)
+                                .contentTransition(.identity)
+                                .animation(.default, value: i)
+                        }
+                    }
+                    if let h = mouse.WheelHiRes {
+                        Button { Task.init {
+                            mouse.WheelHiRes?.toggle()
+                        }} label: { Image(systemName: h ? "circle.dotted" : "circle.dashed")
+                                .frame(maxWidth: .infinity)
+                                .foregroundColor(h ? .accentColor : .primary)
+                                .contentTransition(.interpolate)
+                                .animation(.linear, value: h)
+                        }
+                    }
                 }
                 .transition(.move(edge: .top))
                 .font(.title)
-                .padding(.vertical, 4)
+                .padding(.vertical, 6)
                 .buttonStyle(.plain)
+                .animation(.linear, value: mouse.Ratchet)
                 
                 if mouse.Ratchet == true && mouse.SmartShift != 0 {
                     HStack {
@@ -89,39 +139,38 @@ struct SwitchView: View {
                             .font(.title3)
                         Slider(value: $ssSlider,
                                in: ClosedRange(uncheckedBounds: (1, 49)))
-                        { x in if !x { mouse.SmartShift = UInt(ssSlider) } }
-                            .animation(.linear, value: mouse.Ratchet)
+                        { x in if !x { Task.init { mouse.SmartShift = UInt(ssSlider) }}}
+                            .onAppear() { ssSlider = Float(mouse.SmartShift ?? 40) }
                     }
                     .padding(.horizontal, 4)
                     .padding(.vertical, 4)
                     .transition(.move(edge: .bottom))
                 }
-                
-                
             }
-            .frame(height: 60)
-            .symbolRenderingMode(.hierarchical)
+            .frame(height: 56)
         }
     }
 }
 
 
 struct MenuView: View {
-//    @ObservedObject var data: ViewData = ViewData.main
     @ObservedObject var source = DataSource.sharedInstance
     
     var body: some View {
         VStack {
-            if let m = source.mainMouse {
-                StatusView()
+            StatusView()
+                .padding(4)
+                .padding(.horizontal, 4)
+                .symbolRenderingMode(.hierarchical)
+            if source.mainMouse != nil {
                 DPIView().padding(4)
-                SwitchView().padding(4)
+                SwitchView()
+                    .padding(4)
+                    .symbolRenderingMode(.hierarchical)
             }
         }
-        .transition(.opacity)
-        .contentTransition(.opacity)
         .padding(16)
         .frame(maxWidth: 240, alignment: .top)
-        .animation(.spring(), value: source.mainMouse?.Ratchet)
+        .animation(.linear, value: source.mainMouse?.Ratchet)
     }
 }

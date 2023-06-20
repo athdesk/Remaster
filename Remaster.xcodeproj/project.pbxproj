@@ -10,6 +10,7 @@
 		DE07A4E82A3F257500E43C5C /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE07A4E72A3F257400E43C5C /* Event.swift */; };
 		DE07A4EC2A404B2C00E43C5C /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE07A4EB2A404B2C00E43C5C /* Utilities.swift */; };
 		DE07A4EE2A404B6900E43C5C /* MouseFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE07A4ED2A404B6900E43C5C /* MouseFactory.swift */; };
+		DE07A4F02A41A9C900E43C5C /* IndicatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE07A4EF2A41A9C900E43C5C /* IndicatorView.swift */; };
 		DE4A9B4B2A3E056A007B5F7A /* MxMaster2S.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4A9B4A2A3E056A007B5F7A /* MxMaster2S.swift */; };
 		DE9C87942A38A753002770AD /* RemasterHelperHIDApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9C87932A38A753002770AD /* RemasterHelperHIDApp.swift */; };
 		DE9C87982A38A755002770AD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DE9C87972A38A755002770AD /* Assets.xcassets */; };
@@ -60,6 +61,7 @@
 		DE07A4E72A3F257400E43C5C /* Event.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Event.swift; sourceTree = "<group>"; };
 		DE07A4EB2A404B2C00E43C5C /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
 		DE07A4ED2A404B6900E43C5C /* MouseFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MouseFactory.swift; sourceTree = "<group>"; };
+		DE07A4EF2A41A9C900E43C5C /* IndicatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndicatorView.swift; sourceTree = "<group>"; };
 		DE1D620C2A388A09009DAA65 /* hidpp.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = hidpp.xcodeproj; path = ../hidpp/hidpp.xcodeproj; sourceTree = "<group>"; };
 		DE4A9B4A2A3E056A007B5F7A /* MxMaster2S.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MxMaster2S.swift; sourceTree = "<group>"; };
 		DE9C87912A38A753002770AD /* RemasterHelperHID.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RemasterHelperHID.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -131,6 +133,7 @@
 				DE9C87B92A39EA91002770AD /* SwiftHID */,
 				DE9C87C42A3AA5C7002770AD /* Bits.swift */,
 				DE9C87932A38A753002770AD /* RemasterHelperHIDApp.swift */,
+				DE07A4EF2A41A9C900E43C5C /* IndicatorView.swift */,
 				DE9C87B32A39113E002770AD /* MenuView.swift */,
 				DE9C87A82A38BD53002770AD /* MainLogic.swift */,
 				DE9C87B72A39BA4D002770AD /* Preferences.swift */,
@@ -333,6 +336,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DE07A4F02A41A9C900E43C5C /* IndicatorView.swift in Sources */,
 				DE9C87BD2A39EAEC002770AD /* Device.swift in Sources */,
 				DE9C87C52A3AA5C7002770AD /* Bits.swift in Sources */,
 				DE9C87BB2A39EAC1002770AD /* DeviceMonitor.swift in Sources */,

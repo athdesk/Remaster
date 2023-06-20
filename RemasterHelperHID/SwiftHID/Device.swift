@@ -72,6 +72,7 @@ public struct HIDDevice : Hashable {
     public let reportDescriptor: Data
     public let device: IOHIDDevice
     public let name: String
+    public let transport: String
     public let notificationName: Notification.Name
     public let notificationNameExtra: Notification.Name
     
@@ -132,6 +133,7 @@ public struct HIDDevice : Hashable {
         self.device = device
         self.id = GenericDeviceGetIntProperty(device: self.device, key: kIOHIDLocationIDKey)
         self.name = GenericDeviceGetStringProperty(device: self.device, key: kIOHIDProductKey)
+        self.transport = GenericDeviceGetStringProperty(device: self.device, key: kIOHIDTransportKey)
         self.vendorId = GenericDeviceGetIntProperty(device: self.device, key: kIOHIDVendorIDKey)
         self.productId = GenericDeviceGetIntProperty(device: self.device, key: kIOHIDProductIDKey)
         self.reportSizeIn = GenericDeviceGetIntProperty(device: self.device, key: kIOHIDMaxInputReportSizeKey)

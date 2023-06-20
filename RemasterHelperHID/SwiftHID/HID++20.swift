@@ -109,8 +109,14 @@ extension HIDPP {
             case SetMode = 0x2
             case GetRatchet = 0x03
         }
-        
+
         enum BatteryStatus : FunctionID, IFeature {
+            static let ID: FeatureID = 0x1004
+            case StatusEvent = 0x00
+            case GetBatteryLevelStatus = 0x01
+        }
+        
+        enum BatteryStatusAlt : FunctionID, IFeature {
             static let ID: FeatureID = 0x1000
 
             case GetBatteryLevelStatus = 0x00

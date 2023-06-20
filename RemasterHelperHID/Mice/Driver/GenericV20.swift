@@ -25,16 +25,19 @@ class GenericV20Device : Mouse {
     
     public var identifier: any MouseIdentifier { backingDevice.identifier }
     public var name: String { backingDevice.name }
-    var transport: TransportType { .Wired }
+    var transport: TransportType { backingDevice.transport }
     
-    @Published internal var _Battery: UInt? = nil
-    var Battery: UInt { _Battery ?? getBattery() }
+    @Published var Battery: Battery? = nil
     
     /// Getters / Setters
-    ///
-    // Assume not supported
+    
+    // Assume these are not supported
+    // TODO: eventually implement software fallbacks for these in the basic driver
     var Ratchet: Bool? { get { nil } set { } }
     var SmartShift: UInt? { get { nil } set { } }
+    var WheelInvert: Bool? { get { nil } set { } }
+    var WheelHiRes: Bool? { get { nil } set { } }
+    var WheelDiversion: Bool? { get { nil } set { } }
 
     @Published var _DPI: UInt?
     var DPI: UInt { get { _DPI ?? getDPI() } set { setDPI(to: newValue) } }
@@ -43,18 +46,38 @@ class GenericV20Device : Mouse {
         
     /// Battery
     
-    func getBattery() -> UInt {
+    func getBattery() -> Battery? {
         let report = Proto.BatteryStatus.GetBatteryLevelStatus.Call(onDevice: backingDevice)
         if report?.isError == false {
-            let b = UInt(report!.parameters[0])
-            _Battery = b
+            let percent = UInt(report!.parameters[0])
+            let charging = report!.parameters[2]
+            let b = RemasterHelperHID.Battery(Percent: percent,
+                               Charging: charging == 0 ? false : true)
+            self.Battery = b
             return b
         }
-        _Battery = 0
-        return 0
+        Battery = nil
+        return nil
     }
     
     /// Events
+    
+    internal var EventBattery : EventCallback {{ n in
+        print("EventBattery")
+        let ppReport = n.object as! HIDPP.CustomReport
+        if ppReport.isError == false {
+            let data = ppReport.parameters
+            switch ppReport.function {
+            case Proto.BatteryStatus.StatusEvent.rawValue:
+                let percent = UInt(data[0])
+                let charging = data[2]
+                self.Battery = RemasterHelperHID.Battery(Percent: percent,
+                                                       Charging: charging == 0 ? false : true)
+            default:
+                break
+            }
+        }
+    }}
     
     internal var EventDPI: EventCallback {{ n in
         let ppReport = n.object as! HIDPP.CustomReport
@@ -104,6 +127,7 @@ class GenericV20Device : Mouse {
             let dpiBuf = [UInt8](data[1..<3])
             let r = UInt(UInt16(dpiBuf)?.bigEndian ?? 0)
             _DPI = r
+            DebugPrint("DPI is \(_DPI ?? 0)")
             return r
         }
         return 0
@@ -144,6 +168,10 @@ class GenericV20Device : Mouse {
         
         if let i = dev.GetFeatureIndex(forID: Proto.HiResWheel.ID) {
             _ = backingDevice.notifier.newObserver(forIndex: i, using: EventWheel)
+        }
+        
+        if let i = dev.GetFeatureIndex(forID: Proto.BatteryStatus.ID) {
+            _ = backingDevice.notifier.newObserver(forIndex: i, using: EventBattery)
         }
     }
 }

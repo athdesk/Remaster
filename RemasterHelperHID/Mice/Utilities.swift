@@ -24,6 +24,11 @@ struct DPISupport {
     let step: UInt?
 }
 
+struct Battery {
+    let Percent: UInt
+    let Charging: Bool
+}
+
 // just to only have explicit identifiers
 protocol MouseIdentifier : Hashable { }
 
