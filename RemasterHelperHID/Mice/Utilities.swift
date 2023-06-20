@@ -68,15 +68,3 @@ typealias UIntOptCallback = (UInt?) -> ()
 typealias UIntTripletCallback = (UInt, UInt, UInt) -> ()
 typealias StringCallback = (String) -> ()
 typealias BoolOptCallback = (Bool?) -> ()
-
-// much swiftui
-class ConnectionWatcher : ObservableObject {
-    static let sharedInstance = ConnectionWatcher()
-    @Published var isMainAvailable: Bool = false
-    
-    func updateStatus() {
-        DispatchQueue.main.async { [self] in
-            isMainAvailable = MouseFactory.defaultInstance != nil
-        }
-    }
-}

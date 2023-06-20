@@ -9,10 +9,10 @@ import SwiftUI
 import Combine
 
 struct StatusView: View {
-    @ObservedObject var source = DataSource.sharedInstance
+    @ObservedObject var factory = MouseFactory.sharedInstance
     var body: some View {
         HStack(alignment: .center, spacing: 8) {
-            Text(source.mainMouse != nil ? source.mainMouse!.name : "No Mouse")
+            Text(factory.mainMouse != nil ? factory.mainMouse!.name : "No Mouse")
                 .font(.title2)
                 .minimumScaleFactor(0.1)
                 .lineLimit(1)
@@ -20,12 +20,12 @@ struct StatusView: View {
             Spacer()
                 .minimumScaleFactor(0)
             
-            TransportIndicatorView(transport: source.mainMouse?.transport)
+            TransportIndicatorView(transport: factory.mainMouse?.transport)
                 .font(.title2)
                 .minimumScaleFactor(0.1)
                 .frame(width: 20, height: 16)
             
-            if let b = source.mainMouse?.Battery {
+            if let b = factory.mainMouse?.Battery {
                 VStack(spacing: 0) {
 //                    if !b.Charging {
 //                        Text("\(b.Percent)")
@@ -59,11 +59,11 @@ struct StatusView: View {
 }
 
 struct DPIView: View {
-    @ObservedObject var source = DataSource.sharedInstance
+    @ObservedObject var factory = MouseFactory.sharedInstance
     @State var dpiSlider: Float = 0
     
     var body: some View {
-        if let mouse = source.mainMouse {
+        if let mouse = factory.mainMouse {
             Divider()
             VStack {
                 HStack {
@@ -78,7 +78,7 @@ struct DPIView: View {
                                          Float(mouse.SupportedDPI.max))))
                 { x in if !x { Task.init { mouse.DPI = UInt(dpiSlider) }}}
                     .onAppear() { dpiSlider = Float(mouse.DPI) }
-                    .onChange(of: source.mainMouseRef) { _ in dpiSlider = Float(source.mainMouse?.DPI ?? 0) }
+//                    .onChange(of: factory) { _ in dpiSlider = Float(factory.mainMouse?.DPI ?? 0) }
                     .animation(.linear, value: dpiSlider)
             }
             .transition(.scale)
@@ -88,10 +88,10 @@ struct DPIView: View {
 }
 
 struct SwitchView: View {
-    @ObservedObject var source = DataSource.sharedInstance
+    @ObservedObject var factory = MouseFactory.sharedInstance
     @State var ssSlider: Float = 0
     var body: some View {
-        if let mouse = source.mainMouse {
+        if let mouse = factory.mainMouse {
             Divider()
             VStack {
                 HStack { // Upper half
@@ -154,7 +154,7 @@ struct SwitchView: View {
 
 
 struct MenuView: View {
-    @ObservedObject var source = DataSource.sharedInstance
+    @ObservedObject var factory = MouseFactory.sharedInstance
     
     var body: some View {
         VStack {
@@ -162,7 +162,7 @@ struct MenuView: View {
                 .padding(4)
                 .padding(.horizontal, 4)
                 .symbolRenderingMode(.hierarchical)
-            if source.mainMouse != nil {
+            if factory.mainMouse != nil {
                 DPIView().padding(4)
                 SwitchView()
                     .padding(4)
@@ -171,6 +171,6 @@ struct MenuView: View {
         }
         .padding(16)
         .frame(maxWidth: 240, alignment: .top)
-        .animation(.linear, value: source.mainMouse?.Ratchet)
+        .animation(.linear, value: factory.mainMouse?.Ratchet)
     }
 }

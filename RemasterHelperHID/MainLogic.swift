@@ -47,19 +47,19 @@ func start() {
                 // to make it possible to pair/unpair devices
                 print("receiver, trying index \(i)")
                 guard let m = MxMaster3SDevice(withHIDDevice: device, index: UInt8(i)) else { continue }
-                MouseFactory.addMouse(m)
+                MouseFactory.sharedInstance.addMouse(m)
             }
         } else {
             guard let driver = rawDevice.getDriver() else { return }
             guard let m = driver.init(withHIDDevice: device, index: 0xff) else { return }
-            MouseFactory.addMouse(m)
+            MouseFactory.sharedInstance.addMouse(m)
         }
     }
     
     NotificationCenter.default.addObserver(forName: .HIDDeviceDisconnected, object: nil, queue: opQueue) { n in
         let device = n.object as! HIDDevice
         for i in [UInt8]([0, 1, 2, 3, 4, 5, 6, 255]) {
-            MouseFactory.removeMouse(withIdentifier: HIDPP.Device.HIDAddress(device: device.device, index: i))
+            MouseFactory.sharedInstance.removeMouse(withIdentifier: HIDPP.Device.HIDAddress(device: device.device, index: i))
         }
     }
       
@@ -68,7 +68,7 @@ func start() {
     }
  
     sleep(500)
-//    let x = MouseFactory.defaultInstance as! DriverMxMaster3
+//    let x = MouseFactory.mainMouse as! DriverMxMaster3
 //    let iodev = x.backingDevice!.hid.device
 //
 //    let cfElements = IOHIDDeviceCopyMatchingElements(iodev, nil, IOOptionBits(kIOHIDOptionsTypeNone))!

@@ -10,7 +10,7 @@ import Combine
 
 // Class for interfacing with #.*.*.# a mouse #.*.*.# :)
 //
-// the `defaultInstance` should always try to represent a connected mouse
+// the `mainMouse` should always try to represent a connected mouse
 // this means that it's going to be mutating without telling anyone
 // (or maybe send a notification, but it's better for most of the
 //      data to not be targeted at one specific device)
