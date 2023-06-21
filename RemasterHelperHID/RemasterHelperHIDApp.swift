@@ -10,12 +10,11 @@ import SwiftUI
 @main
 struct RemasterHelperHIDApp: App {
     var body: some Scene {
-        Settings {
+        Window("settings", id: "settings") {
             MainWindow()
         }
-        .windowToolbarStyle(.unified(showsTitle: false))
         .windowStyle(.hiddenTitleBar)
-        .windowResizability(.contentMinSize)
+        .windowResizability(.contentSize)
         
         MenuBarExtra("Remaster", systemImage: "seal") {
             MenuView()

@@ -9,6 +9,11 @@ import Foundation
 import SwiftUI
 
 enum RemasterDevice : CaseIterable {
+    case Receiver(ReceiverType)
+    case MxMaster2S
+    case MxMaster3S
+    case G502HSE
+    
     static var allCases: [RemasterDevice] = [
         Receiver(.Bolt),
         Receiver(.Unifying),
@@ -24,12 +29,6 @@ enum RemasterDevice : CaseIterable {
         }
         return devs
     }
-
-    case Receiver(ReceiverType)
-    case MxMaster2S
-    case MxMaster3S
-    case G502HSE
-    
     
     func getDriver() -> (any Mouse.Type)? {
         switch self {

@@ -155,9 +155,16 @@ struct SwitchView: View {
 
 struct MenuView: View {
     @ObservedObject var factory = MouseFactory.sharedInstance
+    @Environment(\.openWindow) var openWindow
     
     var body: some View {
         VStack {
+            Button {
+                openWindow(id: "settings")
+            } label: {
+                Image(systemName: "gear")
+            }
+
             StatusView()
                 .padding(4)
                 .padding(.horizontal, 4)

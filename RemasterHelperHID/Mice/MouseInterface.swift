@@ -18,11 +18,12 @@ import Combine
 //      especially for Bluetooth, so we might need to be a bit
 //      clever in the way we reapply settings etc.
 
-protocol Mouse : AnyObject, ObservableObject {
+protocol Mouse : AnyObject, ObservableObject, Identifiable {
     var identifier: any MouseIdentifier { get }
     var name: String { get }
     var transport: TransportType { get }
-
+    var thumbnailName: String { get }
+    
 //   Events have to be manually specified by drivers
 //    var EventBattery: EventCallback { get }
 //    var EventDPI: EventCallback { get }
@@ -50,3 +51,4 @@ extension Mouse {
         return objectWillChange.sink { _ in clause() }
     }
 }
+

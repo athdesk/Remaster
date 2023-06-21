@@ -8,6 +8,17 @@
 import Foundation
 import Combine
 
+func getThumbName(fromName name: String) -> String {
+    switch name {
+    case "MX Master 3S": return "MX Master 3S"
+    case "MX Master 2S": return "MX Master 3S"
+    case "G502 HERO SE": return "G502"
+    case "G502 HERO": return "G502"
+    case "G502": return "G502"
+    default: return "Generic"
+    }
+}
+
 extension HIDPP.Device.HIDAddress : MouseIdentifier {
     static func == (lhs: HIDPP.Device.HIDAddress, rhs: HIDPP.Device.HIDAddress) -> Bool {
         return lhs.hashValue == rhs.hashValue
@@ -26,6 +37,7 @@ class GenericV20Device : Mouse {
     public var identifier: any MouseIdentifier { backingDevice.identifier }
     public var name: String { backingDevice.name }
     var transport: TransportType { backingDevice.transport }
+    var thumbnailName: String {getThumbName(fromName: name)}
     
     @Published var Battery: Battery? = nil
     
