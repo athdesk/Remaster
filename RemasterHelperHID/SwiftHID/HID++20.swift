@@ -181,13 +181,6 @@ extension HIDPP.CustomReport {
 
 extension HIDPP.Device {
     typealias Proto = HIDPP.v20
-    
-    struct HIDAddress {
-        var device: IOHIDDevice
-        var index: UInt8
-    }
-    
-    var identifier: HIDAddress { HIDAddress(device: hid.device, index: devIndex) }
 
     var protocolVersion: String? { GetProtocolVersion() }
     

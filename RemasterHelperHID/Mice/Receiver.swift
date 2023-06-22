@@ -65,6 +65,7 @@ class BoltReceiver : Receiver {
     let Serial: String
     let MaxDevices: Int = 6
     
+    // TODO: make this a sequential queue
     var ReceiverConnectedHandler: EventCallback {{ n in
         let ppReport = n.object as! HIDPP.CustomReport
         if ppReport.isError20 == false {
@@ -73,21 +74,22 @@ class BoltReceiver : Receiver {
             let prodId = UInt16([UInt8](data[1..<3])) ?? 0
             let index = ppReport.deviceIndex
             
-            if connected {
-                guard let deviceDescriptor =  RemasterDevice(fromMonitorData: HIDMonitorData(
-                    vendorId: self.backingDevice.hid.vendorId,
-                    productId: Int(prodId)) )
-                else { return }
-                guard let driver = deviceDescriptor.getDriver() else { return }
-                guard let m = driver.init(withHIDDevice: self.backingDevice.hid, index: index) else { return }
-                MouseFactory.sharedInstance.addMouse(m)
-            } else {
-                MouseFactory.sharedInstance.removeMouse(
-                    withIdentifier: HIDPP.Device.HIDAddress(device: self.backingDevice.hid.device, index: index))
+            Task {
+                if connected {
+                    guard let deviceDescriptor =  RemasterDevice(fromMonitorData: HIDMonitorData(
+                        vendorId: self.backingDevice.hid.vendorId,
+                        productId: Int(prodId)) )
+                    else { return }
+                    guard let driver = deviceDescriptor.getDriver() else { return }
+                    if let m = MouseInterface(driver: driver, device: self.backingDevice.hid, index: index) {
+                        await MouseTracker.global.addMouse(m)
+                    }
+                } else {
+                    await MouseTracker.global.removeMouse(withHid: self.backingDevice.hid, index: index)
+                }
+                
+                print("Device with product id \(prodId)", connected ? "connected" : "disconnected")
             }
-            
-            print("Device with product id \(prodId)", connected ? "connected" : "disconnected")
-            
         }
     }}
     

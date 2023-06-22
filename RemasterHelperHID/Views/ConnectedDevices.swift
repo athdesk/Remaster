@@ -25,7 +25,7 @@ struct DeviceCard: View {
                         .fontDesign(.rounded)
                         .minimumScaleFactor(0.1)
                         .lineLimit(1)
-                        .bold(mouse.self === MouseFactory.sharedInstance.mainMouse)
+//                        .bold(mouse.self === MouseFactory.sharedInstance.mainMouse)
                     HStack(alignment: .lastTextBaseline) {
                         TransportIndicatorView(transport: mouse.transport)
                             .font(.title2)
@@ -126,55 +126,56 @@ struct DeviceTab: View {
 struct ConnectedDevices: SettingsTab {
     static let title = "Connected Devices"
     
-    @ObservedObject var factory = MouseFactory.sharedInstance
-    var sortedMice: [any Mouse] {
-        Array(factory.mice.values).sorted { lhs, rhs in
-            lhs.name > rhs.name
-        }
-    }
+    @ObservedObject var factory = MouseTracker.global
+//    var sortedMice: [any Mouse] {
+//        Array(factory.mice.values).sorted { lhs, rhs in
+//            lhs.name > rhs.name
+//        }
+//    }
     
     @State var asd: String = "asad"
     @State var selectedMouse: (any Mouse)? = nil
     
     var body: some View {
-        GeometryReader { geo in
-            VStack(alignment: .center, spacing: 0) {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(alignment: .center) {
-                        ForEach(sortedMice, id: \.identifier.hashValue) { v in
-                            Button {
-                                if selectedMouse === v {
-                                    selectedMouse = nil
-                                } else {
-                                    selectedMouse = v
-                                }
-                            } label: {
-                                DeviceCard(mouse: v, activeMouse: selectedMouse)
-                            }
-                            .transition(.asymmetric(insertion: .push(from: .bottom), removal: .push(from: .top)))
-                        }
-                    }
-                    .buttonStyle(.plain)
-                    .padding(12)
-                    .frame(minWidth: geo.size.width, minHeight: geo.size.height * 0.4, maxHeight: geo.size.height * 0.7, alignment: .center)
-                    .animation(.easeInOut, value: sortedMice.count)
-                }
-                .frame(idealWidth: .infinity, maxWidth: .infinity, idealHeight: .infinity, maxHeight: .infinity)
-                if let m = selectedMouse {
-                    DeviceTab(mouse: m)
-                        .transition(.asymmetric(insertion: .push(from: .bottom), removal: .push(from: .top)))
-                }
-            }
-        }
-//        .navigationTitle("Connected Devices")
-        .animation(.easeInOut, value: selectedMouse?.id)
+//        GeometryReader { geo in
+//            VStack(alignment: .center, spacing: 0) {
+//                ScrollView(.horizontal, showsIndicators: false) {
+//                    HStack(alignment: .center) {
+//                        ForEach(sortedMice, id: \.identifier.hashValue) { v in
+//                            Button {
+//                                if selectedMouse === v {
+//                                    selectedMouse = nil
+//                                } else {
+//                                    selectedMouse = v
+//                                }
+//                            } label: {
+//                                DeviceCard(mouse: v, activeMouse: selectedMouse)
+//                            }
+//                            .transition(.asymmetric(insertion: .push(from: .bottom), removal: .push(from: .top)))
+//                        }
+//                    }
+//                    .buttonStyle(.plain)
+//                    .padding(12)
+//                    .frame(minWidth: geo.size.width, minHeight: geo.size.height * 0.4, maxHeight: geo.size.height * 0.7, alignment: .center)
+//                    .animation(.easeInOut, value: sortedMice.count)
+//                }
+//                .frame(idealWidth: .infinity, maxWidth: .infinity, idealHeight: .infinity, maxHeight: .infinity)
+//                if let m = selectedMouse {
+//                    DeviceTab(mouse: m)
+//                        .transition(.asymmetric(insertion: .push(from: .bottom), removal: .push(from: .top)))
+//                }
+//            }
+//        }
+////        .navigationTitle("Connected Devices")
+//        .animation(.easeInOut, value: selectedMouse?.id)
+        Text("E")
     }
 }
 
-struct ConnectedDevices_Previews: PreviewProvider {
-    static var previews: some View {
-        DeviceCard(mouse: MouseFactory.sharedInstance.mainMouse!)
-            .frame(minWidth: 840, minHeight: 600 * 0.6)
-//        ConnectedDevices(selectedMouse: MouseFactory.sharedInstance.mainMouse)
-    }
-}
+//struct ConnectedDevices_Previews: PreviewProvider {
+//    static var previews: some View {
+//        DeviceCard(mouse: MouseFactory.sharedInstance.mainMouse!)
+//            .frame(minWidth: 840, minHeight: 600 * 0.6)
+////        ConnectedDevices(selectedMouse: MouseFactory.sharedInstance.mainMouse)
+//    }
+//}

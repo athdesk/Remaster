@@ -9,7 +9,7 @@ import SwiftUI
 import Combine
 
 struct StatusView: View {
-    @ObservedObject var factory = MouseFactory.sharedInstance
+    @ObservedObject var factory = MouseTracker.global
     var body: some View {
         HStack(alignment: .center, spacing: 8) {
             Text(factory.mainMouse != nil ? factory.mainMouse!.name : "No Mouse")
@@ -59,7 +59,7 @@ struct StatusView: View {
 }
 
 struct DPIView: View {
-    @ObservedObject var factory = MouseFactory.sharedInstance
+    @ObservedObject var factory = MouseTracker.global
     @State var dpiSlider: Float = 0
     
     var body: some View {
@@ -76,7 +76,7 @@ struct DPIView: View {
                        in: ClosedRange(uncheckedBounds:
                                         (Float(mouse.SupportedDPI.min),
                                          Float(mouse.SupportedDPI.max))))
-                { x in if !x { Task.init { mouse.DPI = UInt(dpiSlider) }}}
+                { x in if !x { Task { await mouse.setDPI(UInt(dpiSlider)) }}}
                     .onAppear() { dpiSlider = Float(mouse.DPI) }
 //                    .onChange(of: factory) { _ in dpiSlider = Float(factory.mainMouse?.DPI ?? 0) }
                     .animation(.linear, value: dpiSlider)
@@ -88,7 +88,7 @@ struct DPIView: View {
 }
 
 struct SwitchView: View {
-    @ObservedObject var factory = MouseFactory.sharedInstance
+    @ObservedObject var factory = MouseTracker.global
     @State var ssSlider: Float = 0
     var body: some View {
         if let mouse = factory.mainMouse {
@@ -96,9 +96,8 @@ struct SwitchView: View {
             VStack {
                 HStack { // Upper half
                     if let r = mouse.Ratchet {
-                        Button { Task.init {
-                            mouse.Ratchet?.toggle()
-                        }} label: { Image(systemName: "pin.square")
+                        Button { Task { await mouse.toggleRatchet() } }
+                        label: { Image(systemName: "pin.square")
                                 .frame(maxWidth: .infinity)
                                 .symbolVariant(r ? .fill : .none)
                                 .foregroundColor(r ? .accentColor : .primary)
@@ -106,9 +105,8 @@ struct SwitchView: View {
                         }
                     }
                     if let i = mouse.WheelInvert {
-                        Button { Task.init {
-                            mouse.WheelInvert?.toggle()
-                        }} label: { Image(systemName: "arrow.up.and.down.square")
+                        Button { Task { await mouse.toggleWheelInvert() } }
+                        label: { Image(systemName: "arrow.up.and.down.square")
                                 .frame(maxWidth: .infinity)
                                 .symbolVariant(i ? .fill : .none)
                                 .foregroundColor(i ? .accentColor : .primary)
@@ -117,9 +115,8 @@ struct SwitchView: View {
                         }
                     }
                     if let h = mouse.WheelHiRes {
-                        Button { Task.init {
-                            mouse.WheelHiRes?.toggle()
-                        }} label: { Image(systemName: h ? "circle.dotted" : "circle.dashed")
+                        Button { Task { await mouse.toggleWheelHiRes() } }
+                        label: { Image(systemName: h ? "circle.dotted" : "circle.dashed")
                                 .frame(maxWidth: .infinity)
                                 .foregroundColor(h ? .accentColor : .primary)
                                 .contentTransition(.interpolate)
@@ -139,7 +136,7 @@ struct SwitchView: View {
                                 .font(.title3)
                             Slider(value: $ssSlider,
                                    in: ClosedRange(uncheckedBounds: (1, 49)))
-                            { x in if !x { Task.init { mouse.SmartShift = UInt(ssSlider) }}}
+                        { x in if !x { Task.init { await mouse.setSmartShift(UInt(ssSlider)) }}}
                                 .onAppear() { ssSlider = Float(mouse.SmartShift ?? 40) }
                     }
                 }
@@ -154,7 +151,7 @@ struct SwitchView: View {
 
 
 struct MenuView: View {
-    @ObservedObject var factory = MouseFactory.sharedInstance
+    @ObservedObject var factory = MouseTracker.global
     @Environment(\.openWindow) var openWindow
     
     var body: some View {
@@ -163,6 +160,7 @@ struct MenuView: View {
                 openWindow(id: "settings")
             } label: {
                 Image(systemName: "gear")
+                Text(factory.mainMouse?.Ratchet == true ? "dio" : "porco")
             }
 
             StatusView()

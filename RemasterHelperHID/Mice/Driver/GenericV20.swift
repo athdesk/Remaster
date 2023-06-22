@@ -19,25 +19,26 @@ func getThumbName(fromName name: String) -> String {
     }
 }
 
-extension HIDPP.Device.HIDAddress : MouseIdentifier {
-    static func == (lhs: HIDPP.Device.HIDAddress, rhs: HIDPP.Device.HIDAddress) -> Bool {
-        return lhs.hashValue == rhs.hashValue
-    }
-    
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(self.device)
-        hasher.combine(self.index)
-    }
-}
+//extension HIDPP.Device.HIDAddress : MouseIdentifier {
+//    static func == (lhs: HIDPP.Device.HIDAddress, rhs: HIDPP.Device.HIDAddress) -> Bool {
+//        return lhs.hashValue == rhs.hashValue
+//    }
+//    
+//    func hash(into hasher: inout Hasher) {
+//        hasher.combine(self.device)
+//        hasher.combine(self.index)
+//    }
+//}
 
 class GenericV20Device : Mouse {
     typealias Proto = HIDPP.v20
     internal var backingDevice: HIDPP.Device
     
-    public var identifier: any MouseIdentifier { backingDevice.identifier }
     public var name: String { backingDevice.name }
     var transport: TransportType { backingDevice.transport }
     var thumbnailName: String {getThumbName(fromName: name)}
+    var hid: HIDDevice { backingDevice.hid }
+    var index: UInt8 { backingDevice.devIndex }
     
     @Published var Battery: Battery? = nil
     
