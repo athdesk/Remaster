@@ -45,7 +45,7 @@ extension HIDPP.Device {
     class EventNotifier: Equatable  {
         private let basename: Notification.Name
         private let observer: NSObjectProtocol
-        
+        private let opQueue: OperationQueue
         static func == (lhs: HIDPP.Device.EventNotifier, rhs: HIDPP.Device.EventNotifier) -> Bool {
             return lhs.observer === rhs.observer
         }
@@ -65,7 +65,7 @@ extension HIDPP.Device {
         func newObserver(forType t: HIDPP.EType, using block: @escaping EventCallback) -> NSObjectProtocol {
             NotificationCenter.default.addObserver(forName: HIDPP.Device.EventNotifier.name(forType: t, forBaseName: basename),
                                                    object: nil,
-                                                   queue: nil, using: block)
+                                                   queue: opQueue, using: block)
         }
         
         private static func name(forType t: HIDPP.EType, forBaseName baseName: Notification.Name) -> Notification.Name {
@@ -78,6 +78,13 @@ extension HIDPP.Device {
         init(forHID hid: HIDDevice, forIndex i: UInt8) {
             // random slug added to avoid double notifications when both mice and receivers register events on the same physical hid device
             let slug = "-" + String(describing: arc4random())
+            let _basename = Notification.Name(hid.notificationNameExtra.rawValue + slug)
+            basename = _basename
+            
+            opQueue = OperationQueue()
+            opQueue.name = _basename.rawValue
+            opQueue.maxConcurrentOperationCount = 4
+            opQueue.underlyingQueue = DispatchQueue.global(qos: .utility)
             
             notificationHandler = { n in
                 DispatchQueue.global().async {
@@ -88,15 +95,13 @@ extension HIDPP.Device {
                     guard let type = HIDPP.EType(fromReport: ppReport) else {
                         return
                     }
-                    NotificationCenter.default.post(name: EventNotifier.name(forType: type, forBaseName: Notification.Name(hid.notificationNameExtra.rawValue + slug)), object: ppReport)
+                    NotificationCenter.default.post(name: EventNotifier.name(forType: type, forBaseName: _basename), object: ppReport)
                 }
             }
             
-            
-            basename = Notification.Name(hid.notificationNameExtra.rawValue + slug)
             observer = NotificationCenter.default.addObserver(forName: hid.notificationNameExtra,
                                                                    object: nil,
-                                                                   queue: nil,
+                                                                   queue: opQueue,
                                                                    using: notificationHandler)
         }
         

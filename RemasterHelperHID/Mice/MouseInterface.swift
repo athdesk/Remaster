@@ -42,7 +42,6 @@ protocol Mouse : AnyObject, ObservableObject, Identifiable {
 
 extension Mouse {
     func onUpdate(_ clause: @escaping () -> () ) -> AnyCancellable? {
-        print("onUpdate()")
         return objectWillChange.sink { _ in clause() }
     }
 }

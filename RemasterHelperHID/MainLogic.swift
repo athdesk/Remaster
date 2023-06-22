@@ -64,8 +64,8 @@ func start() {
         
     }
       
-    DispatchQueue.global(qos: .utility).async {
-        hidMonitor.start()
+    Task {
+        await hidMonitor.start()
     }
  
     sleep(500)

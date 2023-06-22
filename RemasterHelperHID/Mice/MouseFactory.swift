@@ -16,14 +16,11 @@ class MouseFactory : ObservableObject {
     }
     
     private var mouseSink: AnyCancellable? = nil
-    func MainChangedCallback(_ new:(any Mouse)?, _ old: (any Mouse)?) {
+    func MainChangedCallback(_ new:(any Mouse)?, _ old: (any Mouse)?) async {
         mouseSink?.cancel()
         mouseSink = nil
         if let m = new {
-            mouseSink = m.onUpdate {
-                DispatchQueue.main.async { self.objectWillChange.send() }
-            }
-            m.refreshData()
+            mouseSink = m.onUpdate {  DispatchQueue.main.async { self.objectWillChange.send() } }
         }
     }
     
@@ -50,12 +47,12 @@ class MouseFactory : ObservableObject {
         let oldMain = _mice[Identifiers.Main]
         guard let newMain = _mice.first(where: isReal)?.value else {
             _mice[Identifiers.Main] = nil
-            MainChangedCallback(nil, oldMain)
+            Task { await MainChangedCallback(nil, oldMain) }
             return
         }
         if newMain === _mice[Identifiers.Main] { return }
         print("There's a new sheriff in town! \(newMain.name)")
-        MainChangedCallback(newMain, oldMain)
+        Task { await MainChangedCallback(newMain, oldMain) }
         _mice[Identifiers.Main] = newMain
         newMain.refreshData()
     }

@@ -40,6 +40,7 @@ protocol IFeature : RawRepresentable where RawValue == FunctionID {
 // I regret not having done a real Device class
 
 fileprivate var StoredFeatureIndexes: Dictionary<HIDPP.Device, Dictionary<FeatureID, FeatureIndex>> = .init()
+fileprivate var StoredFeatureIndexesLock = NSLock()
 
 extension IFeature {
     static internal var _index: FeatureIndex? { nil }
@@ -47,6 +48,8 @@ extension IFeature {
     static func getIndex(_ dev: HIDPP.Device) throws -> FeatureIndex {
         if self._index != nil { return self._index! }
         var dict = StoredFeatureIndexes[dev] ?? .init()
+        StoredFeatureIndexesLock.lock()
+        defer { StoredFeatureIndexesLock.unlock() }
         let f = dict[self.ID] ?? {
             let e = dev.GetFeatureIndex(forID: self.ID)
             if e != nil {

@@ -10,7 +10,7 @@
 import Foundation
 import IOKit.hid
 
-class HIDDeviceMonitor {
+actor HIDDeviceMonitor {
     public let vp:[HIDMonitorData]
     public let reportSize:Int
     
@@ -36,14 +36,15 @@ class HIDDeviceMonitor {
         IOHIDManagerScheduleWithRunLoop(managerRef, CFRunLoopGetCurrent(), CFRunLoopMode.defaultMode.rawValue);
         IOHIDManagerOpen(managerRef, IOOptionBits(kIOHIDOptionsTypeNone));
         
-        let matchingCallback: IOHIDDeviceCallback = { inContext, inResult, inSender, inIOHIDDeviceRef in
-            let this:HIDDeviceMonitor = unsafeBitCast(inContext, to: HIDDeviceMonitor.self)
-            this.rawDeviceAdded(inResult, inSender: inSender!, inIOHIDDeviceRef: inIOHIDDeviceRef)
+        let matchingCallback: IOHIDDeviceCallback = { _, _, _, inIOHIDDeviceRef in
+            let device = HIDDevice(device:inIOHIDDeviceRef)
+            device.enableNotifications()
+            Task { NotificationCenter.default.post(name: .HIDDeviceConnected, object: device) }
         }
         
         let removalCallback: IOHIDDeviceCallback = { inContext, inResult, inSender, inIOHIDDeviceRef in
-            let this:HIDDeviceMonitor = unsafeBitCast(inContext, to: HIDDeviceMonitor.self)
-            this.rawDeviceRemoved(inResult, inSender: inSender!, inIOHIDDeviceRef: inIOHIDDeviceRef)
+            let device = HIDDevice(device:inIOHIDDeviceRef)
+            Task { NotificationCenter.default.post(name: .HIDDeviceDisconnected, object: device) }
         }
         
         IOHIDManagerRegisterDeviceMatchingCallback(managerRef, matchingCallback, unsafeBitCast(self, to: UnsafeMutableRawPointer.self))
@@ -51,18 +52,6 @@ class HIDDeviceMonitor {
         
         
         RunLoop.current.run()
-    }
-      
-    func rawDeviceAdded(_ inResult: IOReturn, inSender: UnsafeMutableRawPointer, inIOHIDDeviceRef: IOHIDDevice!) {
-        let device = HIDDevice(device:inIOHIDDeviceRef)
-        device.enableNotifications()
-        DispatchQueue.main.async { NotificationCenter.default.post(name: .HIDDeviceConnected, object: device) }
-    }
-    
-    func rawDeviceRemoved(_ inResult: IOReturn, inSender: UnsafeMutableRawPointer, inIOHIDDeviceRef: IOHIDDevice!) {
-        let device = HIDDevice(device:inIOHIDDeviceRef) // this should live enough to avoid remaking the whole struct (impossible)
-//        device.forget()
-        DispatchQueue.main.async { NotificationCenter.default.post(name: .HIDDeviceDisconnected, object: device) }
     }
 }
 
