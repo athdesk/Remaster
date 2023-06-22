@@ -10,7 +10,7 @@ import Foundation
 struct HIDPP {
     struct CustomReport {
         private var d: Data
-        var isError: Bool { !(CheckError10() == .Success && CheckError20() == .Success) }
+        var isError20: Bool { !(CheckError10() == .Success && CheckError20() == .Success) }
         
         enum RType: UInt8 {
             case Short = 0x10

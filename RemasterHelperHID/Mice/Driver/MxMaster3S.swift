@@ -41,7 +41,7 @@ class MxMaster3SDevice : GenericV20Device {
     
     override internal var EventWheel: EventCallback {{ n in
         let ppReport = n.object as! HIDPP.CustomReport
-        if ppReport.isError == false {
+        if ppReport.isError20 == false {
             let data = ppReport.parameters
             switch ppReport.function {
             case 0x1: // Ratchet status
@@ -122,7 +122,7 @@ class MxMaster3SDevice : GenericV20Device {
     
     func getSmartShift() -> UInt? {
         let report = Proto.SmartShift.Read.Call(onDevice: backingDevice)
-        if report?.isError == false {
+        if report?.isError20 == false {
             let data = report!.parameters
             let r = UInt(data[1])
             _SmartShift = r

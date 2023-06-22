@@ -13,31 +13,43 @@ enum ReceiverType : CaseIterable {
     case Bolt
     case Unifying
     
+    func getIconName() -> String {
+        switch self {
+        case .Bolt: return "bolt"
+        case .Unifying: return "rays"
+        }
+    }
+    
     func getDriver() -> (any Receiver.Type) {
         switch self {
-        case .Bolt:
-            return BoltReceiver.self
-        case .Unifying:
-            return UnifyingReceiver.self
+        case .Bolt: return BoltReceiver.self
+        case .Unifying: return UnifyingReceiver.self
         }
     }
 }
 
 protocol Receiver {
     var type: ReceiverType { get }
+    var hid: HIDDevice { get }
+    
     var Serial: String { get }
+    var MaxDevices: Int { get }
     
     init?(withHIDDevice d: HIDDevice)
 }
 
 class UnifyingReceiver : Receiver {
+    let type = ReceiverType.Unifying
+    let hid: HIDDevice
+    
     let backingDevice: HIDPP.Device
-    let type = ReceiverType.Bolt
     
     var Serial: String { abort() }
+    var MaxDevices: Int { abort () }
     
     required init?(withHIDDevice d: HIDDevice) {
         guard let dev = HIDPP.Device(dev: d, devIndex: 0xff) else { return nil }
+        self.hid = d
         self.backingDevice = dev
     }
 }
@@ -45,16 +57,86 @@ class UnifyingReceiver : Receiver {
 class BoltReceiver : Receiver {
     typealias Proto = HIDPP.v10
     let type = ReceiverType.Bolt
+    let hid: HIDDevice
     let backingDevice: HIDPP.Device
     
-    lazy var Serial: String = {
-        let r = Proto.Register.BoltUID.Read(onDevice: backingDevice)
-        guard let p = r?.parameters else { return "Unknown" }
-        return String(bytes: p, encoding: .utf8) ?? "Unknown"
-    }()
+    private var observers: [NSObjectProtocol] = []
+    
+    let Serial: String
+    let MaxDevices: Int = 6
+    
+    var ReceiverConnectedHandler: EventCallback {{ n in
+        let ppReport = n.object as! HIDPP.CustomReport
+        if ppReport.isError20 == false {
+            let data = ppReport.parameters
+            let connected = (data[0] & 0x40 == 0)
+            let prodId = UInt16([UInt8](data[1..<3])) ?? 0
+            let index = ppReport.deviceIndex
+            
+            if connected {
+                guard let deviceDescriptor =  RemasterDevice(fromMonitorData: HIDMonitorData(
+                    vendorId: self.backingDevice.hid.vendorId,
+                    productId: Int(prodId)) )
+                else { return }
+                guard let driver = deviceDescriptor.getDriver() else { return }
+                guard let m = driver.init(withHIDDevice: self.backingDevice.hid, index: index) else { return }
+                MouseFactory.sharedInstance.addMouse(m)
+            } else {
+                MouseFactory.sharedInstance.removeMouse(
+                    withIdentifier: HIDPP.Device.HIDAddress(device: self.backingDevice.hid.device, index: index))
+            }
+            
+            print("Device with product id \(prodId)", connected ? "connected" : "disconnected")
+            
+        }
+    }}
     
     required init?(withHIDDevice d: HIDDevice) {
         guard let dev = HIDPP.Device(dev: d, devIndex: 0xff) else { return nil }
+        self.hid = d
         self.backingDevice = dev
+        
+        // Read serial
+        let rSerial = Proto.Register.BoltUID.Read(onDevice: backingDevice)
+        guard let pSerial = rSerial?.parameters else { return nil }
+        guard let serial = String(bytes: pSerial, encoding: .utf8) else { return nil }
+        self.Serial = serial
+        
+        // This enables reporting                                         // Wireless, Software, Battery
+        let r = Proto.Register.Notifications.Write(onDevice: backingDevice, parameters: [0x10, 0x09, 0x00])
+        if r?.CheckError10() != .Success { return nil }
+        
+        // Bolt apparently just uses this subID for both disconnection and connection events
+        observers.append(backingDevice.notifier.newObserver(forSubID: .DeviceConnection, using: ReceiverConnectedHandler))
+        
+    }
+    
+    deinit {
+        for obs in observers {
+            NotificationCenter.default.removeObserver(obs)
+        }
     }
 }
+
+
+//        NOTIFICATION_FLAG = _NamedInts(
+//            numpad_numerical_keys=0x800000,
+//            f_lock_status=0x400000,
+//            roller_H=0x200000,
+//            battery_status=0x100000,  # send battery charge notifications (0x07 or 0x0D)
+//            mouse_extra_buttons=0x080000,
+//            roller_V=0x040000,
+//            keyboard_sleep_raw=0x020000,  # system control keys such as Sleep
+//            keyboard_multimedia_raw=0x010000,  # consumer controls such as Mute and Calculator
+//            # reserved_r1b4=        0x001000,  # unknown, seen on a unifying receiver
+//            reserved5=0x008000,
+//            reserved4=0x004000,
+//            reserved3=0x002000,
+//            reserved2=0x001000,
+//            software_present=0x000800,  # .. no idea
+//            reserved1=0x000400,
+//            keyboard_illumination=0x000200,  # illumination brightness level changes (by pressing keys)
+//            wireless=0x000100,  # notify when the device wireless goes on/off-line
+//            mx_air_3d_gesture=0x000001,
+//        )
+        

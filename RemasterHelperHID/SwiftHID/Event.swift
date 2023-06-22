@@ -13,14 +13,13 @@ extension HIDPP {
             switch self {
             case .Device20(let arg):
                 target.write("Device20[\(arg)]")
-            default:
-                target.write("Unknown")
+            case .Device10(let arg):
+                target.write("Device10[\(arg)]")
             }
         }
         
         case Device20(UInt8)
-        case Device10
-        case Receiver
+        case Device10(UInt8)
         
         init?(fromReport r: CustomReport) {
             let fIndex = r.subID
@@ -30,7 +29,8 @@ extension HIDPP {
                 let e = Self.Device20(fIndex)
                 self = e
             } else if fIndex < 0x80 { // 1.0 (Receivers)
-                return nil
+                let e = Self.Device10(fIndex)
+                self = e
             } else { // Not an event
                 return nil
             }
@@ -50,6 +50,12 @@ extension HIDPP.Device {
             return lhs.observer === rhs.observer
         }
 
+        func newObserver(forSubID i: HIDPP.v10.SubID, using block: @escaping EventCallback) -> NSObjectProtocol {
+            let t = HIDPP.EType.Device10(i.rawValue)
+            print("Adding observer for index \(i)")
+            return newObserver(forType: t, using: block)
+        }
+        
         func newObserver(forIndex i: FeatureIndex, using block: @escaping EventCallback) -> NSObjectProtocol {
             let t = HIDPP.EType.Device20(i.rawValue)
             print("Adding observer for index \(i)")
@@ -70,22 +76,25 @@ extension HIDPP.Device {
         private let notificationHandler: (Notification) -> ()
         
         init(forHID hid: HIDDevice, forIndex i: UInt8) {
+            // random slug added to avoid double notifications when both mice and receivers register events on the same physical hid device
+            let slug = "-" + String(describing: arc4random())
+            
             notificationHandler = { n in
                 DispatchQueue.global().async {
                     let recv = n.object as! HIDDevice.Report
                     let ppReport = HIDPP.CustomReport(withData: recv.reportData)
-                    guard ppReport.deviceIndex == i else { return }
+                    // TODO: make this not suck ( 255 catches all, for receivers )
+                    if i != 255 { guard ppReport.deviceIndex == i else { return } }
                     guard let type = HIDPP.EType(fromReport: ppReport) else {
                         return
                     }
-                    NotificationCenter.default.post(name: EventNotifier.name(forType: type, forBaseName: hid.notificationNameExtra), object: ppReport)
-//                    DebugPrint("Notified event \(EventNotifier.name(forType: type, forBaseName: hid.notificationNameExtra))")
-//                    DebugPrint(ppReport.unwrap().hexDescription)
+                    NotificationCenter.default.post(name: EventNotifier.name(forType: type, forBaseName: Notification.Name(hid.notificationNameExtra.rawValue + slug)), object: ppReport)
                 }
             }
             
-            basename = hid.notificationNameExtra
-            observer = NotificationCenter.default.addObserver(forName: basename,
+            
+            basename = Notification.Name(hid.notificationNameExtra.rawValue + slug)
+            observer = NotificationCenter.default.addObserver(forName: hid.notificationNameExtra,
                                                                    object: nil,
                                                                    queue: nil,
                                                                    using: notificationHandler)

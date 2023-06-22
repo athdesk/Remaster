@@ -36,24 +36,20 @@ func start() {
     opQueue.maxConcurrentOperationCount = 4
     opQueue.underlyingQueue = DispatchQueue.global(qos: .userInitiated)
     
+    var rec: [any Receiver] = []
+    
     NotificationCenter.default.addObserver(forName: .HIDDeviceConnected, object: nil, queue: opQueue) { n in
         let device = n.object as! HIDDevice
         print(device.device)
-        guard let rawDevice = RemasterDevice(fromMonitorData: device.idPair) else { return }
-        if case .Receiver(let type) = rawDevice {
+        guard let deviceDescriptor = RemasterDevice(fromMonitorData: device.idPair) else { return }
+        
+        if case .Receiver(let type) = deviceDescriptor {
             if let receiver = type.getDriver().init(withHIDDevice: device) {
                 print("Receiver: \(receiver.Serial)")
-                for i in 0...6 {
-                    // this works surprisingly well
-                    // but I should implement receiver communication anyway
-                    // to make it possible to pair/unpair devices
-                    print("receiver, trying index \(i)")
-                    guard let m = MxMaster3SDevice(withHIDDevice: device, index: UInt8(i)) else { continue }
-                    MouseFactory.sharedInstance.addMouse(m)
-                }
+                rec.append(receiver)
             }
         } else {
-            guard let driver = rawDevice.getDriver() else { return }
+            guard let driver = deviceDescriptor.getDriver() else { return }
             guard let m = driver.init(withHIDDevice: device, index: 0xff) else { return }
             MouseFactory.sharedInstance.addMouse(m)
         }
@@ -64,6 +60,8 @@ func start() {
         for i in [UInt8]([0, 1, 2, 3, 4, 5, 6, 255]) {
             MouseFactory.sharedInstance.removeMouse(withIdentifier: HIDPP.Device.HIDAddress(device: device.device, index: i))
         }
+        rec.removeAll { r in device == r.hid }
+        
     }
       
     DispatchQueue.global(qos: .utility).async {

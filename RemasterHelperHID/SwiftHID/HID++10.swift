@@ -54,6 +54,19 @@ extension HIDPP {
                 call.deviceIndex = dev.devIndex
                 call.subID = UInt8(request >> 8)
                 call.address = UInt8(request & 0xff)
+                call.parameters = parameters
+                let r = dev.SendCommand(call, timeout: timeout)
+                return r
+            }
+            
+            func Write(onDevice dev: HIDPP.Device, parameters: [UInt8] = [],  timeout: TimeInterval = 2) -> HIDPP.CustomReport? {
+                let t = HIDPP.CustomReport.RType.Short // TODO: choose it based on size
+                let request: UInt16 = 0x8000 | self.rawValue
+                var call = HIDPP.CustomReport(withType: t)
+                call.deviceIndex = dev.devIndex
+                call.subID = UInt8(request >> 8)
+                call.address = UInt8(request & 0xff)
+                call.parameters = parameters
                 let r = dev.SendCommand(call, timeout: timeout)
                 return r
             }

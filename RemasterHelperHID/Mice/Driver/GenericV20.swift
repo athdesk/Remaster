@@ -60,7 +60,7 @@ class GenericV20Device : Mouse {
     
     func getBattery() -> Battery? {
         let report = Proto.BatteryStatus.GetBatteryLevelStatus.Call(onDevice: backingDevice)
-        if report?.isError == false {
+        if report?.isError20 == false {
             let percent = UInt(report!.parameters[0])
             let charging = report!.parameters[2]
             let b = RemasterHelperHID.Battery(Percent: percent,
@@ -75,9 +75,8 @@ class GenericV20Device : Mouse {
     /// Events
     
     internal var EventBattery : EventCallback {{ n in
-        print("EventBattery")
         let ppReport = n.object as! HIDPP.CustomReport
-        if ppReport.isError == false {
+        if ppReport.isError20 == false {
             let data = ppReport.parameters
             switch ppReport.function {
             case Proto.BatteryStatus.StatusEvent.rawValue:
@@ -93,7 +92,7 @@ class GenericV20Device : Mouse {
     
     internal var EventDPI: EventCallback {{ n in
         let ppReport = n.object as! HIDPP.CustomReport
-        if ppReport.isError == false {
+        if ppReport.isError20 == false {
             let data = ppReport.parameters
             switch ppReport.function {
             case Proto.AdjustableDPI.SetSensorDPI.rawValue: break
@@ -114,7 +113,7 @@ class GenericV20Device : Mouse {
     private func getSupportedDPI() -> (UInt, UInt, UInt)? {
         let p: [UInt8] = [0]
         let report = Proto.AdjustableDPI.GetSensorDPIList.Call(onDevice: backingDevice, parameters: p)
-        if report?.isError == false {
+        if report?.isError20 == false {
             let d = report!.parameters
             let min = UInt(UInt16([UInt8](d[1..<3]))?.bigEndian ?? 0)
             var step = UInt(UInt16([UInt8](d[3..<5]))?.bigEndian ?? 0)
@@ -134,7 +133,7 @@ class GenericV20Device : Mouse {
     private func getDPI() -> UInt {
         let p: [UInt8] = [0] // 0 is sensorId
         let report = Proto.AdjustableDPI.GetSensorDPI.Call(onDevice: backingDevice, parameters: p)
-        if report?.isError == false {
+        if report?.isError20 == false {
             let data = report!.parameters
             let dpiBuf = [UInt8](data[1..<3])
             let r = UInt(UInt16(dpiBuf)?.bigEndian ?? 0)
@@ -165,6 +164,8 @@ class GenericV20Device : Mouse {
         _ = getSupportedDPI()
     }
     
+    private var observers: [NSObjectProtocol] = []
+    
     required init?(withHIDDevice d: HIDDevice, index i: UInt8) {
         guard let dev = HIDPP.Device(dev: d, devIndex: i) else { return nil }
         let v = dev.protocolVersion
@@ -175,15 +176,21 @@ class GenericV20Device : Mouse {
         backingDevice = dev
         
         if let i = dev.GetFeatureIndex(forID: Proto.AdjustableDPI.ID) {
-            _ = backingDevice.notifier.newObserver(forIndex: i, using: EventDPI)
+            observers.append(backingDevice.notifier.newObserver(forIndex: i, using: EventDPI))
         }
         
         if let i = dev.GetFeatureIndex(forID: Proto.HiResWheel.ID) {
-            _ = backingDevice.notifier.newObserver(forIndex: i, using: EventWheel)
+            observers.append(backingDevice.notifier.newObserver(forIndex: i, using: EventWheel))
         }
         
         if let i = dev.GetFeatureIndex(forID: Proto.BatteryStatus.ID) {
-            _ = backingDevice.notifier.newObserver(forIndex: i, using: EventBattery)
+            observers.append(backingDevice.notifier.newObserver(forIndex: i, using: EventBattery))
+        }
+    }
+    
+    deinit {
+        for obs in observers {
+            NotificationCenter.default.removeObserver(obs)
         }
     }
 }
