@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct DeviceCard: View {
-    var mouse: any Mouse
-    var activeMouse: (any Mouse)?
+    var mouse: MouseInterface
+    var activeMouse: MouseInterface?
     
     var body: some View {
         GeometryReader { geo in
@@ -63,7 +63,7 @@ struct DeviceCard: View {
             }
             .clipped()
         }
-        .animation(.easeInOut, value: activeMouse?.id)
+        .animation(.easeInOut, value: activeMouse)
         .aspectRatio(0.66, contentMode: .fit)
     }
 }
@@ -82,7 +82,7 @@ struct ListText: View {
 }
 
 struct DeviceTab: View {
-    var mouse: any Mouse
+    var mouse: MouseInterface
     var body: some View {
         GeometryReader { geo in
             ZStack {
@@ -134,41 +134,39 @@ struct ConnectedDevices: SettingsTab {
 //    }
     
     @State var asd: String = "asad"
-    @State var selectedMouse: (any Mouse)? = nil
+    @State var selectedMouse: MouseInterface? = nil
     
     var body: some View {
-//        GeometryReader { geo in
-//            VStack(alignment: .center, spacing: 0) {
-//                ScrollView(.horizontal, showsIndicators: false) {
-//                    HStack(alignment: .center) {
-//                        ForEach(sortedMice, id: \.identifier.hashValue) { v in
-//                            Button {
-//                                if selectedMouse === v {
-//                                    selectedMouse = nil
-//                                } else {
-//                                    selectedMouse = v
-//                                }
-//                            } label: {
-//                                DeviceCard(mouse: v, activeMouse: selectedMouse)
-//                            }
-//                            .transition(.asymmetric(insertion: .push(from: .bottom), removal: .push(from: .top)))
-//                        }
-//                    }
-//                    .buttonStyle(.plain)
-//                    .padding(12)
-//                    .frame(minWidth: geo.size.width, minHeight: geo.size.height * 0.4, maxHeight: geo.size.height * 0.7, alignment: .center)
-//                    .animation(.easeInOut, value: sortedMice.count)
-//                }
-//                .frame(idealWidth: .infinity, maxWidth: .infinity, idealHeight: .infinity, maxHeight: .infinity)
-//                if let m = selectedMouse {
-//                    DeviceTab(mouse: m)
-//                        .transition(.asymmetric(insertion: .push(from: .bottom), removal: .push(from: .top)))
-//                }
-//            }
-//        }
-////        .navigationTitle("Connected Devices")
-//        .animation(.easeInOut, value: selectedMouse?.id)
-        Text("E")
+        GeometryReader { geo in
+            VStack(alignment: .center, spacing: 0) {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(alignment: .center) {
+                        ForEach(factory.mice, id: \.hashValue) { v in
+                            Button {
+                                if selectedMouse === v {
+                                    selectedMouse = nil
+                                } else {
+                                    selectedMouse = v
+                                }
+                            } label: {
+                                DeviceCard(mouse: v, activeMouse: selectedMouse)
+                            }
+                            .transition(.asymmetric(insertion: .push(from: .bottom), removal: .push(from: .top)))
+                        }
+                    }
+                    .buttonStyle(.plain)
+                    .padding(12)
+                    .frame(minWidth: geo.size.width, minHeight: geo.size.height * 0.4, maxHeight: geo.size.height * 0.7, alignment: .center)
+                    .animation(.easeInOut, value: factory.mice.count)
+                }
+                .frame(idealWidth: .infinity, maxWidth: .infinity, idealHeight: .infinity, maxHeight: .infinity)
+                if let m = selectedMouse {
+                    DeviceTab(mouse: m)
+                        .transition(.asymmetric(insertion: .push(from: .bottom), removal: .push(from: .top)))
+                }
+            }
+        }
+        .animation(.easeInOut, value: selectedMouse)
     }
 }
 
