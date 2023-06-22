@@ -23,7 +23,7 @@ extension HIDPP {
         case Receiver
         
         init?(fromReport r: CustomReport) {
-            let fIndex = r.subID.rawValue
+            let fIndex = r.subID
             if fIndex == 0x00 {
                 return nil
             } else if fIndex < 0x40 { // 2.0

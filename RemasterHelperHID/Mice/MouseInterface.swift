@@ -24,11 +24,6 @@ protocol Mouse : AnyObject, ObservableObject, Identifiable {
     var transport: TransportType { get }
     var thumbnailName: String { get }
     
-//   Events have to be manually specified by drivers
-//    var EventBattery: EventCallback { get }
-//    var EventDPI: EventCallback { get }
-//    var EventWheel: EventCallback { get }
-    
     var Ratchet: Bool? { get set }
     var SmartShift: UInt? { get set }
     var WheelInvert: Bool? { get set }

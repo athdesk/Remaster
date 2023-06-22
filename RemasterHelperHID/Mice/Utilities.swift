@@ -7,11 +7,6 @@
 
 import Foundation
 
-enum ReceiverType : CaseIterable {
-    case Bolt
-    case Unifying
-}
-
 enum TransportType {
     case Wired
     case Bluetooth

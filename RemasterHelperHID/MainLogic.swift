@@ -40,14 +40,17 @@ func start() {
         let device = n.object as! HIDDevice
         print(device.device)
         guard let rawDevice = RemasterDevice(fromMonitorData: device.idPair) else { return }
-        if case .Receiver = rawDevice {
-            for i in 0...6 {
-                // this works surprisingly well
-                // but I should implement receiver communication anyway
-                // to make it possible to pair/unpair devices
-                print("receiver, trying index \(i)")
-                guard let m = MxMaster3SDevice(withHIDDevice: device, index: UInt8(i)) else { continue }
-                MouseFactory.sharedInstance.addMouse(m)
+        if case .Receiver(let type) = rawDevice {
+            if let receiver = type.getDriver().init(withHIDDevice: device) {
+                print("Receiver: \(receiver.Serial)")
+                for i in 0...6 {
+                    // this works surprisingly well
+                    // but I should implement receiver communication anyway
+                    // to make it possible to pair/unpair devices
+                    print("receiver, trying index \(i)")
+                    guard let m = MxMaster3SDevice(withHIDDevice: device, index: UInt8(i)) else { continue }
+                    MouseFactory.sharedInstance.addMouse(m)
+                }
             }
         } else {
             guard let driver = rawDevice.getDriver() else { return }

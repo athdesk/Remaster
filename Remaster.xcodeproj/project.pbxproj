@@ -13,6 +13,8 @@
 		DE07A4F02A41A9C900E43C5C /* Indicators.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE07A4EF2A41A9C900E43C5C /* Indicators.swift */; };
 		DE07A4FA2A4207FC00E43C5C /* MainWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE07A4F92A4207FC00E43C5C /* MainWindow.swift */; };
 		DE07A4FC2A42102000E43C5C /* ConnectedDevices.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE07A4FB2A42102000E43C5C /* ConnectedDevices.swift */; };
+		DE07A5192A443F3100E43C5C /* Splashscreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE07A5182A443F3000E43C5C /* Splashscreen.swift */; };
+		DE07A51B2A44445E00E43C5C /* Receiver.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE07A51A2A44445E00E43C5C /* Receiver.swift */; };
 		DE4A9B4B2A3E056A007B5F7A /* MxMaster2S.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4A9B4A2A3E056A007B5F7A /* MxMaster2S.swift */; };
 		DE9C87942A38A753002770AD /* RemasterHelperHIDApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9C87932A38A753002770AD /* RemasterHelperHIDApp.swift */; };
 		DE9C87982A38A755002770AD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DE9C87972A38A755002770AD /* Assets.xcassets */; };
@@ -66,6 +68,8 @@
 		DE07A4EF2A41A9C900E43C5C /* Indicators.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Indicators.swift; sourceTree = "<group>"; };
 		DE07A4F92A4207FC00E43C5C /* MainWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainWindow.swift; sourceTree = "<group>"; };
 		DE07A4FB2A42102000E43C5C /* ConnectedDevices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectedDevices.swift; sourceTree = "<group>"; };
+		DE07A5182A443F3000E43C5C /* Splashscreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Splashscreen.swift; sourceTree = "<group>"; };
+		DE07A51A2A44445E00E43C5C /* Receiver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Receiver.swift; sourceTree = "<group>"; };
 		DE1D620C2A388A09009DAA65 /* hidpp.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = hidpp.xcodeproj; path = ../hidpp/hidpp.xcodeproj; sourceTree = "<group>"; };
 		DE4A9B4A2A3E056A007B5F7A /* MxMaster2S.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MxMaster2S.swift; sourceTree = "<group>"; };
 		DE9C87912A38A753002770AD /* RemasterHelperHID.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RemasterHelperHID.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -129,6 +133,7 @@
 				DE9C87B32A39113E002770AD /* MenuView.swift */,
 				DE07A4F92A4207FC00E43C5C /* MainWindow.swift */,
 				DE07A4FB2A42102000E43C5C /* ConnectedDevices.swift */,
+				DE07A5182A443F3000E43C5C /* Splashscreen.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -178,6 +183,7 @@
 				DE9C87CB2A3B8423002770AD /* SupportedDevices.swift */,
 				DE07A4EB2A404B2C00E43C5C /* Utilities.swift */,
 				DE07A4ED2A404B6900E43C5C /* MouseFactory.swift */,
+				DE07A51A2A44445E00E43C5C /* Receiver.swift */,
 			);
 			path = Mice;
 			sourceTree = "<group>";
@@ -350,6 +356,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DE07A51B2A44445E00E43C5C /* Receiver.swift in Sources */,
 				DE07A4F02A41A9C900E43C5C /* Indicators.swift in Sources */,
 				DE9C87BD2A39EAEC002770AD /* Device.swift in Sources */,
 				DE9C87C52A3AA5C7002770AD /* Bits.swift in Sources */,
@@ -368,6 +375,7 @@
 				DE9C87C32A3A9009002770AD /* HID++20.swift in Sources */,
 				DE9C87C72A3B6EED002770AD /* MouseInterface.swift in Sources */,
 				DE9C87942A38A753002770AD /* RemasterHelperHIDApp.swift in Sources */,
+				DE07A5192A443F3100E43C5C /* Splashscreen.swift in Sources */,
 				DE9C87BF2A3A34AA002770AD /* HID++.swift in Sources */,
 				DE9C87CC2A3B8423002770AD /* SupportedDevices.swift in Sources */,
 				DE9C87B82A39BA4D002770AD /* Preferences.swift in Sources */,

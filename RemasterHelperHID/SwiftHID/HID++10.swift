@@ -34,6 +34,31 @@ import Foundation
 
 extension HIDPP {
     struct v10 {
+        enum Register: UInt16 {
+            // Long Registers are (0x0200 | regNum), so we can do subId = 0x81 | .hiByte and address = .loByte
+            case ReceiverConnection = 0x02
+            case ReceiverPairing = 0xB2
+            case ReceiverDevActivity = 0x2B3
+            case ReceiverInfo = 0x2B5
+            case BoltDevDiscovery = 0xC0
+            case BoltPairing = 0x2C1
+            case BoltUID = 0x02FB
+
+            case Notifications = 0x00
+            case Firmware = 0xF1
+            
+            func Read(onDevice dev: HIDPP.Device, parameters: [UInt8] = [],  timeout: TimeInterval = 2) -> HIDPP.CustomReport? {
+                let t = HIDPP.CustomReport.RType.Short // TODO: choose it based on size
+                let request: UInt16 = 0x8100 | self.rawValue
+                var call = HIDPP.CustomReport(withType: t)
+                call.deviceIndex = dev.devIndex
+                call.subID = UInt8(request >> 8)
+                call.address = UInt8(request & 0xff)
+                let r = dev.SendCommand(call, timeout: timeout)
+                return r
+            }
+        }
+        
         enum SubID: UInt8 {
             case DeviceDisconnection = 0x40
             case DeviceConnection = 0x41
@@ -75,7 +100,7 @@ extension HIDPP {
 extension HIDPP.CustomReport {
     func CheckError10() -> HIDPP.v10.ErrorCode {
         guard self.type == .Short else { return .Success }
-        guard self.subID.rawValue == HIDPP.v10.SubID.ErrorMessage else { return .Success }
+        guard self.subID == HIDPP.v10.SubID.ErrorMessage else { return .Success }
         
         return HIDPP.v10.ErrorCode(rawValue: self.parameters[1]) ?? .Invalid
     }

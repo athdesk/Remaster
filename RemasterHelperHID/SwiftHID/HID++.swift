@@ -40,7 +40,12 @@ struct HIDPP {
             set { d[1] = newValue}
         }
         
-        var subID: FeatureIndex {
+        var subID: UInt8 {
+            get { d[2] }
+            set { d[2] = newValue }
+        }
+        
+        var feature: FeatureIndex {
             get { FeatureIndex(d[2]) }
             set { d[2] = newValue.rawValue }
         }
@@ -111,7 +116,7 @@ struct HIDPP {
             d = Data(count: CustomReport.len(fromType: t))
             self.type = t
             self.deviceIndex = dev ?? 0 // this is to make it possible to manually populate
-            self.subID = feat
+            self.feature = feat
             self.function = fun
             self.swId = swId ?? 1 // seems to always be 1
         }

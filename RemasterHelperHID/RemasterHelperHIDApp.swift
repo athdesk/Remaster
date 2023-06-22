@@ -13,8 +13,9 @@ struct RemasterHelperHIDApp: App {
         Window("settings", id: "settings") {
             MainWindow()
         }
-        .windowStyle(.hiddenTitleBar)
+        .windowToolbarStyle(.unifiedCompact)
         .windowResizability(.contentSize)
+        .defaultPosition(.center)
         
         MenuBarExtra("Remaster", systemImage: "seal") {
             MenuView()

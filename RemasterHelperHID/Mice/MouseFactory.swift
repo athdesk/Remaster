@@ -9,40 +9,6 @@ import Foundation
 import Combine
 import SwiftUI
 
-
-
-//class DataSource: ObservableObject, Equatable {
-//    static func == (lhs: DataSource, rhs: DataSource) -> Bool {
-//        // TODO: make this actually useful
-//        lhs.mainMouse === rhs.mainMouse
-//    }
-//
-//    private var mouseSink: AnyCancellable? = nil
-//    
-//    static var sharedInstance = DataSource()
-//    
-//    var mainMouseRef: Int? = nil
-//    var mainMouse: (any Mouse)? = nil {
-//        didSet {
-//            print("Replaced main instance")
-//            mainMouseRef = nil
-//            mouseSink?.cancel()
-//            mouseSink = nil
-//            if let m = mainMouse {
-//                print("Changing reference value to trigger events")
-//                mainMouseRef = Unmanaged.passUnretained(m as AnyObject).toOpaque().hashValue
-//                print("Setting update hook on \(m)")
-//                mouseSink = m.onUpdate {
-//                    DispatchQueue.main.async { self.objectWillChange.send() }
-//                }
-//            }
-//            self.objectWillChange.send()
-//        }
-//    }
-//    
-// 
-//}
-
 class MouseFactory : ObservableObject {
     enum Identifiers : MouseIdentifier, CaseIterable, Hashable {
         // Special identifiers that alias to some specific instances
@@ -51,11 +17,6 @@ class MouseFactory : ObservableObject {
     
     private var mouseSink: AnyCancellable? = nil
     func MainChangedCallback(_ new:(any Mouse)?, _ old: (any Mouse)?) {
-//        new?.view = ViewData.main
-//        old?.view = ViewData()
-//        DispatchQueue.main.async {
-//            DataSource.sharedInstance.mainMouse = new
-//        }
         mouseSink?.cancel()
         mouseSink = nil
         if let m = new {
