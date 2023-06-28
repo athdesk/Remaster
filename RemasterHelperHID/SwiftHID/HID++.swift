@@ -205,6 +205,11 @@ struct HIDPP {
                 return nil
             }
         }
+        
+        // Meant to be used with receivers
+        init?(receiver: Receiver, devIndex: UInt8) {
+            self.init(dev: receiver.hid, devIndex: devIndex)
+        }
     }
     
 }

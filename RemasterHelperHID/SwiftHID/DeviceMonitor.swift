@@ -62,6 +62,7 @@ extension HIDDevice {
             let device = Unmanaged<IOHIDDevice>.fromOpaque(context!).takeUnretainedValue()
             let data = Data(bytes: UnsafePointer<UInt8>(report), count: reportLength)
             if HIDDevice.filter(reportId, data) {
+                print("[R] \(data.hexDescription)")
                 NotificationCenter.default.post(name: .HIDDeviceExtraDataReceived(device), object: Report(reportData: data, sourceDevice: HIDDevice(device: device)))
             } else {
                 NotificationCenter.default.post(name: .HIDDeviceDataReceived(device), object: Report(reportData: data, sourceDevice: HIDDevice(device: device)))

@@ -8,26 +8,6 @@
 import Foundation
 import IOKit.hid
 
-//var bridge = HIDBridge()
-//var CurrentMXDevice: SwiftMxDevice? = nil
-//
-//func OnDeviceConnected(dev: SwiftMxDevice) {
-//    dev.restoreDesiredDPI()
-//}
-//
-//func ConnectDevice(devPath: String, devIndex: Int32) {
-//    CurrentMXDevice = nil // this is needed due to a bug, maybe I should fix the memory corruption lol
-//                          // if we create a new instance of SwiftMxDevice, the old one doesn't get
-//                          // destroyed before the new one is initialized, so we end up with two Dispatchers
-//
-//    CurrentMXDevice = try? SwiftMxDevice(devPath: devPath, devIndex: devIndex, callback: { dev in
-//        OnDeviceConnected(dev: dev)
-//        print("Found a new device to handle")
-//    })
-//}
-
-//extension IOHIDDevice : MouseIdentifier { }
-
 func start() {
     let hidMonitor = HIDDeviceMonitor(RemasterDevice.SupportedDevices, reportSize: 64)
     

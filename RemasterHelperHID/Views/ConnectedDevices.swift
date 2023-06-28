@@ -25,7 +25,7 @@ struct DeviceCard: View {
                         .fontDesign(.rounded)
                         .minimumScaleFactor(0.1)
                         .lineLimit(1)
-//                        .bold(mouse.self === MouseFactory.sharedInstance.mainMouse)
+                        .bold(mouse.self === MouseTracker.global.mainMouse)
                     HStack(alignment: .lastTextBaseline) {
                         TransportIndicatorView(transport: mouse.transport)
                             .font(.title2)
@@ -127,13 +127,6 @@ struct ConnectedDevices: SettingsTab {
     static let title = "Connected Devices"
     
     @ObservedObject var factory = MouseTracker.global
-//    var sortedMice: [any Mouse] {
-//        Array(factory.mice.values).sorted { lhs, rhs in
-//            lhs.name > rhs.name
-//        }
-//    }
-    
-    @State var asd: String = "asad"
     @State var selectedMouse: MouseInterface? = nil
     
     var body: some View {

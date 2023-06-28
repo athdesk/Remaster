@@ -76,14 +76,7 @@ class BoltReceiver : Receiver {
             
             Task {
                 if connected {
-                    guard let deviceDescriptor =  RemasterDevice(fromMonitorData: HIDMonitorData(
-                        vendorId: self.backingDevice.hid.vendorId,
-                        productId: Int(prodId)) )
-                    else { return }
-                    guard let driver = deviceDescriptor.getDriver() else { return }
-                    if let m = MouseInterface(driver: driver, device: self.backingDevice.hid, index: index) {
-                        await MouseTracker.global.addMouse(m)
-                    }
+                    await self.TryConnectDevice(productId: prodId, index: index)
                 } else {
                     await MouseTracker.global.removeMouse(withHid: self.backingDevice.hid, index: index)
                 }
@@ -92,6 +85,17 @@ class BoltReceiver : Receiver {
             }
         }
     }}
+    
+    private func TryConnectDevice(productId pid: UInt16, index: UInt8) async {
+        guard let deviceDescriptor =  RemasterDevice(fromMonitorData: HIDMonitorData(
+            vendorId: self.backingDevice.hid.vendorId,
+            productId: Int(pid)) )
+        else { return }
+        guard let driver = deviceDescriptor.getDriver() else { return }
+        if let m = MouseInterface(driver: driver, device: self.backingDevice.hid, index: index) {
+            await MouseTracker.global.addMouse(m)
+        }
+    }
     
     required init?(withHIDDevice d: HIDDevice) {
         guard let dev = HIDPP.Device(dev: d, devIndex: 0xff) else { return nil }
@@ -110,7 +114,11 @@ class BoltReceiver : Receiver {
         
         // Bolt apparently just uses this subID for both disconnection and connection events
         observers.append(backingDevice.notifier.newObserver(forSubID: .DeviceConnection, using: ReceiverConnectedHandler))
+//        ConnectAll()
         
+        
+        // Forces refresh of connected devices
+        _ = HIDPP.v10.Register.ReceiverConnection.Write(onDevice: self.backingDevice, parameters: [2])
     }
     
     deinit {
