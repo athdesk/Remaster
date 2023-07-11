@@ -9,7 +9,7 @@ import Foundation
 
 class MxMaster3SDevice : GenericV20Device {
     @Published private var _Ratchet: Bool? = nil
-    @Published private var _SmartShift: UInt? = nil
+    private var _SmartShift: UInt? = nil // This is not published due to a UI bug caused by it (double refresh)
     @Published private var _WheelInvert: Bool? = nil
     @Published private var _WheelHiRes: Bool? = nil
     @Published private var _WheelDiversion: Bool? = nil

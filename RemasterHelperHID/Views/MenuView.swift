@@ -135,7 +135,7 @@ struct SwitchView: View {
                             Image(systemName: "s.circle.fill")
                                 .font(.title3)
                             Slider(value: $ssSlider,
-                                   in: ClosedRange(uncheckedBounds: (1, 49)))
+                                   in: ClosedRange(uncheckedBounds: (1, 128)))
                         { x in if !x { Task.init { await mouse.setSmartShift(UInt(ssSlider)) }}}
                                 .onAppear() { ssSlider = Float(mouse.SmartShift ?? 40) }
                     }

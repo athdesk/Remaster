@@ -49,6 +49,7 @@ extension Mouse {
 
 // Since actors don't support inheritance I guess we'll try and keep it clean manually, by using Mouse-conforming classes only here
 // Also this gives the chance to refactor the Mouse protocol more easily
+// This has to be a separate actor, not a class running on MainActor because of long operations causing ui freezes
 
 actor MouseInterface : ObservableObject, Hashable {
     static func == (lhs: MouseInterface, rhs: MouseInterface) -> Bool {
@@ -106,7 +107,13 @@ actor MouseInterface : ObservableObject, Hashable {
         SupportedDPI = mouse.SupportedDPI
 
         Task {
-            let sink = m.onUpdate { self.objectWillChange.send() }
+            let sink = m.onUpdate {
+                Task {
+                    await MainActor.run {
+                        self.objectWillChange.send()
+                    }
+                }
+            }
             await setSink(sink)
             await refreshData()
         }

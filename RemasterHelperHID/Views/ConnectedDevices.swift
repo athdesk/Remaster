@@ -82,7 +82,13 @@ struct ListText: View {
 }
 
 struct DeviceTab: View {
-    var mouse: MouseInterface
+    @ObservedObject var mouse: MouseInterface
+    @State var ssSlider: Float = 0
+    
+    init(_ m : MouseInterface) {
+        mouse = m
+    }
+    
     var body: some View {
         GeometryReader { geo in
             ZStack {
@@ -104,13 +110,37 @@ struct DeviceTab: View {
                     GeometryReader { geo in
                         HStack { // Body
                             List { // Toggles
-                                Toggle(isOn: .constant(.random())) { ListText("Ratchet") }
-                                Toggle(isOn: .constant(.random())) { ListText("Scroll Wheel Inversion") }
+                                if let v = mouse.Ratchet {
+                                    Toggle(isOn: Binding(get: {v}, set: { _ in Task { await mouse.toggleRatchet() } }))
+                                        { ListText("Ratchet") }
+                                    if v && mouse.SmartShift != 0 {
+                                        HStack { // SmartShift slider
+                                            Image(systemName: "s.circle.fill")
+                                                .font(.title3)
+                                            Slider(value: $ssSlider,
+                                                   in: ClosedRange(uncheckedBounds: (1, 128)))
+                                            { x in if !x { Task.init { await mouse.setSmartShift(UInt(ssSlider)) }}}
+                                                .onAppear() { ssSlider = Float(mouse.SmartShift ?? 40) }
+                                        }
+                                        .padding(8)
+                                    }
+                                }
+                                if let v = mouse.WheelInvert {
+                                    Toggle(isOn: Binding(get: {v}, set: { _ in Task { await mouse.toggleWheelInvert() } }))
+                                        { ListText("Scroll Wheel Inversion") }
+                                }
+                                if let v = mouse.WheelHiRes {
+                                    Toggle(isOn: Binding(get: {v}, set: { _ in Task { await mouse.toggleWheelHiRes() } }))
+                                        { ListText("High Resolution Wheel") }
+                                }
                             }
+                            .transition(.opacity)
+                            .animation(.default, value: mouse.Ratchet)
+                            .buttonStyle(.plain)
                             .toggleStyle(.switch)
                             .scrollContentBackground(.hidden)
                             .font(.smallCaps(.title3)())
-                            .frame(maxWidth: geo.size.width * 0.33)
+                            .frame(minWidth: 240, maxWidth: max(240, geo.size.width * 0.33))
                             Spacer()
                         }
                         .padding(4)
@@ -154,7 +184,7 @@ struct ConnectedDevices: SettingsTab {
                 }
                 .frame(idealWidth: .infinity, maxWidth: .infinity, idealHeight: .infinity, maxHeight: .infinity)
                 if let m = selectedMouse {
-                    DeviceTab(mouse: m)
+                    DeviceTab(m)
                         .transition(.asymmetric(insertion: .push(from: .bottom), removal: .push(from: .top)))
                 }
             }
@@ -163,10 +193,12 @@ struct ConnectedDevices: SettingsTab {
     }
 }
 
-//struct ConnectedDevices_Previews: PreviewProvider {
-//    static var previews: some View {
-//        DeviceCard(mouse: MouseFactory.sharedInstance.mainMouse!)
-//            .frame(minWidth: 840, minHeight: 600 * 0.6)
-////        ConnectedDevices(selectedMouse: MouseFactory.sharedInstance.mainMouse)
-//    }
-//}
+struct ConnectedDevices_Previews: PreviewProvider {
+    static var previews: some View {
+        if let mouse = MouseTracker.global.mainMouse {
+            DeviceTab(mouse)
+                .frame(minWidth: 840, minHeight: 600 * 0.6)
+            //        ConnectedDevices(selectedMouse: MouseFactory.sharedInstance.mainMouse)
+        }
+    }
+}
