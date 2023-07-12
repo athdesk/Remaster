@@ -125,7 +125,7 @@ class MouseTracker : ObservableObject {
     @MainActor @Published private(set) var receivers: [Receiver] = []
     
     @MainActor var mainMouse: MouseInterface? { mice.first }
-    var sinks: [MouseInterface:AnyCancellable?] = [:] //TODO: change to dict
+    var sinks: [MouseInterface:AnyCancellable] = [:]
     
     @MainActor private func notifyChange() async {
         await MainActor.run { self.objectWillChange.send() }

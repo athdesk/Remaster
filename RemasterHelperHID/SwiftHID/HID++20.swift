@@ -90,6 +90,27 @@ extension HIDPP {
             case Ping = 0x1
         }
         
+        enum OnboardProfiles: FunctionID, IFeature {
+            static let ID: FeatureID = 0x8100
+            
+//            enum Event {
+//                case CurrentProfileChanged = 0
+//                case CurrentDPIIndexChanged = 1
+//            }
+            
+            case GetDescription = 0
+            case SetMode = 1
+            case GetMode = 2
+            case SetCurrentProfile = 3
+            case GetCurrentProfile = 4
+            case MemoryRead = 5
+            case MemoryAddrWrite = 6
+            case MemoryWrite = 7
+            case MemoryWriteEnd = 8
+            case GetCurrentDPIIndex = 11
+            case SetCurrentDPIIndex = 12
+        }
+        
         enum FriendlyName: FunctionID, IFeature {
             static let ID: FeatureID = 0x0007
             
@@ -134,7 +155,7 @@ extension HIDPP {
             case GetSensorDPI = 0x02
             case SetSensorDPI = 0x03
         }
-               
+        
         enum ErrorCode : UInt8 {
             case Success = 0x00
             case Unknown = 0x01

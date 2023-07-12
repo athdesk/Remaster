@@ -14,8 +14,8 @@ enum TransportType {
 }
 
 struct DPISupport {
-    let min: UInt = 1000
-    let max: UInt = 2000
+    let min: UInt
+    let max: UInt
     let step: UInt?
 }
 

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Combine
 
 struct DeviceCard: View {
     var mouse: MouseInterface
@@ -83,7 +84,6 @@ struct ListText: View {
 
 struct DeviceTab: View {
     @ObservedObject var mouse: MouseInterface
-    @State var ssSlider: Float = 0
     
     init(_ m : MouseInterface) {
         mouse = m
@@ -109,40 +109,30 @@ struct DeviceTab: View {
                     .padding(12)
                     GeometryReader { geo in
                         HStack { // Body
-                            List { // Toggles
-                                if let v = mouse.Ratchet {
-                                    Toggle(isOn: Binding(get: {v}, set: { _ in Task { await mouse.toggleRatchet() } }))
-                                        { ListText("Ratchet") }
-                                    if v && mouse.SmartShift != 0 {
-                                        HStack { // SmartShift slider
-                                            Image(systemName: "s.circle.fill")
-                                                .font(.title3)
-                                            Slider(value: $ssSlider,
-                                                   in: ClosedRange(uncheckedBounds: (1, 128)))
-                                            { x in if !x { Task.init { await mouse.setSmartShift(UInt(ssSlider)) }}}
-                                                .onAppear() { ssSlider = Float(mouse.SmartShift ?? 40) }
-                                        }
-                                        .padding(8)
-                                    }
-                                }
-                                if let v = mouse.WheelInvert {
-                                    Toggle(isOn: Binding(get: {v}, set: { _ in Task { await mouse.toggleWheelInvert() } }))
-                                        { ListText("Scroll Wheel Inversion") }
-                                }
-                                if let v = mouse.WheelHiRes {
-                                    Toggle(isOn: Binding(get: {v}, set: { _ in Task { await mouse.toggleWheelHiRes() } }))
-                                        { ListText("High Resolution Wheel") }
-                                }
-                            }
-                            .transition(.opacity)
+                            ToggleList(mouse: mouse)
                             .animation(.default, value: mouse.Ratchet)
-                            .buttonStyle(.plain)
-                            .toggleStyle(.switch)
-                            .scrollContentBackground(.hidden)
-                            .font(.smallCaps(.title3)())
-                            .frame(minWidth: 240, maxWidth: max(240, geo.size.width * 0.33))
+                            .frame(minWidth: 280, maxWidth: 440)
                             Spacer()
+                            List {
+                                DPIView(mouse: mouse)
+                            }
+                            .frame(minWidth: 240, maxWidth: 400)
+                            Spacer()
+                            if geo.size.width > (800) {
+                                List {
+                                    Text("Third column")
+                                        .font(.largeTitle)
+                                    Text("content")
+                                }
+                                .frame(minWidth: 240, maxWidth: 320)
+                                .transition(.move(edge: .trailing))
+                            }
                         }
+                        .animation(.linear(duration: 0.1), value: geo.size.width)
+                        .toggleStyle(.switch)
+                        .font(.smallCaps(.title3)())
+                        .scrollContentBackground(.hidden)
+                        .transition(.opacity)
                         .padding(4)
                         Spacer()
                     }
@@ -157,7 +147,7 @@ struct ConnectedDevices: SettingsTab {
     static let title = "Connected Devices"
     
     @ObservedObject var factory = MouseTracker.global
-    @State var selectedMouse: MouseInterface? = nil
+    @State private var selectedMouse: MouseInterface? = nil
     
     var body: some View {
         GeometryReader { geo in
@@ -168,13 +158,23 @@ struct ConnectedDevices: SettingsTab {
                             Button {
                                 if selectedMouse === v {
                                     selectedMouse = nil
+                                    print("removing")
                                 } else {
                                     selectedMouse = v
+                                    print("placing")
                                 }
                             } label: {
                                 DeviceCard(mouse: v, activeMouse: selectedMouse)
                             }
                             .transition(.asymmetric(insertion: .push(from: .bottom), removal: .push(from: .top)))
+                            .onDisappear {
+                                // This fixes a retain cycle in case the selected mouse gets removed
+                                if !factory.mice.contains(where: { m in
+                                    m === selectedMouse
+                                }) {
+                                    selectedMouse = nil
+                                }
+                            }
                         }
                     }
                     .buttonStyle(.plain)

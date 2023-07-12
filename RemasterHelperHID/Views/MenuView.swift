@@ -58,94 +58,60 @@ struct StatusView: View {
     }
 }
 
-struct DPIView: View {
-    @ObservedObject var factory = MouseTracker.global
-    @State var dpiSlider: Float = 0
-    
-    var body: some View {
-        if let mouse = factory.mainMouse {
-            Divider()
-            VStack {
-                HStack {
-                    Text("DPI").font(.title2)
-                    Spacer()
-                    Text("\(UInt(dpiSlider))").font(.title)
-                }
-                .padding(.bottom, 6)
-                Slider(value: $dpiSlider,
-                       in: ClosedRange(uncheckedBounds:
-                                        (Float(mouse.SupportedDPI.min),
-                                         Float(mouse.SupportedDPI.max))))
-                { x in if !x { Task { await mouse.setDPI(UInt(dpiSlider)) }}}
-                    .onAppear() { dpiSlider = Float(mouse.DPI) }
-//                    .onChange(of: factory) { _ in dpiSlider = Float(factory.mainMouse?.DPI ?? 0) }
-                    .animation(.linear, value: dpiSlider)
-            }
-            .transition(.scale)
-            .padding(.horizontal, 6)
-        }
-    }
-}
-
 struct SwitchView: View {
-    @ObservedObject var factory = MouseTracker.global
+    @ObservedObject var mouse: MouseInterface
     @State var ssSlider: Float = 0
     var body: some View {
-        if let mouse = factory.mainMouse {
-            Divider()
-            VStack {
-                HStack { // Upper half
-                    if let r = mouse.Ratchet {
-                        Button { Task { await mouse.toggleRatchet() } }
-                        label: { Image(systemName: "pin.square")
-                                .frame(maxWidth: .infinity)
-                                .symbolVariant(r ? .fill : .none)
-                                .foregroundColor(r ? .accentColor : .primary)
-                                .contentTransition(.identity)
-                        }
-                    }
-                    if let i = mouse.WheelInvert {
-                        Button { Task { await mouse.toggleWheelInvert() } }
-                        label: { Image(systemName: "arrow.up.and.down.square")
-                                .frame(maxWidth: .infinity)
-                                .symbolVariant(i ? .fill : .none)
-                                .foregroundColor(i ? .accentColor : .primary)
-                                .contentTransition(.identity)
-                                .animation(.default, value: i)
-                        }
-                    }
-                    if let h = mouse.WheelHiRes {
-                        Button { Task { await mouse.toggleWheelHiRes() } }
-                        label: { Image(systemName: h ? "circle.dotted" : "circle.dashed")
-                                .frame(maxWidth: .infinity)
-                                .foregroundColor(h ? .accentColor : .primary)
-                                .contentTransition(.interpolate)
-                                .animation(.linear, value: h)
-                        }
+        VStack {
+            HStack { // Upper half
+                if let r = mouse.Ratchet {
+                    Button { Task { await mouse.toggleRatchet() } }
+                    label: { Image(systemName: "pin.square")
+                            .frame(maxWidth: .infinity)
+                            .symbolVariant(r ? .fill : .none)
+                            .foregroundColor(r ? .accentColor : .primary)
+                            .contentTransition(.identity)
                     }
                 }
-                .transition(.move(edge: .top))
-                .font(.title)
-                .padding(.vertical, 6)
-                .buttonStyle(.plain)
-                .animation(.linear, value: mouse.Ratchet)
-                
-                HStack { // Lower half (optional controls)
-                    if mouse.Ratchet == true && mouse.SmartShift != 0 {
-                            Image(systemName: "s.circle.fill")
-                                .font(.title3)
-                            Slider(value: $ssSlider,
-                                   in: ClosedRange(uncheckedBounds: (1, 128)))
-                        { x in if !x { Task.init { await mouse.setSmartShift(UInt(ssSlider)) }}}
-                                .onAppear() { ssSlider = Float(mouse.SmartShift ?? 40) }
+                if let i = mouse.WheelInvert {
+                    Button { Task { await mouse.toggleWheelInvert() } }
+                    label: { Image(systemName: "arrow.up.and.down.square")
+                            .frame(maxWidth: .infinity)
+                            .symbolVariant(i ? .fill : .none)
+                            .foregroundColor(i ? .accentColor : .primary)
+                            .contentTransition(.identity)
+                            .animation(.default, value: i)
                     }
                 }
-                .padding(.horizontal, 4)
-                .padding(.vertical, 4)
-                .transition(.move(edge: .bottom))
+                if let h = mouse.WheelHiRes {
+                    Button { Task { await mouse.toggleWheelHiRes() } }
+                    label: { Image(systemName: h ? "circle.dotted" : "circle.dashed")
+                            .frame(maxWidth: .infinity)
+                            .foregroundColor(h ? .accentColor : .primary)
+                            .contentTransition(.interpolate)
+                            .animation(.linear, value: h)
+                    }
+                }
             }
-            .frame(height: 64)
+            .transition(.move(edge: .top))
+            .font(.title)
+            .padding(.vertical, 6)
+            .buttonStyle(.plain)
+            HStack { // Lower half (optional controls)
+                if mouse.Ratchet == true && mouse.SmartShift != 0 {
+                    Image(systemName: "s.circle.fill")
+                        .font(.title3)
+                    Slider(value: $ssSlider,
+                           in: ClosedRange(uncheckedBounds: (1, 128)))
+                    { x in if !x { Task.init { await mouse.setSmartShift(UInt(ssSlider)) }}}
+                        .onAppear() { ssSlider = Float(mouse.SmartShift ?? 40) }
+                }
+            }
+            .padding(.horizontal, 4)
+            .padding(.vertical, 4)
         }
+        .animation(.linear, value: mouse.Ratchet)
+        .frame(height: 64)
     }
 }
 
@@ -168,10 +134,14 @@ struct MenuView: View {
                 .padding(.horizontal, 4)
                 .symbolRenderingMode(.hierarchical)
             if factory.mainMouse != nil {
-                DPIView().padding(4)
-                SwitchView()
-                    .padding(4)
-                    .symbolRenderingMode(.hierarchical)
+                if let m = factory.mainMouse {
+                    Divider()
+                    DPIView(mouse: m).padding(4)
+                    Divider()
+                    SwitchView(mouse: m)
+                        .padding(4)
+                        .symbolRenderingMode(.hierarchical)
+                }
             }
         }
         .padding(16)

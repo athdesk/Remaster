@@ -55,7 +55,7 @@ class GenericV20Device : Mouse {
     @Published var _DPI: UInt?
     var DPI: UInt { get { _DPI ?? getDPI() } set { setDPI(to: newValue) } }
     // TODO: fix this
-    var SupportedDPI: DPISupport { DPISupport(step: nil) }
+    var SupportedDPI: DPISupport { DPISupport(min: 600, max: 4000, step: nil) }
         
     /// Battery
     
@@ -89,6 +89,11 @@ class GenericV20Device : Mouse {
                 break
             }
         }
+    }}
+    
+    // TODO: Add real support for reading stored profiles, as DPI switching is implemented in that way sometimes
+    internal var EventProfile: EventCallback {{ n in
+        self.refreshData()
     }}
     
     internal var EventDPI: EventCallback {{ n in
@@ -186,6 +191,10 @@ class GenericV20Device : Mouse {
         
         if let i = dev.GetFeatureIndex(forID: Proto.BatteryStatus.ID) {
             observers.append(backingDevice.notifier.newObserver(forIndex: i, using: EventBattery))
+        }
+        
+        if let i = dev.GetFeatureIndex(forID: Proto.OnboardProfiles.ID) {
+            observers.append(backingDevice.notifier.newObserver(forIndex: i, using: EventProfile))
         }
     }
     
