@@ -158,10 +158,8 @@ struct ConnectedDevices: SettingsTab {
                             Button {
                                 if selectedMouse === v {
                                     selectedMouse = nil
-                                    print("removing")
                                 } else {
                                     selectedMouse = v
-                                    print("placing")
                                 }
                             } label: {
                                 DeviceCard(mouse: v, activeMouse: selectedMouse)

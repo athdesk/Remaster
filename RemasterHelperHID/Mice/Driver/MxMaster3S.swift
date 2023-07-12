@@ -13,6 +13,8 @@ class MxMaster3SDevice : GenericV20Device {
     @Published private var _WheelInvert: Bool? = nil
     @Published private var _WheelHiRes: Bool? = nil
     @Published private var _WheelDiversion: Bool? = nil
+    @Published private var _HWheelInvert: Bool? = nil
+    @Published private var _HWheelDiversion: Bool? = nil
     
     override var Ratchet: Bool? {
         get { return _Ratchet }
@@ -39,6 +41,16 @@ class MxMaster3SDevice : GenericV20Device {
         set { setWheelDiversion(to: newValue ?? false) }
     }
     
+    override var HWheelInvert: Bool? {
+        get { return _HWheelInvert }
+        set { setHWheelInvert(to: newValue ?? false) }
+    }
+    
+    override var HWheelDiversion: Bool? {
+        get { return _HWheelDiversion }
+        set { setHWheelDiversion(to: newValue ?? false) }
+    }
+    
     override internal var EventWheel: EventCallback {{ n in
         let ppReport = n.object as! HIDPP.CustomReport
         if ppReport.isError20 == false {
@@ -52,6 +64,44 @@ class MxMaster3SDevice : GenericV20Device {
             }
         }
     }}
+    
+    private func setHWheelMode(diversion: Bool, invert: Bool) {
+        var params: [UInt8] = []
+        params.append(diversion ? 1 : 0)
+        params.append(invert ? 1 : 0)
+        _ = Proto.ThumbWheel.SetMode.Call(onDevice: backingDevice, parameters: params)
+        _ = getHWheelInfo()
+    }
+    
+    private func setHWheelInvert(to: Bool) {
+        guard _HWheelInvert != nil || getHWheelInfo().0 != nil else { return }
+        setHWheelMode(diversion: _HWheelDiversion ?? false,
+                     invert: to)
+    }
+    
+    private func setHWheelDiversion(to: Bool) {
+        guard _HWheelDiversion != nil || getHWheelInfo().1 != nil else { return }
+        setHWheelMode(diversion: to,
+                     invert: _HWheelInvert ?? false)
+    }
+    
+    // Invert, Diverted
+    private func getHWheelInfo() -> (Bool?, Bool?) {
+        var inv: Bool?
+        var div: Bool?
+        
+        let rMode = Proto.ThumbWheel.GetMode.Call(onDevice: backingDevice)
+        if rMode?.CheckError20() == .Success {
+            let lo8 = rMode!.parameters[0]
+            let hi8 = rMode!.parameters[1]
+            div = lo8 != 0
+            inv = hi8 != 0
+        }
+        _HWheelInvert = inv
+        _HWheelDiversion = div
+        print("thumb wheel invert \(inv) divert \(div)")
+        return (inv, div)
+    }
     
     private func setWheelMode(diversion: Bool, invert: Bool, hires: Bool) {
         var flags: UInt8 = 0
@@ -151,6 +201,7 @@ class MxMaster3SDevice : GenericV20Device {
         super.refreshData()
         _ = getWheelInfo()
         _ = getSmartShift()
+        _ = getHWheelInfo()
     }
     
 }

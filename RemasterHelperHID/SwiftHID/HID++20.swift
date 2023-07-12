@@ -153,6 +153,14 @@ extension HIDPP {
             case Write = 0x1
         }
         
+        enum ThumbWheel: FunctionID, IFeature {
+            static let ID: FeatureID = 0x2150
+            
+            case GetCapability = 0x00
+            case GetMode = 0x1
+            case SetMode = 0x2
+        }
+        
         enum HiResWheel: FunctionID, IFeature {
             static let ID: FeatureID = 0x2121
             

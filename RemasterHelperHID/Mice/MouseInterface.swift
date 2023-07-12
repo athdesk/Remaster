@@ -27,9 +27,13 @@ protocol Mouse : AnyObject, ObservableObject, Identifiable {
     
     var Ratchet: Bool? { get set }
     var SmartShift: UInt? { get set }
+    
     var WheelInvert: Bool? { get set }
     var WheelHiRes: Bool? { get set }
     var WheelDiversion: Bool? { get set }
+    
+    var HWheelInvert: Bool? { get set }
+    var HWheelDiversion: Bool? { get set }
     
     var Battery: Battery? { get }
     
@@ -50,6 +54,7 @@ extension Mouse {
 // Since actors don't support inheritance I guess we'll try and keep it clean manually, by using Mouse-conforming classes only here
 // Also this gives the chance to refactor the Mouse protocol more easily
 // This has to be a separate actor, not a class running on MainActor because of long operations causing ui freezes
+// Though this makes it really annoying to work with. Hopefully I don't lose my sanity from having to copy-paste too much stuff
 
 actor MouseInterface : ObservableObject, Hashable {
     static func == (lhs: MouseInterface, rhs: MouseInterface) -> Bool {
@@ -78,13 +83,17 @@ actor MouseInterface : ObservableObject, Hashable {
     nonisolated var WheelInvert: Bool? { mouse.WheelInvert }
     nonisolated var WheelHiRes: Bool? { mouse.WheelHiRes }
     nonisolated var WheelDiversion: Bool? { mouse.WheelDiversion }
+    nonisolated var HWheelInvert: Bool? { mouse.HWheelInvert }
+    nonisolated var HWheelDiversion: Bool? { mouse.HWheelDiversion }
     nonisolated var DPI: UInt { mouse.DPI }
     
     func toggleRatchet() { mouse.Ratchet?.toggle() }
     func toggleWheelInvert() { mouse.WheelInvert?.toggle() }
     func toggleWheelHiRes() { mouse.WheelHiRes?.toggle() }
-    
     func toggleWheelDiversion() { mouse.WheelDiversion?.toggle() }
+    
+    func toggleHWheelInvert() { mouse.HWheelInvert?.toggle() }
+    func toggleHWheelDiversion() { mouse.HWheelDiversion?.toggle() }
     
     func setDPI(_ n: UInt) { mouse.DPI = n }
     func setSmartShift(_ n: UInt) { mouse.SmartShift = n }

@@ -35,6 +35,13 @@ enum DiversionChoice: ReprogChoice {
     case Default
     case Diverted
     
+    func bool() -> Bool {
+        switch self {
+        case .Default: return false
+        case .Diverted: return true
+        }
+    }
+    
     func str() -> String {
         switch self {
         case .Default:
@@ -61,17 +68,27 @@ struct ToggleList: View {
         case .some(_):
             return .Default
         }
-    } set: { v in
-        Task { await mouse.toggleWheelDiversion() }
-    }
-
-        
-    }
-    @State private var selHWheel = DiversionChoice.Default
+    } set: { v in Task {
+        if v.bool() != mouse.WheelDiversion { await mouse.toggleWheelDiversion() }
+    }}}
+    
+    private var selHWheel: Binding<DiversionChoice> { Binding {
+        switch mouse.HWheelDiversion {
+        case true:
+            return .Diverted
+        case false:
+            return .Default
+        case .none:
+            return .Default
+        case .some(_):
+            return .Default
+        }
+    } set: { v in Task {
+        if v.bool() != mouse.HWheelDiversion { await mouse.toggleHWheelDiversion() }
+    }}}
+    
     @State private var selGestures = DiversionChoice.Default
    
-    // TODO: make these an enum
-    let btnPickerChoices = ["Left Click", "Right Click", "Middle Click", "Button 4", "Button 5", "Button 6"]
     let divPickerChoices = [DiversionChoice.Default, DiversionChoice.Diverted]
     
     var body: some View {
@@ -104,7 +121,7 @@ struct ToggleList: View {
             ReprogSelector(choices: divPickerChoices, selection: selVWheel) {
                 ListText("Scroll Wheel").frame(maxWidth: .infinity, alignment: .leading)
             }
-            ReprogSelector(choices: divPickerChoices, selection: $selHWheel) {
+            ReprogSelector(choices: divPickerChoices, selection: selHWheel) {
                 ListText("Thumb Wheel").frame(maxWidth: .infinity, alignment: .leading)
             }
             ReprogSelector(choices: divPickerChoices, selection: $selGestures) {

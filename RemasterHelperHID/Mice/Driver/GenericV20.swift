@@ -48,9 +48,13 @@ class GenericV20Device : Mouse {
     // TODO: eventually implement software fallbacks for these in the basic driver
     var Ratchet: Bool? { get { nil } set { } }
     var SmartShift: UInt? { get { nil } set { } }
+    
     var WheelInvert: Bool? { get { nil } set { } }
     var WheelHiRes: Bool? { get { nil } set { } }
     var WheelDiversion: Bool? { get { nil } set { } }
+    
+    var HWheelInvert: Bool? { get { nil } set { } }
+    var HWheelDiversion: Bool? { get { nil } set { } }
 
     @Published var _DPI: UInt?
     var DPI: UInt { get { _DPI ?? getDPI() } set { setDPI(to: newValue) } }
