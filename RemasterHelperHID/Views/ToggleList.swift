@@ -7,8 +7,12 @@
 
 import SwiftUI
 
-struct DiversionSelector<T: StringProtocol, Content: View>: View {
-    let choices: Array<T>
+protocol ReprogChoice : Hashable {
+    func str() -> String
+}
+
+struct ReprogSelector<T: ReprogChoice, Content: View>: View {
+    let choices: [T]
     @Binding var selection: T
     let title: () -> Content
     var body: some View {
@@ -17,12 +21,26 @@ struct DiversionSelector<T: StringProtocol, Content: View>: View {
             Spacer()
             Menu {
                 ForEach(choices, id: \.self) { s in
-                    Button(s) { selection = s }
+                    Button(s.str()) { selection = s }
                 }
             } label: {
-                Text(selection)
+                Text(selection.str())
             }
             .menuStyle(.borderlessButton)
+        }
+    }
+}
+
+enum DiversionChoice: ReprogChoice {
+    case Default
+    case Diverted
+    
+    func str() -> String {
+        switch self {
+        case .Default:
+            return "Default"
+        case .Diverted:
+            return "Controlled by Remaster"
         }
     }
 }
@@ -32,13 +50,29 @@ struct ToggleList: View {
     @State private var ssSlider: Float = 0
     
     //TODO: bind these directly to the mouse
-    @State private var selVWheel = "Default"
-    @State private var selHWheel = "Default"
-    @State private var selGestures = "Default"
+    private var selVWheel: Binding<DiversionChoice> { Binding {
+        switch mouse.WheelDiversion {
+        case true:
+            return .Diverted
+        case false:
+            return .Default
+        case .none:
+            return .Default
+        case .some(_):
+            return .Default
+        }
+    } set: { v in
+        Task { await mouse.toggleWheelDiversion() }
+    }
+
+        
+    }
+    @State private var selHWheel = DiversionChoice.Default
+    @State private var selGestures = DiversionChoice.Default
    
     // TODO: make these an enum
     let btnPickerChoices = ["Left Click", "Right Click", "Middle Click", "Button 4", "Button 5", "Button 6"]
-    let movPickerChoices = ["Controlled by Remaster", "Default"]
+    let divPickerChoices = [DiversionChoice.Default, DiversionChoice.Diverted]
     
     var body: some View {
         List { // Toggles
@@ -67,26 +101,15 @@ struct ToggleList: View {
             }
             Divider()
             // TODO: add diversion capability checks
-            DiversionSelector(choices: movPickerChoices, selection: $selVWheel) {
+            ReprogSelector(choices: divPickerChoices, selection: selVWheel) {
                 ListText("Scroll Wheel").frame(maxWidth: .infinity, alignment: .leading)
             }
-            DiversionSelector(choices: movPickerChoices, selection: $selHWheel) {
+            ReprogSelector(choices: divPickerChoices, selection: $selHWheel) {
                 ListText("Thumb Wheel").frame(maxWidth: .infinity, alignment: .leading)
             }
-            DiversionSelector(choices: movPickerChoices, selection: $selGestures) {
+            ReprogSelector(choices: divPickerChoices, selection: $selGestures) {
                 ListText("Gestures").frame(maxWidth: .infinity, alignment: .leading)
             }
-            
-//                Picker(selection: $selWheel, content: {
-//                    ForEach(movPickerChoices, id: \.self) {
-//                        Text($0)
-//                    }
-//                }, label: {
-//                    ListText("Scroll Wheel")
-//                })
-//                .pickerStyle(.menu)
-//
-            
         }
     }
 }

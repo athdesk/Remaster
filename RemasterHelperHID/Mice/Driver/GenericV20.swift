@@ -91,7 +91,8 @@ class GenericV20Device : Mouse {
         }
     }}
     
-    // TODO: Add real support for reading stored profiles, as DPI switching is implemented in that way sometimes
+    // TODO: Add real support for reading stored profiles, if we ever want to support them
+    // For now, we just refresh data to pickup DPI and other stuff that may be contained in the profile
     internal var EventProfile: EventCallback {{ n in
         self.refreshData()
     }}

@@ -85,9 +85,37 @@ extension HIDPP {
         enum IRoot : FunctionID, IFeature {
             static internal let ID: FeatureID = 0x0000
             static internal var _index: FeatureIndex? = FeatureIndex(0)
-
+            
             case GetFeature = 0x0
             case Ping = 0x1
+        }
+        
+        // Each IFeature can support being called with the stored function ids, and setting events relating to itself.
+        // For now we don't include event descriptors in the enums
+        // (except for battery, where it doesn't alias with any other function id)
+        // It would make sense to include an `Event` property, but for now I just left event descriptors as comments
+        
+        enum ReprogControls4: FunctionID, IFeature {
+            static let ID: FeatureID = 0x1b04
+
+            enum Flags: UInt8 {
+                case TemporaryDiverted = 0x1
+                case ChangeTemporaryDivert = 0x2
+                case PersistentDiverted = 0x4
+                case ChangePersistentDivert = 0x8
+                case RawXYDiverted = 0x10
+                case ChangeRawXYDivert = 0x20
+            }
+            
+//            enum Event {
+//                case DivertedButtonEvent = 0
+//                case DivertedRawXYEvent = 1
+//            };
+            
+            case GetControlCount = 0
+            case GetControlInfo = 1
+            case GetControlReporting = 2
+            case SetControlReporting = 3
         }
         
         enum OnboardProfiles: FunctionID, IFeature {

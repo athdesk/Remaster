@@ -84,6 +84,8 @@ actor MouseInterface : ObservableObject, Hashable {
     func toggleWheelInvert() { mouse.WheelInvert?.toggle() }
     func toggleWheelHiRes() { mouse.WheelHiRes?.toggle() }
     
+    func toggleWheelDiversion() { mouse.WheelDiversion?.toggle() }
+    
     func setDPI(_ n: UInt) { mouse.DPI = n }
     func setSmartShift(_ n: UInt) { mouse.SmartShift = n }
     
