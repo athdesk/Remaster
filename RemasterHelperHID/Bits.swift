@@ -40,6 +40,15 @@ extension UnsignedInteger {
     }
 }
 
+extension Data {
+    var hexDescriptionPacked: String {
+        return reduce("") {$0 + String(format: "%02x", $1)}
+    }
+    var hexDescription: String {
+        return reduce("") {$0 + String(format: "%02x ", $1)}
+    }
+}
+
 func DebugPrint(_ x: Any...) {
     #if DEBUG
     for i in x {

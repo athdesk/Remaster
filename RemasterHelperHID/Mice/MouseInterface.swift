@@ -25,6 +25,8 @@ protocol Mouse : AnyObject, ObservableObject, Identifiable {
     var hid: HIDDevice { get }
     var index: UInt8 { get }
     
+    var Serial: String { get }
+
     var Ratchet: Bool? { get set }
     var SmartShift: UInt? { get set }
     
@@ -77,6 +79,8 @@ actor MouseInterface : ObservableObject, Hashable, Identifiable {
     nonisolated let thumbnailName: String
     nonisolated let hid: HIDDevice
     nonisolated let index: UInt8
+    
+    nonisolated var Serial: String { mouse.Serial }
     
     nonisolated let SupportedDPI: DPISupport
     nonisolated var Battery: Battery? { mouse.Battery }

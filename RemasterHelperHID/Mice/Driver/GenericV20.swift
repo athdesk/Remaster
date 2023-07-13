@@ -36,9 +36,32 @@ class GenericV20Device : Mouse {
     
     public var name: String { backingDevice.name }
     var transport: TransportType { backingDevice.transport }
-    var thumbnailName: String {getThumbName(fromName: name)}
+    var thumbnailName: String { getThumbName(fromName: name) }
     var hid: HIDDevice { backingDevice.hid }
     var index: UInt8 { backingDevice.devIndex }
+    
+    lazy var fwInfoID: [UInt8]? = {
+        let report = Proto.FwVersion.GetInfoID.Call(onDevice: self.backingDevice)
+        if report?.isError20 == false {
+            return report?.parameters
+        }
+        return nil
+    }()
+    
+    lazy var fwInfoVer: [UInt8]? = {
+        let report = Proto.FwVersion.GetInfoVer.Call(onDevice: self.backingDevice)
+        if report?.isError20 == false {
+            return report?.parameters
+        }
+        return nil
+    }()
+    
+    var Serial: String {
+        guard let i = fwInfoID else { return "Unknown" }
+        return Data(i[1..<5]).hexDescriptionPacked
+    }
+    
+    
     
     @Published var Battery: Battery? = nil
     
@@ -201,6 +224,8 @@ class GenericV20Device : Mouse {
         if let i = dev.GetFeatureIndex(forID: Proto.OnboardProfiles.ID) {
             observers.append(backingDevice.notifier.newObserver(forIndex: i, using: EventProfile))
         }
+        
+        print("Serial \(Serial)")
     }
     
     deinit {

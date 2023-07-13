@@ -82,6 +82,22 @@ struct ListText: View {
     }
 }
 
+struct DualListText: View {
+    var text1: String
+    var text2: String
+    var body: some View {
+        HStack {
+            ListText(text1)
+            Spacer()
+            ListText(text2)
+        }
+    }
+    init(_ leftText: String, _ rightText: String) {
+        text1 = leftText
+        text2 = rightText
+    }
+}
+
 struct DeviceTab: View {
     @ObservedObject var mouse: MouseInterface
     
@@ -120,9 +136,17 @@ struct DeviceTab: View {
                             Spacer()
                             if geo.size.width > (800) {
                                 List {
-                                    Text("Third column")
-                                        .font(.largeTitle)
-                                    Text("content")
+                                    DualListText("Serial", mouse.Serial)
+                                    
+                                    let transport = { () -> String in
+                                        if case .Receiver(let type) = mouse.transport {
+                                            return String(describing: type)
+                                        } else {
+                                            return String(describing: mouse.transport)
+                                        }
+                                    }()
+                                    
+                                    DualListText("Transport", transport)
                                 }
                                 .frame(minWidth: 240, maxWidth: 320)
                                 .transition(.move(edge: .trailing))

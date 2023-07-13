@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		DE07A4E82A3F257500E43C5C /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE07A4E72A3F257400E43C5C /* Event.swift */; };
 		DE07A4EC2A404B2C00E43C5C /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE07A4EB2A404B2C00E43C5C /* Utilities.swift */; };
-		DE07A4EE2A404B6900E43C5C /* MouseFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE07A4ED2A404B6900E43C5C /* MouseFactory.swift */; };
 		DE07A4F02A41A9C900E43C5C /* Indicators.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE07A4EF2A41A9C900E43C5C /* Indicators.swift */; };
 		DE07A4FA2A4207FC00E43C5C /* MainWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE07A4F92A4207FC00E43C5C /* MainWindow.swift */; };
 		DE07A4FC2A42102000E43C5C /* ConnectedDevices.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE07A4FB2A42102000E43C5C /* ConnectedDevices.swift */; };
@@ -66,7 +65,6 @@
 /* Begin PBXFileReference section */
 		DE07A4E72A3F257400E43C5C /* Event.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Event.swift; sourceTree = "<group>"; };
 		DE07A4EB2A404B2C00E43C5C /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
-		DE07A4ED2A404B6900E43C5C /* MouseFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MouseFactory.swift; sourceTree = "<group>"; };
 		DE07A4EF2A41A9C900E43C5C /* Indicators.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Indicators.swift; sourceTree = "<group>"; };
 		DE07A4F92A4207FC00E43C5C /* MainWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainWindow.swift; sourceTree = "<group>"; };
 		DE07A4FB2A42102000E43C5C /* ConnectedDevices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectedDevices.swift; sourceTree = "<group>"; };
@@ -188,7 +186,6 @@
 				DE9C87C62A3B6EED002770AD /* MouseInterface.swift */,
 				DE9C87CB2A3B8423002770AD /* SupportedDevices.swift */,
 				DE07A4EB2A404B2C00E43C5C /* Utilities.swift */,
-				DE07A4ED2A404B6900E43C5C /* MouseFactory.swift */,
 				DE07A51A2A44445E00E43C5C /* Receiver.swift */,
 			);
 			path = Mice;
@@ -373,7 +370,6 @@
 				DE9C87D72A3D261E002770AD /* MxMaster3S.swift in Sources */,
 				DE4A9B4B2A3E056A007B5F7A /* MxMaster2S.swift in Sources */,
 				DE9C87CA2A3B808F002770AD /* GenericV20.swift in Sources */,
-				DE07A4EE2A404B6900E43C5C /* MouseFactory.swift in Sources */,
 				DE07A4E82A3F257500E43C5C /* Event.swift in Sources */,
 				DE9C87A92A38BD53002770AD /* MainLogic.swift in Sources */,
 				DE07A4FA2A4207FC00E43C5C /* MainWindow.swift in Sources */,

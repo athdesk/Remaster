@@ -95,6 +95,13 @@ extension HIDPP {
         // (except for battery, where it doesn't alias with any other function id)
         // It would make sense to include an `Event` property, but for now I just left event descriptors as comments
         
+        enum FwVersion: FunctionID, IFeature {
+            static let ID: FeatureID = 0x0003
+            
+            case GetInfoID = 0x00
+            case GetInfoVer = 0x01
+        }
+        
         enum ReprogControls4: FunctionID, IFeature {
             static let ID: FeatureID = 0x1b04
 
