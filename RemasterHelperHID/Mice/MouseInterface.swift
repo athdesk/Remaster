@@ -56,16 +56,19 @@ extension Mouse {
 // This has to be a separate actor, not a class running on MainActor because of long operations causing ui freezes
 // Though this makes it really annoying to work with. Hopefully I don't lose my sanity from having to copy-paste too much stuff
 
-actor MouseInterface : ObservableObject, Hashable {
+actor MouseInterface : ObservableObject, Hashable, Identifiable {
     static func == (lhs: MouseInterface, rhs: MouseInterface) -> Bool {
-        lhs.hid == rhs.hid && lhs.index == rhs.index
+        lhs.UID == rhs.UID
     }
     
     nonisolated func hash(into hasher: inout Hasher) {
         hasher.combine(hid)
         hasher.combine(index)
+        hasher.combine(UID)
     }
     
+    nonisolated var UID: ID { ObjectIdentifier(self) }
+            
     private let mouse: any Mouse
     private var mouseSink: AnyCancellable? = nil
     

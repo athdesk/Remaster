@@ -7,6 +7,13 @@
 
 import Foundation
 
+class Weak<T: AnyObject> : ObservableObject {
+  weak var value : T?
+  init (value: T) {
+    self.value = value
+  }
+}
+
 func _convertToBytes<T>(_ value: T, withCapacity capacity: Int) -> [UInt8] {
     
     var mutableValue = value
