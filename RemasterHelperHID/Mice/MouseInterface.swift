@@ -143,7 +143,17 @@ class MouseTracker : ObservableObject {
     @MainActor @Published private(set) var receivers: [Receiver] = []
     
     @MainActor var mainMouse: MouseInterface? { mice.first }
+    
     var sinks: [MouseInterface:AnyCancellable] = [:]
+    
+    @MainActor private func reapSinks() {
+        sinks.keys.forEach { k in
+            if !mice.contains(where: { $0 === k }) {
+                let v = sinks.removeValue(forKey: k)
+                v?.cancel()
+            }
+        }
+    }
     
     @MainActor private func notifyChange() async {
         await MainActor.run { self.objectWillChange.send() }
@@ -159,12 +169,14 @@ class MouseTracker : ObservableObject {
         mice.removeAll { m in
             m.hid == hid && m.index == index
         }
+        reapSinks()
     }
     
     @MainActor func removeReceiver(withHid hid: HIDDevice) {
         receivers.removeAll { r in
             r.hid == hid
         }
+        reapSinks()
     }
     
     // This is not marked MainActor for performance reasons
