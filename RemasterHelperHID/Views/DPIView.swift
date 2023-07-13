@@ -25,13 +25,13 @@ fileprivate class DPIShim : ObservableObject {
     }
     
     static func shimForMouse(_ m: MouseInterface) -> DPIShim {
-        print("\(Shims.count) shims")
         // Reap dead values here
         Shims.forEach { pair in
             if pair.1.value == nil || !MouseTracker.global.mice.contains(where: { $0 == pair.0 }) {
                 Shims.removeValue(forKey: pair.0)
             }
         }
+        
         return Shims[m]?.value ?? Self.init(m)
     }
     
@@ -39,6 +39,7 @@ fileprivate class DPIShim : ObservableObject {
         sink = m.onUpdate {
             self.uSlider = m.DPI
         }
+        self.uSlider = m.DPI
         Shims[m] = Weak(value: self)
     }
     
