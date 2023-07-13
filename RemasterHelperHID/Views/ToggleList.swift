@@ -116,7 +116,9 @@ struct ToggleList: View {
                 Toggle(isOn: Binding(get: {v}, set: { _ in Task { await mouse.toggleWheelHiRes() } }))
                     { ListText("High Resolution Wheel") }
             }
-            Divider()
+            if mouse.WheelHiRes != nil || mouse.WheelInvert != nil || mouse.Ratchet != nil {
+                Divider()
+            }
             // TODO: add diversion capability checks
             ReprogSelector(choices: divPickerChoices, selection: selVWheel) {
                 ListText("Scroll Wheel").frame(maxWidth: .infinity, alignment: .leading)

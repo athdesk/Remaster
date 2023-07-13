@@ -35,7 +35,7 @@ enum RemasterDevice : CaseIterable {
         case .Receiver(_): return nil
         case .MxMaster2S: return MxMaster2SDevice.self
         case .MxMaster3S: return MxMaster3SDevice.self
-        default: return GenericV20Device.self
+        default: return MxMaster3SDevice.self
         }
     }
 

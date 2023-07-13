@@ -154,7 +154,11 @@ class MxMaster3SDevice : GenericV20Device {
             let flags = rCap!.parameters[0]
             rat = (flags & 0x04) != 0 ? rat : nil
             inv = (flags & 0x08) != 0 ? inv : nil
+        } else {
+            rat = nil
+            inv = nil
         }
+        
         if rat != nil {
             let rRat = Proto.HiResWheel.GetRatchet.Call(onDevice: backingDevice)
             if rRat?.CheckError20() == .Success {
