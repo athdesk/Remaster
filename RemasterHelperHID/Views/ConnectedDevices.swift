@@ -98,6 +98,27 @@ struct DualListText: View {
     }
 }
 
+struct InfoList: View {
+    @ObservedObject var mouse: MouseInterface
+    var body: some View {
+        DualListText("Serial", mouse.Serial)
+        
+        let transport = { () -> String in
+            if case .Receiver(let type) = mouse.transport {
+                return String(describing: type)
+            } else {
+                return String(describing: mouse.transport)
+            }
+        }()
+        
+        DualListText("Transport", transport)
+        
+        if let bat = mouse.Battery {
+            DualListText("Battery", bat.Percent.description + (bat.Charging ? "% +" : "%"))
+        }
+    }
+}
+
 struct DeviceTab: View {
     @ObservedObject var mouse: MouseInterface
     
@@ -126,33 +147,25 @@ struct DeviceTab: View {
                     GeometryReader { geo in
                         HStack { // Body
                             ToggleList(mouse: mouse)
-                            .animation(.default, value: mouse.Ratchet)
-                            .frame(minWidth: 280, maxWidth: 440)
+                                .animation(.default, value: mouse.Ratchet)
+                                .frame(minWidth: 280, maxWidth: 440)
                             Spacer()
                             List {
                                 DPIView(mouse: mouse)
+                                Spacer()
                             }
                             .frame(minWidth: 240, maxWidth: 400)
+                            .transition(.scale)
                             Spacer()
-                            if geo.size.width > (800) {
+                            if geo.size.width > 840 {
                                 List {
-                                    DualListText("Serial", mouse.Serial)
-                                    
-                                    let transport = { () -> String in
-                                        if case .Receiver(let type) = mouse.transport {
-                                            return String(describing: type)
-                                        } else {
-                                            return String(describing: mouse.transport)
-                                        }
-                                    }()
-                                    
-                                    DualListText("Transport", transport)
+                                    InfoList(mouse: mouse)
                                 }
+                                .transition(.offset(x: 320, y: 0))
                                 .frame(minWidth: 240, maxWidth: 320)
-                                .transition(.move(edge: .trailing))
                             }
                         }
-                        .animation(.linear(duration: 0.1), value: geo.size.width)
+                        .animation(.easeIn(duration: 0.1), value: geo.size.width > 840)
                         .toggleStyle(.switch)
                         .font(.smallCaps(.title3)())
                         .scrollContentBackground(.hidden)

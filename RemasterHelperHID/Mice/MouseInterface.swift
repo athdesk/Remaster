@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import SwiftUI
 
 // Class for interfacing with #.*.*.# a mouse #.*.*.# :)
 //
@@ -71,6 +72,9 @@ actor MouseInterface : ObservableObject, Hashable, Identifiable {
     
     nonisolated var UID: ID { ObjectIdentifier(self) }
             
+    // This exists only to unify UI views referencing the same Mouse
+    @Published @MainActor var dpiShim: Float = 100
+    
     private let mouse: any Mouse
     private var mouseSink: AnyCancellable? = nil
     
@@ -123,7 +127,6 @@ actor MouseInterface : ObservableObject, Hashable, Identifiable {
         transport = mouse.transport
         thumbnailName = mouse.thumbnailName
         SupportedDPI = mouse.SupportedDPI
-
         Task {
             let sink = m.onUpdate {
                 Task {
@@ -131,6 +134,9 @@ actor MouseInterface : ObservableObject, Hashable, Identifiable {
                         self.objectWillChange.send()
                     }
                 }
+            }
+            await MainActor.run {
+                dpiShim = Float(mouse.DPI)
             }
             await setSink(sink)
             await refreshData()
@@ -191,7 +197,7 @@ class MouseTracker : ObservableObject {
         } else {
             guard let driver = deviceDescriptor.getDriver() else { return }
             guard let iMouse = MouseInterface(driver: driver, device: device, index: 0xff) else { return }
-            print("Device \(iMouse.name) is here!")
+            print("Device \(iMouse.name) (\(iMouse.Serial)) is here!")
             await addMouse(iMouse)
         }
     }
