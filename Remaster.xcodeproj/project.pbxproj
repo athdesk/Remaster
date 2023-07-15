@@ -36,6 +36,7 @@
 		DEBC420D2A386DDE0054F984 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DEBC420C2A386DDE0054F984 /* Assets.xcassets */; };
 		DEBC42102A386DDE0054F984 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DEBC420F2A386DDE0054F984 /* Preview Assets.xcassets */; };
 		DEDEA4712A5E0C8F00B7A2B3 /* DPIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEDEA4702A5E0C8F00B7A2B3 /* DPIView.swift */; };
+		DEE2CFDD2A61E52300C3A817 /* ReprogControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEE2CFDC2A61E52300C3A817 /* ReprogControls.swift */; };
 		DEF856592A5F2FF400856677 /* ToggleList.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEF856582A5F2FF400856677 /* ToggleList.swift */; };
 /* End PBXBuildFile section */
 
@@ -96,6 +97,7 @@
 		DEBC420F2A386DDE0054F984 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		DEBC42112A386DDE0054F984 /* Remaster.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Remaster.entitlements; sourceTree = "<group>"; };
 		DEDEA4702A5E0C8F00B7A2B3 /* DPIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DPIView.swift; sourceTree = "<group>"; };
+		DEE2CFDC2A61E52300C3A817 /* ReprogControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReprogControls.swift; sourceTree = "<group>"; };
 		DEF856582A5F2FF400856677 /* ToggleList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleList.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -121,6 +123,7 @@
 		DE07A4EA2A404AFD00E43C5C /* Driver */ = {
 			isa = PBXGroup;
 			children = (
+				DEE2CFDA2A61E50300C3A817 /* Features */,
 				DE9C87C92A3B808F002770AD /* GenericV20.swift */,
 				DE9C87D62A3D261E002770AD /* MxMaster3S.swift */,
 				DE4A9B4A2A3E056A007B5F7A /* MxMaster2S.swift */,
@@ -236,6 +239,14 @@
 			children = (
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		DEE2CFDA2A61E50300C3A817 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				DEE2CFDC2A61E52300C3A817 /* ReprogControls.swift */,
+			);
+			path = Features;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -382,6 +393,7 @@
 				DEF856592A5F2FF400856677 /* ToggleList.swift in Sources */,
 				DE9C87BF2A3A34AA002770AD /* HID++.swift in Sources */,
 				DE9C87CC2A3B8423002770AD /* SupportedDevices.swift in Sources */,
+				DEE2CFDD2A61E52300C3A817 /* ReprogControls.swift in Sources */,
 				DE9C87B82A39BA4D002770AD /* Preferences.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

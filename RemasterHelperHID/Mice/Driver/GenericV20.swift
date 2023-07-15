@@ -40,6 +40,7 @@ class GenericV20Device : Mouse {
     var hid: HIDDevice { backingDevice.hid }
     var index: UInt8 { backingDevice.devIndex }
     
+    
     lazy var fwInfoID: [UInt8]? = {
         let report = Proto.FwVersion.GetInfoID.Call(onDevice: self.backingDevice)
         if report?.isError20 == false {
@@ -61,7 +62,7 @@ class GenericV20Device : Mouse {
         return Data(i[1..<5]).hexDescriptionPacked
     }
     
-    
+    var ReprogrammableKeys: ReprogControls?
     
     @Published var Battery: Battery? = nil
     
@@ -209,6 +210,8 @@ class GenericV20Device : Mouse {
         }
         backingDevice = dev
         
+        Task { ReprogrammableKeys = ReprogControls(backingDevice: self.backingDevice) }
+        
         if let i = dev.GetFeatureIndex(forID: Proto.AdjustableDPI.ID) {
             observers.append(backingDevice.notifier.newObserver(forIndex: i, using: EventDPI))
         }
@@ -225,7 +228,7 @@ class GenericV20Device : Mouse {
             observers.append(backingDevice.notifier.newObserver(forIndex: i, using: EventProfile))
         }
         
-        print("Serial \(Serial)")
+        print(" -- Serial \(Serial)")
     }
     
     deinit {

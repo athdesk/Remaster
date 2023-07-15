@@ -123,13 +123,22 @@ struct HIDPP {
         
     }
 
-    struct Device : Hashable {
+    struct Device : Hashable, Equatable {
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(hid)
+            hasher.combine(devIndex)
+        }
+        
+        static func == (lhs: HIDPP.Device, rhs: HIDPP.Device) -> Bool {
+            lhs.hid == rhs.hid && lhs.devIndex == rhs.devIndex
+        }
+        
         public let hid: HIDDevice
         public let devIndex: UInt8
         public var isStandalone: Bool { devIndex == 0 || devIndex == 255 }
         public lazy var name: String = {
             if isStandalone { return hid.name }
-            return GetName() ?? "1.0 Device"
+            return GetName() ?? "Unknown Device"
         }()
         public lazy var transport: TransportType = {
             if devIndex == 0xff {
@@ -160,7 +169,7 @@ struct HIDPP {
                     //                print("()<--------", recv.reportData.hexDescription)
                     let ppReport = HIDPP.CustomReport(withData: recv.reportData)
                     
-                    guard ppReport.deviceIndex == devIndex else { return }
+                    guard ppReport.deviceIndex == self.devIndex else { return }
                     
                     let e = ppReport.CheckError20()
                     if e != .Success {
@@ -186,11 +195,6 @@ struct HIDPP {
             guard receiveLock.lock(before: .init(timeIntervalSinceNow: timeout)) else { return nil }
             receiveLock.unlock()
             return result
-        }
-        
-        public func hash(into hasher: inout Hasher) {
-            hasher.combine(hid)
-            hasher.combine(devIndex)
         }
         
         init?(dev: HIDDevice, devIndex: UInt8) {

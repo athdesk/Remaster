@@ -81,7 +81,7 @@ class BoltReceiver : Receiver {
                     await MouseTracker.global.removeMouse(withHid: self.backingDevice.hid, index: index)
                 }
                 
-                print("Device with product id \(prodId)", connected ? "connected" : "disconnected")
+                print("[I] Device with product id \(String(format:"%02X", prodId))", connected ? "connected" : "disconnected")
             }
         }
     }}

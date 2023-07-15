@@ -42,6 +42,10 @@ protocol IFeature : RawRepresentable where RawValue == FunctionID {
 fileprivate var StoredFeatureIndexes: Dictionary<HIDPP.Device, Dictionary<FeatureID, FeatureIndex>> = .init()
 fileprivate var StoredFeatureIndexesLock = NSLock()
 
+// This is global for all devices, but it shouldn't matter as we can't ever be making that many calls
+// It's meant to make it possible to parallelize calls without destroying coherency
+fileprivate var callSeq: UInt = 0
+
 extension IFeature {
     static internal var _index: FeatureIndex? { nil }
     
@@ -63,11 +67,13 @@ extension IFeature {
         return f!
     }
     
+    
     func Call(onDevice dev: HIDPP.Device, parameters: [UInt8] = [], timeout: TimeInterval = 1) -> HIDPP.CustomReport? {
         // TODO: make an exception to the default for longer reports
         let t = dev.funcReportType ?? HIDPP.CustomReport.RType.Long
         do {
-            var call = try HIDPP.CustomReport(t, Self.getIndex(dev), self.rawValue, nil, dev.devIndex)
+            var call = try HIDPP.CustomReport(t, Self.getIndex(dev), self.rawValue, UInt8(callSeq), dev.devIndex)
+            callSeq += 1
             call.parameters = parameters
 //            DebugPrint("making call \(self)(\(String(describing: try? Self.getIndex(dev))))@\(dev.hid.name): \(call.unwrap().hexDescription)")
             let r = dev.SendCommand(call, timeout: timeout)
@@ -119,10 +125,10 @@ extension HIDPP {
 //                case DivertedRawXYEvent = 1
 //            };
             
-            case GetControlCount = 0
-            case GetControlInfo = 1
-            case GetControlReporting = 2
-            case SetControlReporting = 3
+            case GetControlCount = 0x0
+            case GetControlInfo = 0x1
+            case GetControlReporting = 0x2
+            case SetControlReporting = 0x3
         }
         
         enum OnboardProfiles: FunctionID, IFeature {
@@ -133,17 +139,17 @@ extension HIDPP {
 //                case CurrentDPIIndexChanged = 1
 //            }
             
-            case GetDescription = 0
-            case SetMode = 1
-            case GetMode = 2
-            case SetCurrentProfile = 3
-            case GetCurrentProfile = 4
-            case MemoryRead = 5
-            case MemoryAddrWrite = 6
-            case MemoryWrite = 7
-            case MemoryWriteEnd = 8
-            case GetCurrentDPIIndex = 11
-            case SetCurrentDPIIndex = 12
+            case GetDescription = 0x0
+            case SetMode = 0x1
+            case GetMode = 0x2
+            case SetCurrentProfile = 0x3
+            case GetCurrentProfile = 0x4
+            case MemoryRead = 0x5
+            case MemoryAddrWrite = 0x6
+            case MemoryWrite = 0x7
+            case MemoryWriteEnd = 0x8
+            case GetCurrentDPIIndex = 0xb
+            case SetCurrentDPIIndex = 0xc
         }
         
         enum FriendlyName: FunctionID, IFeature {
@@ -282,10 +288,11 @@ extension HIDPP.Device {
     
     func GetFeatureIndex(forID f: FeatureID) -> FeatureIndex? {
         let p = f.bigEndian.bytes
-        let report = Proto.IRoot.GetFeature.Call(onDevice: self, parameters: p)
-        if report == nil { return nil }
-        if report?.parameters[0] == 0 { return nil }
-        return FeatureIndex(report!.parameters[0])
+        if let report = Proto.IRoot.GetFeature.Call(onDevice: self, parameters: p) {
+            if report.parameters[0] == 0 || report.isError20 { return nil }
+            return FeatureIndex(report.parameters[0])
+        }
+        return nil
     }
     
     func GetFeature(forIndex i: FeatureIndex) -> (any IFeature.Type)? {

@@ -99,7 +99,6 @@ class MxMaster3SDevice : GenericV20Device {
         }
         _HWheelInvert = inv
         _HWheelDiversion = div
-        print("thumb wheel invert \(inv) divert \(div)")
         return (inv, div)
     }
     
@@ -170,7 +169,6 @@ class MxMaster3SDevice : GenericV20Device {
         _WheelInvert = inv
         _WheelHiRes = res
         _WheelDiversion = div
-//        DebugPrint("inv \(inv) rat \(rat) div \(div) res \(res)")
         return (inv, rat, div, res)
     }
     
