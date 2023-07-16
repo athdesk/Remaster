@@ -10,7 +10,7 @@ import Foundation
 typealias FeatureID = UInt16
 typealias FunctionID = UInt8
 
-struct FeatureIndex : RawRepresentable {
+struct FeatureIndex : RawRepresentable, Hashable {
     typealias RawValue = UInt8
     var rawValue: UInt8
     
@@ -42,9 +42,8 @@ protocol IFeature : RawRepresentable where RawValue == FunctionID {
 fileprivate var StoredFeatureIndexes: Dictionary<HIDPP.Device, Dictionary<FeatureID, FeatureIndex>> = .init()
 fileprivate var StoredFeatureIndexesLock = NSLock()
 
-// This is global for all devices, but it shouldn't matter as we can't ever be making that many calls
 // It's meant to make it possible to parallelize calls without destroying coherency
-fileprivate var callSeq: UInt = 0
+fileprivate var callSeq: [FeatureIndex:UInt] = [:]
 
 extension IFeature {
     static internal var _index: FeatureIndex? { nil }
@@ -72,8 +71,10 @@ extension IFeature {
         // TODO: make an exception to the default for longer reports
         let t = dev.funcReportType ?? HIDPP.CustomReport.RType.Long
         do {
-            var call = try HIDPP.CustomReport(t, Self.getIndex(dev), self.rawValue, UInt8(callSeq & 0xf), dev.devIndex)
-            callSeq += 1
+            let featIndex = try Self.getIndex(dev)
+            let curSeq = callSeq[featIndex] ?? 0
+            var call = HIDPP.CustomReport(t, featIndex, self.rawValue, UInt8(curSeq & 0xf), dev.devIndex)
+            callSeq[featIndex] = curSeq + 1
             call.parameters = parameters
             print("[>] \(call.unwrap().hexDescription)")
             let r = dev.SendCommand(call, timeout: timeout)
