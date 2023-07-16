@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-protocol ReprogChoice : Hashable {
+protocol ReprogChoice : Hashable, Identifiable {
     func str() -> String
 }
 
@@ -31,7 +31,10 @@ struct ReprogSelector<T: ReprogChoice, Content: View>: View {
     }
 }
 
-enum DiversionChoice: ReprogChoice {
+enum DiversionChoice: ReprogChoice, Identifiable {
+    // This is fake, but we don't use IDs with this
+    var id: ObjectIdentifier { ObjectIdentifier(Self.self) }
+    
     case Default
     case Diverted
     
@@ -52,7 +55,7 @@ enum DiversionChoice: ReprogChoice {
     }
 }
 
-struct ToggleList: View {
+struct BasicToggleList: View {
     @ObservedObject var mouse: MouseInterface
     @State private var ssSlider: Float = 0
     
@@ -92,43 +95,31 @@ struct ToggleList: View {
     let divPickerChoices = [DiversionChoice.Default, DiversionChoice.Diverted]
     
     var body: some View {
-        List { // Toggles
-            if let v = mouse.Ratchet {
-                Toggle(isOn: Binding(get: {v}, set: { _ in Task { await mouse.toggleRatchet() } }))
-                    { ListText("Ratchet") }
-                    .animation(.default, value: v)
-                if v && mouse.SmartShift != 0 {
-                    HStack { // SmartShift slider
-                        Image(systemName: "s.circle.fill")
-                            .font(.title3)
-                        Slider(value: $ssSlider, in: ClosedRange(uncheckedBounds: (1, 128)))
-                        { x in if !x { Task.init { await mouse.setSmartShift(UInt(ssSlider)) }}}
-                            .onAppear() { ssSlider = Float(mouse.SmartShift ?? 40) }
-                    }
-                    .padding(8)
+        if let v = mouse.Ratchet {
+            Toggle(isOn: Binding(get: {v}, set: { _ in Task { await mouse.toggleRatchet() } }))
+            { ListText("Ratchet") }
+                .animation(.default, value: v)
+            if v && mouse.SmartShift != 0 {
+                HStack { // SmartShift slider
+                    Image(systemName: "s.circle.fill")
+                        .font(.title3)
+                    Slider(value: $ssSlider, in: ClosedRange(uncheckedBounds: (1, 128)))
+                    { x in if !x { Task.init { await mouse.setSmartShift(UInt(ssSlider)) }}}
+                        .onAppear() { ssSlider = Float(mouse.SmartShift ?? 40) }
                 }
+                .padding(8)
             }
-            if let v = mouse.WheelInvert {
-                Toggle(isOn: Binding(get: {v}, set: { _ in Task { await mouse.toggleWheelInvert() } }))
-                    { ListText("Scroll Wheel Inversion") }
-            }
-            if let v = mouse.WheelHiRes {
-                Toggle(isOn: Binding(get: {v}, set: { _ in Task { await mouse.toggleWheelHiRes() } }))
-                    { ListText("High Resolution Wheel") }
-            }
-            if mouse.WheelHiRes != nil || mouse.WheelInvert != nil || mouse.Ratchet != nil {
-                Divider()
-            }
-            // TODO: add diversion capability checks
-            ReprogSelector(choices: divPickerChoices, selection: selVWheel) {
-                ListText("Scroll Wheel").frame(maxWidth: .infinity, alignment: .leading)
-            }
-            ReprogSelector(choices: divPickerChoices, selection: selHWheel) {
-                ListText("Thumb Wheel").frame(maxWidth: .infinity, alignment: .leading)
-            }
-            ReprogSelector(choices: divPickerChoices, selection: $selGestures) {
-                ListText("Gestures").frame(maxWidth: .infinity, alignment: .leading)
-            }
+        }
+        if let v = mouse.WheelInvert {
+            Toggle(isOn: Binding(get: {v}, set: { _ in Task { await mouse.toggleWheelInvert() } }))
+            { ListText("Scroll Wheel Inversion") }
+        }
+        if let v = mouse.WheelHiRes {
+            Toggle(isOn: Binding(get: {v}, set: { _ in Task { await mouse.toggleWheelHiRes() } }))
+            { ListText("High Resolution Wheel") }
+        }
+        if mouse.WheelHiRes != nil || mouse.WheelInvert != nil || mouse.Ratchet != nil {
+            Spacer()
         }
     }
 }
@@ -136,7 +127,7 @@ struct ToggleList: View {
 struct ToggleList_Previews: PreviewProvider {
     static var previews: some View {
         if let m = MouseTracker.global.mainMouse {
-            ToggleList(mouse: m)
+            BasicToggleList(mouse: m)
         }
     }
 }

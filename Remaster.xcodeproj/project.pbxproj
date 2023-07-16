@@ -36,8 +36,9 @@
 		DEBC420D2A386DDE0054F984 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DEBC420C2A386DDE0054F984 /* Assets.xcassets */; };
 		DEBC42102A386DDE0054F984 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DEBC420F2A386DDE0054F984 /* Preview Assets.xcassets */; };
 		DEDEA4712A5E0C8F00B7A2B3 /* DPIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEDEA4702A5E0C8F00B7A2B3 /* DPIView.swift */; };
+		DEE10C0F2A63F66A002DA924 /* RemapControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEE10C0E2A63F66A002DA924 /* RemapControls.swift */; };
 		DEE2CFDD2A61E52300C3A817 /* ReprogControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEE2CFDC2A61E52300C3A817 /* ReprogControls.swift */; };
-		DEF856592A5F2FF400856677 /* ToggleList.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEF856582A5F2FF400856677 /* ToggleList.swift */; };
+		DEF856592A5F2FF400856677 /* BasicToggleList.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEF856582A5F2FF400856677 /* BasicToggleList.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -97,8 +98,9 @@
 		DEBC420F2A386DDE0054F984 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		DEBC42112A386DDE0054F984 /* Remaster.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Remaster.entitlements; sourceTree = "<group>"; };
 		DEDEA4702A5E0C8F00B7A2B3 /* DPIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DPIView.swift; sourceTree = "<group>"; };
+		DEE10C0E2A63F66A002DA924 /* RemapControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemapControls.swift; sourceTree = "<group>"; };
 		DEE2CFDC2A61E52300C3A817 /* ReprogControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReprogControls.swift; sourceTree = "<group>"; };
-		DEF856582A5F2FF400856677 /* ToggleList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleList.swift; sourceTree = "<group>"; };
+		DEF856582A5F2FF400856677 /* BasicToggleList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicToggleList.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -140,7 +142,8 @@
 				DE07A4FB2A42102000E43C5C /* ConnectedDevices.swift */,
 				DE07A5182A443F3000E43C5C /* Splashscreen.swift */,
 				DEDEA4702A5E0C8F00B7A2B3 /* DPIView.swift */,
-				DEF856582A5F2FF400856677 /* ToggleList.swift */,
+				DEF856582A5F2FF400856677 /* BasicToggleList.swift */,
+				DEE10C0E2A63F66A002DA924 /* RemapControls.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -390,9 +393,10 @@
 				DE9C87C72A3B6EED002770AD /* MouseInterface.swift in Sources */,
 				DE9C87942A38A753002770AD /* RemasterHelperHIDApp.swift in Sources */,
 				DE07A5192A443F3100E43C5C /* Splashscreen.swift in Sources */,
-				DEF856592A5F2FF400856677 /* ToggleList.swift in Sources */,
+				DEF856592A5F2FF400856677 /* BasicToggleList.swift in Sources */,
 				DE9C87BF2A3A34AA002770AD /* HID++.swift in Sources */,
 				DE9C87CC2A3B8423002770AD /* SupportedDevices.swift in Sources */,
+				DEE10C0F2A63F66A002DA924 /* RemapControls.swift in Sources */,
 				DEE2CFDD2A61E52300C3A817 /* ReprogControls.swift in Sources */,
 				DE9C87B82A39BA4D002770AD /* Preferences.swift in Sources */,
 			);

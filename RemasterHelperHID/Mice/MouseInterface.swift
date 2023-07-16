@@ -27,7 +27,9 @@ protocol Mouse : AnyObject, ObservableObject, Identifiable {
     var index: UInt8 { get }
     
     var Serial: String { get }
-
+    
+    var ReprogrammableKeys: ReprogControls? { get }
+    
     var Ratchet: Bool? { get set }
     var SmartShift: UInt? { get set }
     
@@ -85,6 +87,9 @@ actor MouseInterface : ObservableObject, Hashable, Identifiable {
     nonisolated let index: UInt8
     
     nonisolated var Serial: String { mouse.Serial }
+    
+    // This is fine being a nonisolated getter, as its `Keys` property, with which we'll interact, is an actor itself
+    nonisolated var ReprogrammableKeys: ReprogControls? { mouse.ReprogrammableKeys }
     
     nonisolated let SupportedDPI: DPISupport
     nonisolated var Battery: Battery? { mouse.Battery }

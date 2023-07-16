@@ -101,25 +101,27 @@ struct DualListText: View {
 struct InfoList: View {
     @ObservedObject var mouse: MouseInterface
     var body: some View {
-        DualListText("Serial", mouse.Serial)
-        
-        let transport = { () -> String in
-            if case .Receiver(let type) = mouse.transport {
-                return String(describing: type)
-            } else {
-                return String(describing: mouse.transport)
+        List {
+            DualListText("Serial", mouse.Serial)
+            
+            let transport = { () -> String in
+                if case .Receiver(let type) = mouse.transport {
+                    return String(describing: type)
+                } else {
+                    return String(describing: mouse.transport)
+                }
+            }()
+            
+            DualListText("Transport", transport)
+            
+            if let bat = mouse.Battery {
+                DualListText("Battery", bat.Percent.description + (bat.Charging ? "% +" : "%"))
             }
-        }()
-        
-        DualListText("Transport", transport)
-        
-        if let bat = mouse.Battery {
-            DualListText("Battery", bat.Percent.description + (bat.Charging ? "% +" : "%"))
         }
     }
 }
 
-struct DeviceTab: View {
+struct BasicDeviceTab: View {
     @ObservedObject var mouse: MouseInterface
     
     init(_ m : MouseInterface) {
@@ -136,7 +138,7 @@ struct DeviceTab: View {
                 VStack { // Actual Content
                     HStack { // Header
                         Text(mouse.name)
-                            .font(.system(size: 48, weight: .bold, design: .rounded))
+                            .font(.system(size: 40, weight: .bold, design: .rounded))
                             .bold()
                             .fontDesign(.rounded)
                             .minimumScaleFactor(0.4)
@@ -144,35 +146,25 @@ struct DeviceTab: View {
                     }
                     .frame(height: geo.size.height * 0.15)
                     .padding(12)
-                    GeometryReader { geo in
-                        HStack { // Body
-                            ToggleList(mouse: mouse)
-                                .animation(.default, value: mouse.Ratchet)
+                    HStack { // Body
+                        List {
+                            BasicToggleList(mouse: mouse)
                                 .frame(minWidth: 280, maxWidth: 440)
-                            Spacer()
-                            List {
-                                DPIView(mouse: mouse)
-                                Spacer()
-                            }
-                            .frame(minWidth: 240, maxWidth: 400)
-                            .transition(.scale)
-                            Spacer()
-                            if geo.size.width > 840 {
-                                List {
-                                    InfoList(mouse: mouse)
-                                }
-                                .transition(.offset(x: 320, y: 0))
-                                .frame(minWidth: 240, maxWidth: 320)
-                            }
+                            DPIView(mouse: mouse)
+                                .frame(minWidth: 280, maxWidth: 440)
                         }
-                        .animation(.easeIn(duration: 0.1), value: geo.size.width > 840)
-                        .toggleStyle(.switch)
-                        .font(.smallCaps(.title3)())
-                        .scrollContentBackground(.hidden)
-                        .transition(.opacity)
-                        .padding(4)
+                        .animation(.default, value: mouse.Ratchet)
                         Spacer()
+                        InfoList(mouse: mouse)
+                        .frame(minWidth: 240, maxWidth: 400)
+                        .transition(.scale)
                     }
+                    .toggleStyle(.switch)
+                    .font(.smallCaps(.title3)())
+                    .scrollContentBackground(.hidden)
+                    .transition(.opacity)
+                    .padding(4)
+                    Spacer()
                 }
                 .frame(width: geo.size.width, height: geo.size.height)
             }
@@ -220,8 +212,9 @@ struct ConnectedDevices: SettingsTab {
                 }
                 .frame(idealWidth: .infinity, maxWidth: .infinity, idealHeight: .infinity, maxHeight: .infinity)
                 if let m = selectedMouse {
-                    DeviceTab(m)
+                    BasicDeviceTab(m)
                         .transition(.asymmetric(insertion: .push(from: .bottom), removal: .push(from: .top)))
+                        .frame(maxHeight: 360)
                 }
             }
         }
@@ -232,7 +225,7 @@ struct ConnectedDevices: SettingsTab {
 struct ConnectedDevices_Previews: PreviewProvider {
     static var previews: some View {
         if let mouse = MouseTracker.global.mainMouse {
-            DeviceTab(mouse)
+            BasicDeviceTab(mouse)
                 .frame(minWidth: 840, minHeight: 600 * 0.6)
             //        ConnectedDevices(selectedMouse: MouseFactory.sharedInstance.mainMouse)
         }

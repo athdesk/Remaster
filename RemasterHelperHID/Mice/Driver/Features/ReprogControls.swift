@@ -7,7 +7,23 @@
 
 import Foundation
 
-struct ReprogKey {
+// It being a class/actor may not be so bad after all, but struct seems fine until now
+actor ReprogKey : ReprogChoice {
+    static func == (lhs: ReprogKey, rhs: ReprogKey) -> Bool {
+        lhs.hashValue == rhs.hashValue
+    }
+    
+    nonisolated func hash(into hasher: inout Hasher) {
+        hasher.combine(backingDevice)
+        hasher.combine(Index)
+        hasher.combine(ControlID)
+        hasher.combine(TaskID)
+        hasher.combine(Position)
+        hasher.combine(Group)
+        hasher.combine(GroupMask)
+        hasher.combine(Flags)
+    }
+    
     typealias Feature = HIDPP.v20.ReprogControls4
     
     // Key constants
@@ -20,7 +36,7 @@ struct ReprogKey {
     let GroupMask: UInt8
     let Flags: UInt16
     
-    lazy var FriendlyName: String = {
+    nonisolated lazy var FriendlyName: String = {
         if Position == 0 {
             switch Index {
             case 0: return "Left Button"
@@ -31,6 +47,11 @@ struct ReprogKey {
         }
         return "Control \(Position):\(Index)"
     }()
+    
+    // Dirty hack to break the async cycle :crying_face:
+    nonisolated func str() -> String {
+        return FriendlyName
+    }
     
     // Flags easy getters
     var fReprogrammable: Bool { Flags & 0x10 != 0 }
@@ -44,20 +65,30 @@ struct ReprogKey {
     var _rFlags: UInt16 = 0
     
     var rCID: UInt16 {
-        if _rCID != 0 {
-            return _rCID
+        get {
+            if _rCID != 0 {
+                return _rCID
+            }
+            return ControlID
         }
-        return ControlID
+        set {
+            setFields(cid: newValue, flags: rFlags)
+        }
     }
 
     var rFlags: UInt16 {
-        if _rFlags != 0 {
-            return _rFlags
+        get {
+            if _rFlags != 0 {
+                return _rFlags
+            }
+            return Flags
         }
-        return Flags
+        set {
+            setFields(cid: rCID, flags: newValue)
+        }
     }
 
-    mutating private func refreshFields() -> Bool {
+    private func refreshFields() -> Bool {
         guard let report = Feature.GetControlReporting.Call(
             onDevice: backingDevice,
             parameters: ControlID.bytes) else { return false }
@@ -66,13 +97,12 @@ struct ReprogKey {
         guard repCID == ControlID else { return false }
         let mapCID = UInt16([UInt8](report.parameters[3..<5]))!.littleEndian
         let mapFlags = UInt16(report.parameters[2]) + UInt16(report.parameters[5]) << 8
-        print("[D] Mappings for Key \(FriendlyName) are CID \(mapCID), Flags \(mapFlags)")
         _rCID = mapCID
         _rFlags = mapFlags
         return true
     }
 
-    mutating private func setFields(cid: UInt16, flags: UInt16) {
+    private func setFields(cid: UInt16, flags: UInt16) {
         var params: [UInt8] = []
         params.append(contentsOf: ControlID.bytes)
         params.append(UInt8(flags & 0xff))
@@ -93,21 +123,38 @@ struct ReprogKey {
         Group = report.parameters[6]
         GroupMask = report.parameters[7]
         Flags = UInt16(report.parameters[4]) + UInt16(report.parameters[8]) << 8
-
-        if !refreshFields() {
-            print("[E] Error while initializing key \(FriendlyName)")
-        } else {
-            print("[I] Added reprogrammable key \"\(FriendlyName)\"")
+        Task {
+            if await !refreshFields() {
+                print("[E] Error while initializing key \(await FriendlyName)")
+            } else {
+                print("[I] Added reprogrammable key \"\(await FriendlyName)\"")
+            }
         }
     }
 }
 
-class ReprogControls {
+struct ReprogControls {
     typealias Feature = HIDPP.v20.ReprogControls4
     private var backingDevice: HIDPP.Device
-    var KeyCount: UInt8
+    private var KeyCount: UInt8
     var Keys: [ReprogKey] = []
-
+    
+    func getKeyGroup(_ groupID: UInt8) -> [ReprogKey] {
+        var res: [ReprogKey] = []
+        Keys.forEach { k in
+            if k.Group == groupID {
+                res.append(k)
+            }
+        }
+        return res
+    }
+    
+    func getKey(fromCID cid: UInt16) -> ReprogKey? {
+        return Keys.first { k in
+            k.ControlID == cid
+        }
+    }
+    
     init? (backingDevice d: HIDPP.Device) {
         self.backingDevice = d
         guard let report = Feature.GetControlCount.Call(onDevice: d) else { return nil }

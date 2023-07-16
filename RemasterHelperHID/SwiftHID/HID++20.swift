@@ -76,9 +76,9 @@ extension IFeature {
             var call = HIDPP.CustomReport(t, featIndex, self.rawValue, UInt8(curSeq & 0xf), dev.devIndex)
             callSeq[featIndex] = curSeq + 1
             call.parameters = parameters
-            print("[>] \(call.unwrap().hexDescription)")
+//            DebugPrint("[>] \(call.unwrap().hexDescription)")
             let r = dev.SendCommand(call, timeout: timeout)
-            if r != nil { print("[<] \(r!.unwrap().hexDescription)") }
+//            if r != nil { DebugPrint("[<] \(r!.unwrap().hexDescription)") }
             return r
         } catch {
             print("Feature \(self) not supported by \(dev.hid.name)")
