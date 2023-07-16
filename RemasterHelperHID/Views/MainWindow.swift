@@ -11,9 +11,15 @@ protocol SettingsTab : View {
     static var title: String { get }
 }
 
-struct LinkToTab<Tab:SettingsTab>: View {
+struct Link<Tab:SettingsTab>: View {
+    let title: String
     var body: some View {
-        NavigationLink(Tab.title, value: Tab.title)
+        Section {
+            NavigationLink(Tab.title, value: Tab.title)
+        } header: {
+            Text(title)
+                .font(.title2)
+        }
     }
 }
 
@@ -47,12 +53,7 @@ struct MainWindow: View {
         NavigationSplitView()
         {
             List(selection: $sel) {
-                Section {
-                    LinkToTab<ConnectedDevices>()
-                } header: {
-                    Text("Basic Settings")
-                        .font(.title2)
-                }
+                Link<ConnectedDevices>(title: "Basic Settings")
             }
             .toolbar(content: {
                 ToolbarItem(placement: .status) {

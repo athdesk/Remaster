@@ -77,7 +77,9 @@ extension IFeature {
             callSeq[featIndex] = curSeq + 1
             call.parameters = parameters
 //            DebugPrint("[>] \(call.unwrap().hexDescription)")
+            dev.commLock.lock()
             let r = dev.SendCommand(call, timeout: timeout)
+            dev.commLock.unlock()
 //            if r != nil { DebugPrint("[<] \(r!.unwrap().hexDescription)") }
             return r
         } catch {
@@ -252,7 +254,7 @@ extension HIDPP.CustomReport {
 
 extension HIDPP.Device {
     typealias Proto = HIDPP.v20
-
+    
     var protocolVersion: String? { GetProtocolVersion() }
     
     private func GetProtocolVersion() -> String? {

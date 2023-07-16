@@ -134,6 +134,7 @@ struct HIDPP {
         }
         
         public let hid: HIDDevice
+        var commLock = NSLock()
         public let devIndex: UInt8
         public var isStandalone: Bool { devIndex == 0 || devIndex == 255 }
         public lazy var name: String = {
