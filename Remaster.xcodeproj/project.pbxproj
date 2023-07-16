@@ -37,8 +37,9 @@
 		DEBC42102A386DDE0054F984 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DEBC420F2A386DDE0054F984 /* Preview Assets.xcassets */; };
 		DEDEA4712A5E0C8F00B7A2B3 /* DPIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEDEA4702A5E0C8F00B7A2B3 /* DPIView.swift */; };
 		DEE10C0F2A63F66A002DA924 /* RemapControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEE10C0E2A63F66A002DA924 /* RemapControls.swift */; };
+		DEE10C132A641046002DA924 /* ControlRemapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEE10C122A641046002DA924 /* ControlRemapping.swift */; };
 		DEE2CFDD2A61E52300C3A817 /* ReprogControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEE2CFDC2A61E52300C3A817 /* ReprogControls.swift */; };
-		DEF856592A5F2FF400856677 /* BasicToggleList.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEF856582A5F2FF400856677 /* BasicToggleList.swift */; };
+		DEF856592A5F2FF400856677 /* BasicToggles.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEF856582A5F2FF400856677 /* BasicToggles.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -99,8 +100,9 @@
 		DEBC42112A386DDE0054F984 /* Remaster.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Remaster.entitlements; sourceTree = "<group>"; };
 		DEDEA4702A5E0C8F00B7A2B3 /* DPIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DPIView.swift; sourceTree = "<group>"; };
 		DEE10C0E2A63F66A002DA924 /* RemapControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemapControls.swift; sourceTree = "<group>"; };
+		DEE10C122A641046002DA924 /* ControlRemapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlRemapping.swift; sourceTree = "<group>"; };
 		DEE2CFDC2A61E52300C3A817 /* ReprogControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReprogControls.swift; sourceTree = "<group>"; };
-		DEF856582A5F2FF400856677 /* BasicToggleList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicToggleList.swift; sourceTree = "<group>"; };
+		DEF856582A5F2FF400856677 /* BasicToggles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicToggles.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -136,14 +138,10 @@
 		DE07A4F42A41E97E00E43C5C /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				DEE10C112A640FEC002DA924 /* Settings */,
 				DE07A4EF2A41A9C900E43C5C /* Indicators.swift */,
 				DE9C87B32A39113E002770AD /* MenuView.swift */,
-				DE07A4F92A4207FC00E43C5C /* MainWindow.swift */,
-				DE07A4FB2A42102000E43C5C /* ConnectedDevices.swift */,
-				DE07A5182A443F3000E43C5C /* Splashscreen.swift */,
 				DEDEA4702A5E0C8F00B7A2B3 /* DPIView.swift */,
-				DEF856582A5F2FF400856677 /* BasicToggleList.swift */,
-				DEE10C0E2A63F66A002DA924 /* RemapControls.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -242,6 +240,19 @@
 			children = (
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		DEE10C112A640FEC002DA924 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				DE07A4F92A4207FC00E43C5C /* MainWindow.swift */,
+				DEE10C0E2A63F66A002DA924 /* RemapControls.swift */,
+				DEF856582A5F2FF400856677 /* BasicToggles.swift */,
+				DE07A5182A443F3000E43C5C /* Splashscreen.swift */,
+				DE07A4FB2A42102000E43C5C /* ConnectedDevices.swift */,
+				DEE10C122A641046002DA924 /* ControlRemapping.swift */,
+			);
+			path = Settings;
 			sourceTree = "<group>";
 		};
 		DEE2CFDA2A61E50300C3A817 /* Features */ = {
@@ -379,6 +390,7 @@
 				DE9C87C52A3AA5C7002770AD /* Bits.swift in Sources */,
 				DE9C87BB2A39EAC1002770AD /* DeviceMonitor.swift in Sources */,
 				DE07A4FC2A42102000E43C5C /* ConnectedDevices.swift in Sources */,
+				DEE10C132A641046002DA924 /* ControlRemapping.swift in Sources */,
 				DE9C87B42A39113E002770AD /* MenuView.swift in Sources */,
 				DE9C87C12A3A66B4002770AD /* HID++10.swift in Sources */,
 				DE9C87D72A3D261E002770AD /* MxMaster3S.swift in Sources */,
@@ -393,7 +405,7 @@
 				DE9C87C72A3B6EED002770AD /* MouseInterface.swift in Sources */,
 				DE9C87942A38A753002770AD /* RemasterHelperHIDApp.swift in Sources */,
 				DE07A5192A443F3100E43C5C /* Splashscreen.swift in Sources */,
-				DEF856592A5F2FF400856677 /* BasicToggleList.swift in Sources */,
+				DEF856592A5F2FF400856677 /* BasicToggles.swift in Sources */,
 				DE9C87BF2A3A34AA002770AD /* HID++.swift in Sources */,
 				DE9C87CC2A3B8423002770AD /* SupportedDevices.swift in Sources */,
 				DEE10C0F2A63F66A002DA924 /* RemapControls.swift in Sources */,

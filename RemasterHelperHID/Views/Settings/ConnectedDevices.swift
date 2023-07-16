@@ -147,17 +147,18 @@ struct BasicDeviceTab: View {
                     .frame(height: geo.size.height * 0.15)
                     .padding(12)
                     HStack { // Body
+                        Spacer()
                         List {
-                            BasicToggleList(mouse: mouse)
-                                .frame(minWidth: 280, maxWidth: 440)
+                            BasicToggles(mouse: mouse)
                             DPIView(mouse: mouse)
-                                .frame(minWidth: 280, maxWidth: 440)
                         }
+                        .frame(minWidth: 280, maxWidth: 440)
                         .animation(.default, value: mouse.Ratchet)
                         Spacer()
                         InfoList(mouse: mouse)
-                        .frame(minWidth: 240, maxWidth: 400)
+                        .frame(minWidth: 180, maxWidth: 440)
                         .transition(.scale)
+                        Spacer()
                     }
                     .toggleStyle(.switch)
                     .font(.smallCaps(.title3)())

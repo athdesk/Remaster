@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct BasicToggleList: View {
+struct BasicToggles: View {
     @ObservedObject var mouse: MouseInterface
     @State private var ssSlider: Float = 0
 
@@ -44,7 +44,7 @@ struct BasicToggleList: View {
 struct ToggleList_Previews: PreviewProvider {
     static var previews: some View {
         if let m = MouseTracker.global.mainMouse {
-            BasicToggleList(mouse: m)
+            BasicToggles(mouse: m)
         }
     }
 }

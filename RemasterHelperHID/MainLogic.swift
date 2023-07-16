@@ -8,9 +8,8 @@
 import Foundation
 import IOKit.hid
 
+fileprivate let hidMonitor = HIDDeviceMonitor(RemasterDevice.SupportedDevices, reportSize: 64)
 func start() {
-    let hidMonitor = HIDDeviceMonitor(RemasterDevice.SupportedDevices, reportSize: 64)
-
     Task {
         await hidMonitor.start()
     }
