@@ -72,19 +72,16 @@ struct ReprogKey {
         return true
     }
 
-    // TODO: figure out why this does not work
     mutating private func setFields(cid: UInt16, flags: UInt16) {
         var params: [UInt8] = []
         params.append(contentsOf: ControlID.bytes)
         params.append(UInt8(flags & 0xff))
         params.append(contentsOf: cid.bytes)
         params.append(UInt8(flags >> 8))
-        print("[setting fields] \(Data(params).hexDescription)")
-        
-        
-        let _ = Feature.SetControlReporting.Call(
+
+        _ = Feature.SetControlReporting.Call(
             onDevice: backingDevice,
-            parameters: ControlID.bytes)
+            parameters: params)
     }
     
     init(withDevice dev: HIDPP.Device, report: HIDPP.CustomReport, index i: UInt8) {

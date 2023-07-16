@@ -72,12 +72,12 @@ extension IFeature {
         // TODO: make an exception to the default for longer reports
         let t = dev.funcReportType ?? HIDPP.CustomReport.RType.Long
         do {
-            var call = try HIDPP.CustomReport(t, Self.getIndex(dev), self.rawValue, UInt8(callSeq), dev.devIndex)
+            var call = try HIDPP.CustomReport(t, Self.getIndex(dev), self.rawValue, UInt8(callSeq & 0xf), dev.devIndex)
             callSeq += 1
             call.parameters = parameters
-//            DebugPrint("making call \(self)(\(String(describing: try? Self.getIndex(dev))))@\(dev.hid.name): \(call.unwrap().hexDescription)")
+            print("[>] \(call.unwrap().hexDescription)")
             let r = dev.SendCommand(call, timeout: timeout)
-//            DebugPrint("response \(self)@\(dev.hid.name): \(r?.unwrap().hexDescription ?? "bad")")
+            if r != nil { print("[<] \(r!.unwrap().hexDescription)") }
             return r
         } catch {
             print("Feature \(self) not supported by \(dev.hid.name)")
