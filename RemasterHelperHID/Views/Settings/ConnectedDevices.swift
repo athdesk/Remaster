@@ -91,6 +91,7 @@ struct DualListText: View {
             Spacer()
             ListText(text2)
         }
+        .listRowSeparator(.hidden)
     }
     init(_ leftText: String, _ rightText: String) {
         text1 = leftText
@@ -150,7 +151,9 @@ struct BasicDeviceTab: View {
                         Spacer()
                         List {
                             BasicToggles(mouse: mouse)
+                                .listRowSeparator(.hidden)
                             DPIView(mouse: mouse)
+                                .listRowSeparator(.hidden)
                         }
                         .frame(minWidth: 280, maxWidth: 440)
                         .animation(.default, value: mouse.Ratchet)
@@ -228,7 +231,8 @@ struct ConnectedDevices_Previews: PreviewProvider {
         if let mouse = MouseTracker.global.mainMouse {
             BasicDeviceTab(mouse)
                 .frame(minWidth: 840, minHeight: 600 * 0.6)
-            //        ConnectedDevices(selectedMouse: MouseFactory.sharedInstance.mainMouse)
+        } else {
+            Text("No mouse")
         }
     }
 }

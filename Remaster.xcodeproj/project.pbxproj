@@ -15,6 +15,7 @@
 		DE07A5192A443F3100E43C5C /* Splashscreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE07A5182A443F3000E43C5C /* Splashscreen.swift */; };
 		DE07A51B2A44445E00E43C5C /* Receiver.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE07A51A2A44445E00E43C5C /* Receiver.swift */; };
 		DE4A9B4B2A3E056A007B5F7A /* MxMaster2S.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4A9B4A2A3E056A007B5F7A /* MxMaster2S.swift */; };
+		DE7FE8852A98FDC3009C66D5 /* AlertCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE7FE8842A98FDC3009C66D5 /* AlertCard.swift */; };
 		DE9C87942A38A753002770AD /* RemasterHelperHIDApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9C87932A38A753002770AD /* RemasterHelperHIDApp.swift */; };
 		DE9C87982A38A755002770AD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DE9C87972A38A755002770AD /* Assets.xcassets */; };
 		DE9C87A72A38A918002770AD /* libhidpp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DE1D62112A388A09009DAA65 /* libhidpp.a */; };
@@ -75,6 +76,7 @@
 		DE07A51A2A44445E00E43C5C /* Receiver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Receiver.swift; sourceTree = "<group>"; };
 		DE1D620C2A388A09009DAA65 /* hidpp.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = hidpp.xcodeproj; path = ../hidpp/hidpp.xcodeproj; sourceTree = "<group>"; };
 		DE4A9B4A2A3E056A007B5F7A /* MxMaster2S.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MxMaster2S.swift; sourceTree = "<group>"; };
+		DE7FE8842A98FDC3009C66D5 /* AlertCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertCard.swift; sourceTree = "<group>"; };
 		DE9C87912A38A753002770AD /* RemasterHelperHID.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RemasterHelperHID.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DE9C87932A38A753002770AD /* RemasterHelperHIDApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemasterHelperHIDApp.swift; sourceTree = "<group>"; };
 		DE9C87972A38A755002770AD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -251,6 +253,7 @@
 				DE07A5182A443F3000E43C5C /* Splashscreen.swift */,
 				DE07A4FB2A42102000E43C5C /* ConnectedDevices.swift */,
 				DEE10C122A641046002DA924 /* ControlRemapping.swift */,
+				DE7FE8842A98FDC3009C66D5 /* AlertCard.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -392,6 +395,7 @@
 				DE07A4FC2A42102000E43C5C /* ConnectedDevices.swift in Sources */,
 				DEE10C132A641046002DA924 /* ControlRemapping.swift in Sources */,
 				DE9C87B42A39113E002770AD /* MenuView.swift in Sources */,
+				DE7FE8852A98FDC3009C66D5 /* AlertCard.swift in Sources */,
 				DE9C87C12A3A66B4002770AD /* HID++10.swift in Sources */,
 				DE9C87D72A3D261E002770AD /* MxMaster3S.swift in Sources */,
 				DE4A9B4B2A3E056A007B5F7A /* MxMaster2S.swift in Sources */,

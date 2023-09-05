@@ -11,18 +11,6 @@ protocol SettingsTab : View {
     static var title: String { get }
 }
 
-struct Link<Tab:SettingsTab>: View {
-    let title: String
-    var body: some View {
-        Section {
-            NavigationLink(Tab.title, value: Tab.title)
-        } header: {
-            Text(title)
-                .font(.title2)
-        }
-    }
-}
-
 struct WelcomeScreen: SettingsTab {
     static let title = "WelcomeScreen"
     var body: some View {
@@ -53,7 +41,13 @@ struct MainWindow: View {
         NavigationSplitView()
         {
             List(selection: $sel) {
-                Link<ConnectedDevices>(title: "Basic Settings")
+                Section {
+                    NavigationLink(ConnectedDevices.title, value: ConnectedDevices.title)
+                    NavigationLink(ControlRemapping.title, value: ControlRemapping.title)
+                } header: {
+                    Text("Basic Settings")
+                        .font(.title2)
+                }
             }
             .toolbar(content: {
                 ToolbarItem(placement: .status) {
@@ -81,6 +75,8 @@ struct MainWindow: View {
             Splashscreen(artActive) {
                 ZStack{
                     // this lets contents be saved, use a switch if this is too heavy
+                    ControlRemapping()
+                        .opacity(sel == ControlRemapping.title ? 1 : 0)
                     ConnectedDevices()
                         .opacity(sel == ConnectedDevices.title ? 1 : 0)
                     WelcomeScreen()
@@ -89,8 +85,8 @@ struct MainWindow: View {
             }
             .transition(.scale)
             .contentTransition(.interpolate)
+            .animation(.linear(duration: 0.1), value: sel)
         }
-        .animation(.linear(duration: 0.1), value: sel)
         .navigationTitle("")
         .frame(minWidth: 840, minHeight: 600)
     }

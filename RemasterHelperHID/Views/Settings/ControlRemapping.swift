@@ -7,58 +7,77 @@
 
 import SwiftUI
 
-struct ControlRemapping: View {
-    static let title = "Programmable Keys"
+protocol SidebarChoice : Identifiable, Equatable {
+    var content: String { get }
+}
+
+struct FixedSidebarView<Choice: SidebarChoice, Content: View>: View {
+    init(choices: [Choice], widthPercent: CGFloat = 0.4, @ViewBuilder _ content: @escaping (Choice?) -> Content) {
+        self.sidebarChoices = choices
+        self.sidebarSize = widthPercent
+        contentBuilder = content
+    }
     
-    @ObservedObject var factory = MouseTracker.global
-    @State private var selectedMouse: MouseInterface? = nil
+    let sidebarSize: CGFloat
+    let sidebarChoices: [Choice]
+    private let contentBuilder: (Choice?) -> Content
+    @State private var selected: Choice? = nil
+
     
     var body: some View {
+        let content: Content = contentBuilder(selected)
         GeometryReader { geo in
-            VStack(alignment: .center, spacing: 0) {
-                ScrollView(.horizontal) {
-                    HStack(alignment: .center) {
-                        HStack { // Need it twice to apply a frame, because variable .padding makes the text in the card glitch
-                            ForEach(factory.mice, id: \.hashValue) { v in
-                                Button {
-                                    if selectedMouse === v {
-                                        selectedMouse = nil
-                                    } else {
-                                        selectedMouse = v
-                                    }
-                                } label: {
-                                    DeviceCard(mouse: v, activeMouse: selectedMouse)
-                                }
-                                .transition(.asymmetric(insertion: .push(from: .bottom), removal: .push(from: .top)))
-                                .onDisappear {
-                                    // This fixes a retain cycle in case the selected mouse gets removed
-                                    if !factory.mice.contains(where: { m in  m === selectedMouse }) {
-                                        selectedMouse = nil
-                                    }
-                                }
-                            }
-                        }
-                        .frame(minWidth: geo.size.width, minHeight: geo.size.height * 0.4, maxHeight: geo.size.height * 0.7, alignment: .center)
+            HStack {
+                List {
+                    ForEach(sidebarChoices) { cur in
+                        Button(action: { selected = selected == cur ? nil : selected },
+                        label: {
+                            Text(cur.content)
+                        })
+                        .buttonStyle(.plain)
+                        .font(.smallCaps(.title2)())
+                        .foregroundStyle(cur != selected ? .primary : .secondary)
+                        .tint(.accentColor)
+                        .onDisappear(perform: { selected = selected == cur ? nil : selected })
                     }
-                    .buttonStyle(.plain)
-                    .padding(12)
-                    .frame(minWidth: geo.size.width, minHeight: geo.size.height * 0.4, maxHeight: geo.size.height, alignment: .center)
-                    .animation(.easeInOut, value: factory.mice.count)
                 }
-                .frame(idealWidth: .infinity, maxWidth: .infinity, idealHeight: .infinity, maxHeight: .infinity)
-                if let m = selectedMouse {
-                    BasicDeviceTab(m)
-                        .transition(.asymmetric(insertion: .push(from: .bottom), removal: .push(from: .top)))
-                        .frame(maxHeight: 360)
-                }
+                .padding(.all, 12)
+                .scrollContentBackground(.hidden)
+                .background(.thinMaterial)
+                .frame(width: geo.size.width * sidebarSize, height: geo.size.height)
+                
+                content.padding(.all, 12)
             }
+
         }
-        .animation(.easeInOut, value: selectedMouse)
     }
 }
 
-//struct ControlRemapping_Previews: PreviewProvider {
-//    static var previews: some View {
-//        ControlRemapping()
-//    }
-//}
+struct ControlRemapping: SettingsTab {
+    static let title = "Reprogrammable Keys"
+    @ObservedObject var factory = MouseTracker.global
+
+    var body: some View {
+        VStack {
+            if factory.mice.count > 0 {
+                FixedSidebarView(choices: factory.mice) { sel in
+                    Text(sel?.name ?? "No selection")
+                }
+            } else {
+                AlertCard(symbol: "exclamationmark.triangle", description: "Connect a device")
+            }
+        }
+        .animation(.default, value: factory.mice.count)
+    }
+}
+
+extension MouseInterface : SidebarChoice {
+    nonisolated var content: String { self.name }
+}
+
+struct ControlRemapping_Previews: PreviewProvider {
+    static var previews: some View {
+        ControlRemapping()
+            .frame(width: 600, height: 400)
+    }
+}

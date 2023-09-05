@@ -74,7 +74,8 @@ extension IFeature {
             let featIndex = try Self.getIndex(dev)
             let curSeq = callSeq[featIndex] ?? 0
             var call = HIDPP.CustomReport(t, featIndex, self.rawValue, UInt8(curSeq & 0xf), dev.devIndex)
-            callSeq[featIndex] = curSeq + 1
+//            if callSeq.s
+//            callSeq[featIndex] = curSeq + 1
             call.parameters = parameters
 //            DebugPrint("[>] \(call.unwrap().hexDescription)")
             dev.commLock.lock()
